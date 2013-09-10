@@ -40,6 +40,7 @@
     <repository>mvn:ddf.security.pep/security-pep-app/${project.version}/xml/features</repository>
 	<repository>mvn:ddf.security.pdp/security-pdp-app/${project.version}/xml/features</repository>
 	<repository>mvn:ddf.catalog.plugin/catalog-federationreplication-app/${project.version}/xml/features</repository>
+    <repository>mvn:io.hawt/hawtio-karaf/1.2-M16/xml/features</repository>
 
 	<feature name="ddf-framework" version="${project.version}"
 		description="Default features of DDF out-of-the-box.  
