@@ -10,35 +10,7 @@
  *
  **/
 
- // create our angular module and tell angular what route(s) it will handle
-
- var simplePlugin = angular.module('admin_plugin', ['hawtioCore'])
-   .config(function($routeProvider) {
-     $routeProvider.
-       when('/admin_plugin', {
-           templateUrl: '../hawtio/ui-admin-example/admin.html'
-         });
-   })
-
-
- simplePlugin.run(function(workspace, viewRegistry, layoutFull) {
-
-     // tell the app to use the full layout, also could use layoutTree
-     // to get the JMX tree or provide a URL to a custom layout
-     viewRegistry["admin_plugin"] = layoutFull;
-
-     // Set up top-level link to our plugin
-     workspace.topLevelTabs.push({
-       content: "Admin",
-       title: "Admin plugin loaded dynamically",
-       isValid: function() { return true; },
-       href: function() { return "#/admin_plugin"; },
-       isActive: function() { return workspace.isLinkActive("admin_plugin"); }
-
-     });
-
-   });
-
- // tell the hawtio plugin loader about our plugin so it can be
- // bootstrapped with the rest of angular
- hawtioPluginLoader.addModule('admin_plugin');
+function hello()
+{
+    alert("Hello World!");
+}
