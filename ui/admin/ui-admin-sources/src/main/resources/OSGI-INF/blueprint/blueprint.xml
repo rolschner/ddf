@@ -11,14 +11,14 @@
  *
  **/
  -->
-<features name="${project.artifactId}-${project.version}">
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+           xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0">
 
-    <repository>mvn:io.hawt/hawtio-karaf/1.2-M16/xml/features</repository>
+    <bean id="sources_plugin" class="io.hawt.web.plugin.HawtioPlugin" init-method="init" destroy-method="destroy">
+        <property name="name" value="${plugin-name}"/>
+        <property name="context" value="${plugin-context}"/>
+        <property name="domain" value="${plugin-domain}"/>
+        <property name="scripts" value="${plugin-scripts}"/>
+    </bean>
 
-    <feature name="ui-admin" version="${project.version}" description="Admin UI">
-        <feature>hawtio</feature>
-        <bundle>mvn:ddf.ui.admin/ui-admin-example/${project.version}/war</bundle>
-        <bundle>mvn:ddf.ui.admin/ui-admin-sources/${project.version}/war</bundle>
-    </feature>
-
-</features>
+</blueprint>
