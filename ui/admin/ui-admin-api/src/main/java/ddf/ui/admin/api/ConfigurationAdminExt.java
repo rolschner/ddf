@@ -25,6 +25,7 @@ import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.cm.ManagedServiceFactory;
+import org.osgi.service.metatype.AttributeDefinition;
 import org.osgi.service.metatype.MetaTypeInformation;
 import org.osgi.service.metatype.MetaTypeService;
 import org.osgi.service.metatype.ObjectClassDefinition;
@@ -33,6 +34,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.ext.XLogger;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -41,8 +43,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 
 class ConfigurationAdminExt
@@ -458,73 +458,85 @@ class ConfigurationAdminExt
     {
         try
         {
-            // start with ManagedService instances
-            Map optionsPlain = getServices(ManagedService.class.getName(), pidFilter, true);
-
-            // next are the MetaType informations without ManagedService
-            addMetaTypeNames(optionsPlain, getPidObjectClasses(), pidFilter, Constants.SERVICE_PID);
-
-            // add in existing configuration (not duplicating ManagedServices)
-            Configuration[] cfgs = this.service.listConfigurations(pidFilter);
+            // Get ManagedService instances
+            List<Map<String, Object>> serviceList = getServices(ManagedService.class.getName(), pidFilter, true);
+            json.addAll(serviceList);
+            // Get Metatypes
+            List<Map<String, Object>> metatypeList = addMetaTypeNamesToMap(getPidObjectClasses(), pidFilter, Constants.SERVICE_PID);
+            json.addAll(metatypeList);
+            // Get configurations
+            Configuration[] cfgs = service.listConfigurations(pidFilter);
             for (int i = 0; cfgs != null && i < cfgs.length; i++)
             {
 
                 // ignore configuration object if an entry already exists in the map
                 // or if it is invalid
                 final String pid = cfgs[i].getPid();
-                if (optionsPlain.containsKey(pid) || !isAllowedPid(pid))
+                if(!isAllowedPid(pid))
                 {
                     continue;
                 }
+                else
+                {
+                    boolean skip = false;
+                    for(Map<String, Object> data : json)
+                    {
+                        if(data.get("id").equals(pid))
+                        {
+                            skip = true;
+                        }
+                    }
+                    if(skip)
+                    {
+                        continue;
+                    }
+                }
 
-                // insert and entry for the PID
+                // insert an entry for the PID
                 try
                 {
                     ObjectClassDefinition ocd = getObjectClassDefinition(cfgs[i]);
                     if (ocd != null)
                     {
-                        optionsPlain.put(pid, ocd.getName());
+                        Map<String, Object> data = new HashMap<String, Object>();
+                        data.put("id", pid);
+                        data.put("name", ocd.getName());
+                        json.add(data);
                         continue;
                     }
                 }
                 catch (IllegalArgumentException t)
                 {
-                    // MetaTypeProvider.getObjectClassDefinition might throw illegal
-                    // argument exception. So we must catch it here, otherwise the
-                    // other configurations will not be shown
-                    // See https://issues.apache.org/jira/browse/FELIX-2390
+                    // Catch exception thrown by getObjectClassDefinition so other configurations are displayed
                 }
 
                 // no object class definition, use plain PID
-                optionsPlain.put(pid, pid);
+                Map<String, Object> data = new HashMap<String, Object>();
+                data.put("id", pid);
+                data.put("name", pid);
+                json.add(data);
             }
 
-            for (Iterator ii = optionsPlain.keySet().iterator(); ii.hasNext(); )
+            // add configuration data
+            for(Map<String, Object> data : json)
             {
-                String id = (String) ii.next();
-                Object name = optionsPlain.get(id);
-
-                final Configuration config = this.getConfiguration(id);
-                Map<String, Object> data = new HashMap<String, Object>(); //
-                data.put("id", id); 
-                data.put("name", name); 
+                Object id = data.get("id");
+                final Configuration config = this.getConfiguration((String) id);
                 if (null != config)
                 {
                     final String fpid = config.getFactoryPid();
                     if (null != fpid)
                     {
-                        data.put("fpid", fpid); 
+                        data.put("fpid", fpid);
                     }
 
                     final Bundle bundle = getBoundBundle(config);
                     if (null != bundle)
                     {
-                        data.put("bundle", bundle.getBundleId()); 
-                        data.put("bundle_name", getName(bundle)); 
+                        data.put("bundle", bundle.getBundleId());
+                        data.put("bundle_name", getName(bundle));
                     }
                 }
-
-                json.add(data); 
             }
         }
         catch (Exception e)
@@ -816,20 +828,13 @@ class ConfigurationAdminExt
     {
         try
         {
-            final Map optionsFactory = getServices(ManagedServiceFactory.class.getName(),
+            List<Map<String, Object>> serviceList = getServices(ManagedServiceFactory.class.getName(),
                     pidFilter, true);
-            addMetaTypeNames(optionsFactory, getFactoryPidObjectClasses(), pidFilter,
+            List<Map<String, Object>> metatypeList = addMetaTypeNamesToMap(getFactoryPidObjectClasses(), pidFilter,
                     ConfigurationAdmin.SERVICE_FACTORYPID);
 
-            for (Iterator ii = optionsFactory.keySet().iterator(); ii.hasNext(); )
-            {
-                String id = (String) ii.next();
-                Object name = optionsFactory.get(id);
-                Map<String, Object> jsonMap = new HashMap<String, Object>();
-                jsonMap.put("id", id);
-                jsonMap.put("name", name);
-                json.add(jsonMap);
-            }
+            json.addAll(serviceList);
+            json.addAll(metatypeList);
         }
         catch (Exception e)
         {
@@ -850,11 +855,10 @@ class ConfigurationAdminExt
         return getObjectClassDefinitions(FACTORY_PID_GETTER);
     }
 
-    SortedMap getServices(String serviceClass, String serviceFilter,
+    List<Map<String, Object>> getServices(String serviceClass, String serviceFilter,
                           boolean ocdRequired) throws InvalidSyntaxException
     {
-        // sorted map of options
-        SortedMap optionsFactory = new TreeMap(String.CASE_INSENSITIVE_ORDER);
+        List<Map<String, Object>> serviceList = new ArrayList<Map<String, Object>>();
 
         // find all ManagedServiceFactories to get the factoryPIDs
         ServiceReference[] refs = this.getBundleContext().getServiceReferences(serviceClass, serviceFilter);
@@ -876,15 +880,18 @@ class ConfigurationAdminExt
 
                 if (haveOcd)
                 {
-                    optionsFactory.put(pid, name);
+                    Map<String, Object> service = new HashMap<String, Object>();
+                    service.put("id", pid);
+                    service.put("name", name);
+                    serviceList.add(service);
                 }
             }
         }
 
-        return optionsFactory;
+        return serviceList;
     }
 
-    private void addMetaTypeNames(final Map pidMap, final Map ocdCollection, final String filterSpec, final String type)
+    private List<Map<String, Object>> addMetaTypeNamesToMap(final Map ocdCollection, final String filterSpec, final String type)
     {
         Filter filter = null;
         if (filterSpec != null)
@@ -899,6 +906,7 @@ class ConfigurationAdminExt
             }
         }
 
+        List<Map<String, Object>> metatypeList = new ArrayList<Map<String, Object>>();
         for (Iterator ei = ocdCollection.entrySet().iterator(); ei.hasNext(); )
         {
             Entry ociEntry = (Entry) ei.next();
@@ -906,7 +914,12 @@ class ConfigurationAdminExt
             final ObjectClassDefinition ocd = (ObjectClassDefinition) ociEntry.getValue();
             if (filter == null)
             {
-                pidMap.put(pid, ocd.getName());
+                Map<String, Object> metatype = new HashMap<String, Object>();
+                metatype.put("id", pid);
+                metatype.put("name", ocd.getName());
+                AttributeDefinition[] defs = ocd.getAttributeDefinitions(ObjectClassDefinition.ALL);
+                metatype.put("metatype", createMetatypeMap(defs));
+                metatypeList.add(metatype);
             }
             else
             {
@@ -914,10 +927,39 @@ class ConfigurationAdminExt
                 props.put(type, pid);
                 if (filter.match(props))
                 {
-                    pidMap.put(pid, ocd.getName());
+                    Map<String, Object> metatype = new HashMap<String, Object>();
+                    metatype.put("id", pid);
+                    metatype.put("name", ocd.getName());
+                    AttributeDefinition[] defs = ocd.getAttributeDefinitions(ObjectClassDefinition.ALL);
+                    metatype.put("metatype", createMetatypeMap(defs));
+                    metatypeList.add(metatype);
                 }
             }
         }
+        return metatypeList;
+    }
+
+    private Map<String, Object> createMetatypeMap(AttributeDefinition[] definitions)
+    {
+        Map<String, Object> metatypeMap = new HashMap<String, Object>();
+
+        if(definitions != null)
+        {
+            for(AttributeDefinition definition : definitions)
+            {
+                Map<String, Object> attributeMap = new HashMap<String, Object>();
+                attributeMap.put("name", definition.getName());
+                attributeMap.put("cardinality", definition.getCardinality());
+                attributeMap.put("defaultValue", definition.getDefaultValue());
+                attributeMap.put("description", definition.getDescription());
+                attributeMap.put("type", definition.getType());
+                attributeMap.put("optionLabels", definition.getOptionLabels());
+                attributeMap.put("optionValues", definition.getOptionValues());
+                metatypeMap.put(definition.getID(), attributeMap);
+            }
+        }
+
+        return metatypeMap;
     }
 
     private static class PlaceholderConfiguration implements Configuration

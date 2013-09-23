@@ -51,6 +51,7 @@ public class ConfigurationAdmin implements ConfigurationAdminMBean
     private BundleContext bundleContext;
     private ObjectName objectName;
     private MBeanServer mBeanServer;
+    private List<String> filterList;
 
     /**
      * Constructs a ConfigurationAdmin implementation
@@ -115,8 +116,6 @@ public class ConfigurationAdmin implements ConfigurationAdminMBean
     {
         List<Map<String, Object>> factoryConfigurations = listFactoryConfigurations(getDefaultLdapFilter());
 
-
-
         return factoryConfigurations;
     }
 
@@ -157,36 +156,30 @@ public class ConfigurationAdmin implements ConfigurationAdminMBean
 
     private String getDefaultLdapFilter()
     {
-        List<String> configList = new ArrayList<String>(); //this will be created from the metatype eventually
-        configList.add("DDMS_MDC_JSON_Service");
-        configList.add("DDMS_SOAP_Service");
-        configList.add("DIB_1.3_SOAP_Connected_Source");
-        configList.add("DIB_2.0_MDC_Connected_Source");
-        configList.add("DIB_2.0_MDC_Query_Service");
-        configList.add("MDF_JSON_Connected_Source");
-        configList.add("CDDAOpenSearchSource");
-        configList.add("OpenSearchSource");
-
-        StringBuilder ldapFilter = new StringBuilder();
-        ldapFilter.append("(");
-        ldapFilter.append("|");
-
-        for(String fpid : configList)
+        if(filterList != null)
         {
+            StringBuilder ldapFilter = new StringBuilder();
             ldapFilter.append("(");
-            ldapFilter.append(SERVICE_FACTORYPID);
-            ldapFilter.append("=");
-            ldapFilter.append(fpid);
+            ldapFilter.append("|");
+
+            for(String fpid : filterList)
+            {
+                ldapFilter.append("(");
+                ldapFilter.append(SERVICE_FACTORYPID);
+                ldapFilter.append("=");
+                ldapFilter.append(fpid);
+                ldapFilter.append(")");
+            }
+
             ldapFilter.append(")");
+
+            return ldapFilter.toString();
         }
-
-        ldapFilter.append(")");
-
-        return ldapFilter.toString();
+        return "("+SERVICE_FACTORYPID+"="+"*)";
     }
 
     /**
-     * @see org.osgi.jmx.service.cm.ConfigurationAdminMBean#createFactoryConfiguration(java.lang.String)
+     * @see ddf.ui.admin.api.ConfigurationAdminMBean#createFactoryConfiguration(java.lang.String)
      */
     public String createFactoryConfiguration(String factoryPid) throws IOException
     {
@@ -194,7 +187,7 @@ public class ConfigurationAdmin implements ConfigurationAdminMBean
     }
 
     /**
-     * @see org.osgi.jmx.service.cm.ConfigurationAdminMBean#createFactoryConfigurationForLocation(java.lang.String, java.lang.String)
+     * @see ddf.ui.admin.api.ConfigurationAdminMBean#createFactoryConfigurationForLocation(java.lang.String, java.lang.String)
      */
     public String createFactoryConfigurationForLocation(String factoryPid, String location) throws IOException {
         if (factoryPid == null || factoryPid.length() < 1) {
@@ -206,14 +199,14 @@ public class ConfigurationAdmin implements ConfigurationAdminMBean
     }
 
     /**
-     * @see org.osgi.jmx.service.cm.ConfigurationAdminMBean#delete(java.lang.String)
+     * @see ddf.ui.admin.api.ConfigurationAdminMBean#delete(java.lang.String)
      */
     public void delete(String pid) throws IOException {
         deleteForLocation(pid, null);
     }
 
     /**
-     * @see org.osgi.jmx.service.cm.ConfigurationAdminMBean#deleteForLocation(java.lang.String, java.lang.String)
+     * @see ddf.ui.admin.api.ConfigurationAdminMBean#deleteForLocation(java.lang.String, java.lang.String)
      */
     public void deleteForLocation(String pid, String location) throws IOException {
         if (pid == null || pid.length() < 1) {
@@ -224,7 +217,7 @@ public class ConfigurationAdmin implements ConfigurationAdminMBean
     }
 
     /**
-     * @see org.osgi.jmx.service.cm.ConfigurationAdminMBean#deleteConfigurations(java.lang.String)
+     * @see ddf.ui.admin.api.ConfigurationAdminMBean#deleteConfigurations(java.lang.String)
      */
     public void deleteConfigurations(String filter) throws IOException {
         if (filter == null || filter.length() < 1) {
@@ -244,7 +237,7 @@ public class ConfigurationAdmin implements ConfigurationAdminMBean
     }
 
     /**
-     * @see org.osgi.jmx.service.cm.ConfigurationAdminMBean#getBundleLocation(java.lang.String)
+     * @see ddf.ui.admin.api.ConfigurationAdminMBean#getBundleLocation(java.lang.String)
      */
     public String getBundleLocation(String pid) throws IOException {
         if (pid == null || pid.length() < 1) {
@@ -256,7 +249,7 @@ public class ConfigurationAdmin implements ConfigurationAdminMBean
     }
 
     /**
-     * @see org.osgi.jmx.service.cm.ConfigurationAdminMBean#getConfigurations(java.lang.String)
+     * @see ddf.ui.admin.api.ConfigurationAdminMBean#getConfigurations(java.lang.String)
      */
     public String[][] getConfigurations(String filter) throws IOException {
         if (filter == null || filter.length() < 1) {
@@ -278,14 +271,14 @@ public class ConfigurationAdmin implements ConfigurationAdminMBean
     }
 
     /**
-     * @see org.osgi.jmx.service.cm.ConfigurationAdminMBean#getFactoryPid(java.lang.String)
+     * @see ddf.ui.admin.api.ConfigurationAdminMBean#getFactoryPid(java.lang.String)
      */
     public String getFactoryPid(String pid) throws IOException {
         return getFactoryPidForLocation(pid, null);
     }
 
     /**
-     * @see org.osgi.jmx.service.cm.ConfigurationAdminMBean#getFactoryPidForLocation(java.lang.String, java.lang.String)
+     * @see ddf.ui.admin.api.ConfigurationAdminMBean#getFactoryPidForLocation(java.lang.String, java.lang.String)
      */
     public String getFactoryPidForLocation(String pid, String location) throws IOException {
         if (pid == null || pid.length() < 1) {
@@ -296,14 +289,14 @@ public class ConfigurationAdmin implements ConfigurationAdminMBean
     }
 
     /**
-     * @see org.osgi.jmx.service.cm.ConfigurationAdminMBean#getProperties(java.lang.String)
+     * @see ddf.ui.admin.api.ConfigurationAdminMBean#getProperties(java.lang.String)
      */
     public TabularData getProperties(String pid) throws IOException {
         return getPropertiesForLocation(pid, null);
     }
 
     /**
-     * @see org.osgi.jmx.service.cm.ConfigurationAdminMBean#getPropertiesForLocation(java.lang.String, java.lang.String)
+     * @see ddf.ui.admin.api.ConfigurationAdminMBean#getPropertiesForLocation(java.lang.String, java.lang.String)
      */
     @SuppressWarnings("unchecked")
     public TabularData getPropertiesForLocation(String pid, String location) throws IOException {
@@ -325,7 +318,7 @@ public class ConfigurationAdmin implements ConfigurationAdminMBean
     }
 
     /**
-     * @see org.osgi.jmx.service.cm.ConfigurationAdminMBean#setBundleLocation(java.lang.String, java.lang.String)
+     * @see ddf.ui.admin.api.ConfigurationAdminMBean#setBundleLocation(java.lang.String, java.lang.String)
      */
     public void setBundleLocation(String pid, String location) throws IOException {
         if (pid == null || pid.length() < 1) {
@@ -336,14 +329,14 @@ public class ConfigurationAdmin implements ConfigurationAdminMBean
     }
 
     /**
-     * @see org.osgi.jmx.service.cm.ConfigurationAdminMBean#update(java.lang.String, javax.management.openmbean.TabularData)
+     * @see ddf.ui.admin.api.ConfigurationAdminMBean#update(java.lang.String, javax.management.openmbean.TabularData)
      */
     public void update(String pid, TabularData configurationTable) throws IOException {
         updateForLocation(pid, null, configurationTable);
     }
 
     /**
-     * @see org.osgi.jmx.service.cm.ConfigurationAdminMBean#updateForLocation(java.lang.String, java.lang.String, javax.management.openmbean.TabularData)
+     * @see ddf.ui.admin.api.ConfigurationAdminMBean#updateForLocation(java.lang.String, java.lang.String, javax.management.openmbean.TabularData)
      */
     @SuppressWarnings("unchecked")
     public void updateForLocation(String pid, String location, TabularData configurationTable) throws IOException {
@@ -365,5 +358,15 @@ public class ConfigurationAdmin implements ConfigurationAdminMBean
         }
         Configuration config = configurationAdmin.getConfiguration(pid, location);
         config.update(configurationProperties);
+    }
+
+    public List<String> getFilterList()
+    {
+        return filterList;
+    }
+
+    public void setFilterList(List<String> filterList)
+    {
+        this.filterList = filterList;
     }
 }

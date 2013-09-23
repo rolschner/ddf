@@ -20,6 +20,8 @@
     <reference id="configurationAdmin" interface="org.osgi.service.cm.ConfigurationAdmin" />
 
     <bean id="configAdminMbean" class="ddf.ui.admin.api.ConfigurationAdmin" init-method="init" destroy-method="destroy">
+        <cm:managed-properties persistent-id="ddf.ui.admin.api"
+            update-strategy="container-managed" />
         <argument ref="blueprintBundleContext" />
         <argument ref="configurationAdmin" />
     </bean>
