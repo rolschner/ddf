@@ -1,44 +1,42 @@
 /**
  * Copyright (c) Codice Foundation
  *
- * This is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation, either
- * version 3 of the License, or any later version. 
+ * This is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser
+ * General Public License as published by the Free Software Foundation, either version 3 of the 
+ * License, or any later version. 
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU Lesser General Public License for more details. A copy of the GNU Lesser General Public License is distributed along with this program and can be found at
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *  GNU Lesser General Public License for more details. A copy of the GNU Lesser General Public 
+ * License is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
  *
  **/
 
-var baseUrl = "https://localhost:8993";
+var pageHtml = "<a href='#' class='addSourceLink'>Add Source</a>"+
+        "<table class='sourcesTable'><thead><th>Status</th><th>Name</th>"+
+        "<th>Version</th></thead><tbody></tbody></table>"+
+        "<button class='refreshButton'>Refresh</button>";
 var sList;
-var sView;
+var sPage;
+
+// Backbone Objects
 var Source;
 var SourceList;
 var SourceTable;
 var SourceRow;
 
 $(function(){
-  loadSources();
+    //checkIfLoaded(0)();
+    initializeBackboneObjects();
+    instantiateSources();
 });
 
-function loadSources(){
-    $.ajax(
-    {
-        url: baseUrl+"/services/catalog/sources",
-        dataType: "jsonp"
-    }).done(initializeOnScriptLoad);
-}
-
-function initializeOnScriptLoad(sources) {
-    checkIfLoaded(sources, 0);
-}
-
 //Checks if Bacbone is loaded before proceeding
-function checkIfLoaded(sources, counter) {
+/*function checkIfLoaded(counter) {
     if( (typeof Backbone.Collection) === "function"){
         initializeBackboneObjects();
-        instantiateSources(sources);
+        instantiateSources();
     }else{
         if(counter === undefined){
             counter = 0;
@@ -47,42 +45,19 @@ function checkIfLoaded(sources, counter) {
             return;
         }
         counter += 1;
-        setTimeout(function(){checkIfLoaded(sources, counter);},100);
+        setTimeout(function(){checkIfLoaded(counter);},100);
     }
-}
+}*/
 
-function instantiateSources(sources) {
-    if(sView !== undefined){
-        //Should eventually be replaced by some sView.remove() call
-        $("#sourcesTable tbody").html("");
-    }
+function instantiateSources() {
+
     sList = new SourceList();
+    sList.fetch();
 
-    for(s in sources){
-        var newS = new Source(sources[s]);
-        sList.add(newS);
-    }
-
-    sView = new SourceTable({
-                collection: sList,
-                el: $("#sourcesTable tbody")
-            });
-    sView.render();
-}
-
-function refresh(){
-    $.ajax(
-        {
-            url: baseUrl+"/services/catalog/sources",
-            dataType: "jsonp"
-        }).done(function(sources){
-            var sourceArray = [];
-            for(s in sources){
-                var newS = new Source(sources[s]);
-                sourceArray.push(newS);
-            } 
-            sList.set(sourceArray);
-        });
+    sPage = new SourcePage({
+        el: $(".sourcesMain")
+    });
+    sPage.render();
 }
 
 /**
@@ -124,15 +99,46 @@ function initializeBackboneObjects(){
     });
 
     SourceList = Backbone.Collection.extend({
-        model: Source
+        model: Source,
+        url: "/services/catalog/sources",
+        sync: function(method, model, options) {
+            options.dataType = "jsonp";
+            return Backbone.sync(method, model, options);
+        }
+    });
+
+    SourcePage = Backbone.View.extend({ 
+        events: {
+            'click .refreshButton' : 'refreshSources',
+            'click .addSourceLink' : 'addSource'
+        },
+        initialize: function() {
+            _.bindAll(this, "refreshSources");
+        },
+        render: function() {
+            this.$el.html(pageHtml);
+            var sTable = new SourceTable({
+                collection: sList,
+                el: this.$el.children(".sourcesTable").children("tbody")
+            });
+            sTable.render();
+            return this;
+        },
+        refreshSources: function() {
+            sList.fetch();
+        },
+        addSource: function() {
+            alert("TODO: Create Add Dialog");
+        }
     });
 
     SourceTable = Backbone.View.extend({
         sourceRows: [],
         initialize: function(){
-            _.bindAll(this, 'appendSource', 'render', 'removeSource');
+            _.bindAll(this, 'appendSource', 'render', 'removeSource', 'changeSource');
             this.collection.bind("add", this.appendSource);
             this.collection.bind("remove", this.removeSource);
+            this.collection.bind("change", this.changeSource);
         },
         render: function() {
             for(m in this.collection.models){
@@ -149,27 +155,37 @@ function initializeBackboneObjects(){
         },
         removeSource: function(s) {
             for(i in this.sourceRows) {
-                if(this.sourceRows[i].model == s) {
+                if(this.sourceRows[i].model.id == s.id) {
                     this.sourceRows[i].remove();
                     this.sourceRows.splice(i,1);
                     break;
                 }
             }
+        },
+        changeSource: function(change) {
+            this.removeSource(change);
+            this.appendSource(new Source(change.attributes));
         }
     });
 
     SourceRow = Backbone.View.extend({
         tagName: "tr",
         template: _.template("<% _.each(attrs, function(value) { %> <td><%= value %></td> <% }); %>"),
+        events: {
+            'click .editLink' : 'editSource'
+        },
         render: function() {
             this.$el.html(this.template({attrs: [
                         this.model.sourceStatus,
-                        this.model.id,
+                        "<a href='#' class='editLink'>"+this.model.id+"</a>",
                         this.model.version]}));
             return this;
         },
         createTd: function(val) {
             return "<td>"+val+"</td>";
+        },
+        editSource: function() {
+            alert("TODO: Create Edit Dialog");
         }
     });
 }
