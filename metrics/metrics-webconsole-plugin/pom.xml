@@ -18,7 +18,7 @@
   <parent>
     <artifactId>metrics</artifactId>
     <groupId>ddf.metrics</groupId>
-    <version>1.2.3-SNAPSHOT</version>
+    <version>1.2.3</version>
   </parent>
   
   <groupId>ddf.metrics.webconsoleplugin</groupId>

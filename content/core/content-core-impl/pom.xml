@@ -18,7 +18,7 @@
   <parent>
     <artifactId>content-core-pom</artifactId>
     <groupId>ddf.content.core</groupId>
-    <version>1.2.3-SNAPSHOT</version>
+    <version>1.2.3</version>
   </parent>
   
   <artifactId>content-core-impl</artifactId>

@@ -12,8 +12,7 @@
  *
  **/
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>ddf</groupId>
@@ -24,7 +23,7 @@
 
 	<groupId>ddf.mime</groupId>
 	<artifactId>mime</artifactId>
-	<version>1.2.3-SNAPSHOT</version>  <!-- Should be same as ddf.esb.app.version defined in ddf-parent/pom -->
+	<version>1.2.3</version>  <!-- Should be same as ddf.esb.app.version defined in ddf-parent/pom -->
 	<name>DDF MIME</name>
 	<packaging>pom</packaging>
 
@@ -33,4 +32,8 @@
 		<module>tika</module>
 	</modules>
 
+
+  <scm>
+    <tag>1.2.3</tag>
+  </scm>
 </project>

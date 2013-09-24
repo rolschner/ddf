@@ -25,7 +25,7 @@
   
   <groupId>ddf.esb</groupId>
   <artifactId>esb</artifactId>
-  <version>1.2.3-SNAPSHOT</version>
+  <version>1.2.3</version>
   <packaging>pom</packaging>
   <name>DDF :: ESB</name>
   
@@ -47,4 +47,8 @@
       <module>esb-app</module>
   </modules>
   
+
+  <scm>
+    <tag>1.2.3</tag>
+  </scm>
 </project>
