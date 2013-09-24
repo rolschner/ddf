@@ -12,15 +12,12 @@
 package ddf.ui.admin.api;
 
 
-import org.json.JSONException;
-import org.json.JSONWriter;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.Filter;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
-import org.osgi.framework.Version;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.cm.ManagedService;
@@ -48,15 +45,12 @@ import java.util.Map.Entry;
 class ConfigurationAdminExt
 {
     static final String META_TYPE_NAME = "org.osgi.service.metatype.MetaTypeService";
-    static final String PLACEHOLDER_PID = "[Temporary PID replaced by real PID upon save]";
-    static final String FACTORY_PID = "factoryPid";
     private final XLogger logger = new XLogger(LoggerFactory.getLogger(ConfigurationAdminExt.class));
 
     private final BundleContext bundleContext;
     private final ConfigurationAdmin service;
 
-    // used to obtain services. Structure is: service name -> ServiceTracker
-    private final Map services = new HashMap();
+    private final Map<String, ServiceTracker> services = new HashMap<String, ServiceTracker>();
 
     /**
      * @param bundleContext
@@ -70,7 +64,7 @@ class ConfigurationAdminExt
     }
 
 
-    public BundleContext getBundleContext()
+    BundleContext getBundleContext()
     {
         return bundleContext;
     }
@@ -104,336 +98,6 @@ class ConfigurationAdminExt
         // fallback to no configuration at all
         return null;
     }
-
-
-    final Configuration getConfiguration(String pid, String factoryPid) throws IOException
-    {
-        if (factoryPid != null && (pid == null || pid.equals(PLACEHOLDER_PID)))
-        {
-            return this.service.createFactoryConfiguration(factoryPid, null);
-        }
-
-        return this.service.getConfiguration(pid, null);
-    }
-
-
-    Configuration getPlaceholderConfiguration(final String factoryPid)
-    {
-        return new PlaceholderConfiguration(factoryPid);
-    }
-
-    String getPlaceholderPid()
-    {
-        return PLACEHOLDER_PID;
-    }
-/*
-    String applyConfiguration( HttpServletRequest request, String pid )
-        throws IOException
-    {
-        if ( request.getParameter( ConfigManager.ACTION_DELETE ) != null ) 
-        {
-            // only delete if the PID is not our place holder
-            if ( !ConfigManager.PLACEHOLDER_PID.equals( pid ) )
-            {
-                configManager.log( "applyConfiguration: Deleting configuration " + pid );
-                Configuration config = service.getConfiguration( pid, null );
-                config.delete();
-            }
-            return null; // return request.getHeader( "Referer" );
-        }
-
-        String factoryPid = request.getParameter( ConfigManager.FACTORY_PID );
-        Configuration config = null;
-
-        String propertyList = request.getParameter( ConfigManager.PROPERTY_LIST ); 
-        if ( propertyList == null )
-        {
-            // FIXME: this would be a bug !!
-        }
-        else
-        {
-            config = getConfiguration( pid, factoryPid );
-
-            Dictionary props = config.getProperties();
-            if ( props == null )
-            {
-                props = new Hashtable();
-            }
-
-            final MetaTypeServiceSupport mtss = getMetaTypeSupport();
-            final Map adMap = ( mtss != null ) ? mtss.getAttributeDefinitionMap( config, null ) : new HashMap();
-            final StringTokenizer propTokens = new StringTokenizer( propertyList, "," ); 
-            while ( propTokens.hasMoreTokens() )
-            {
-                String propName = propTokens.nextToken();
-                PropertyDescriptor ad = (PropertyDescriptor) adMap.get( propName );
-
-                // try to derive from current value
-                if (ad == null) {
-                    Object currentValue = props.get( propName );
-                    ad = MetaTypeSupport.createAttributeDefinition( propName, currentValue );
-                }
-
-                int attributeType = MetaTypeSupport.getAttributeType( ad );
-
-                if ( ad == null
-                    || ( ad.getCardinality() == 0 && ( attributeType == AttributeDefinition.STRING || attributeType == MetaTypeServiceSupport.ATTRIBUTE_TYPE_PASSWORD ) ) )
-                {
-                    String prop = request.getParameter( propName );
-                    if ( prop != null
-                        && ( attributeType != MetaTypeSupport.ATTRIBUTE_TYPE_PASSWORD || !MetaTypeSupport.PASSWORD_PLACEHOLDER_VALUE.equals( prop ) ) )
-                    {
-                        props.put( propName, prop );
-                    }
-                }
-                else if ( ad.getCardinality() == 0 )
-                {
-                    // scalar of non-string
-                    String prop = request.getParameter( propName );
-                    if ( prop != null )
-                    {
-                        try
-                        {
-                            props.put( propName, MetaTypeSupport.toType( attributeType, prop ) );
-                        }
-                        catch ( NumberFormatException nfe )
-                        {
-                            // don't care
-                        }
-                    }
-                }
-                else
-                {
-                    // array or vector of any type
-                    Vector vec = new Vector();
-
-                    String[] properties = request.getParameterValues( propName );
-                    if ( properties != null )
-                    {
-                        if ( attributeType == MetaTypeSupport.ATTRIBUTE_TYPE_PASSWORD )
-                        {
-                            MetaTypeSupport.setPasswordProps( vec, properties, props.get( propName ) );
-                        }
-                        else
-                        {
-                            for ( int i = 0; i < properties.length; i++ )
-                            {
-                                try
-                                {
-                                    vec.add( MetaTypeSupport.toType( attributeType, properties[i] ) );
-                                }
-                                catch ( NumberFormatException nfe )
-                                {
-                                    // don't care
-                                }
-                            }
-                        }
-                    }
-
-                    // but ensure size (check for positive value since
-                    // abs(Integer.MIN_VALUE) is still INTEGER.MIN_VALUE)
-                    int maxSize = Math.abs( ad.getCardinality() );
-                    if ( vec.size() > maxSize && maxSize > 0 )
-                    {
-                        vec.setSize( maxSize );
-                    }
-
-                    if ( ad.getCardinality() < 0 )
-                    {
-                        // keep the vector, but only add if not empty
-                        if ( vec.isEmpty() )
-                        {
-                            props.remove( propName );
-                        }
-                        else
-                        {
-                            props.put( propName, vec );
-                        }
-                    }
-                    else
-                    {
-                        // convert to an array
-                        props.put( propName, MetaTypeSupport.toArray( attributeType, vec ) );
-                    }
-                }
-            }
-
-            config.update( props );
-        }
-
-        // redirect to the new configuration (if existing)
-        return (config != null) ? config.getPid() : ""; 
-    }
-
-
-    void printConfigurationJson( PrintWriter pw, String pid, Configuration config, String pidFilter,
-        String locale )
-    {
-
-        JSONWriter result = new JSONWriter( pw );
-
-        if ( pid != null )
-        {
-            try
-            {
-                result.object();
-                this.configForm( result, pid, config, pidFilter, locale );
-                result.endObject();
-            }
-            catch ( Exception e )
-            {
-                logger.error( "Error reading configuration PID " + pid, e );
-            }
-        }
-
-    }
-
-
-    void configForm( JSONWriter json, String pid, Configuration config, String pidFilter, String locale )
-        throws JSONException
-    {
-
-        json.key( ConfigManager.PID );
-        json.value( pid );
-
-        if ( pidFilter != null )
-        {
-            json.key( ConfigManager.PID_FILTER );
-            json.value( pidFilter );
-        }
-
-        Dictionary props = null;
-        if ( config != null )
-        {
-            props = config.getProperties(); // unchecked
-        }
-        if ( props == null )
-        {
-            props = new Hashtable();
-        }
-
-        boolean doSimpleMerge = true;
-        final MetaTypeServiceSupport mtss = getMetaTypeSupport();
-        if ( mtss != null )
-        {
-            ObjectClassDefinition ocd = null;
-            if ( config != null )
-            {
-                ocd = mtss.getObjectClassDefinition( config, locale );
-            }
-            if ( ocd == null )
-            {
-                ocd = mtss.getObjectClassDefinition( pid, locale );
-            }
-            if ( ocd != null )
-            {
-                mtss.mergeWithMetaType( props, ocd, json );
-                doSimpleMerge = false;
-            }
-        }
-
-        if (doSimpleMerge)
-        {
-            json.key( "title" ).value( pid ); 
-            json.key( "description" ).value( 
-                "This form is automatically generated from existing properties because no property "
-                    + "descriptors are available for this configuration. This may be cause by the absence "
-                    + "of the OSGi Metatype Service or the absence of a MetaType descriptor for this configuration." );
-
-            json.key( "properties" ).object(); 
-            for ( Enumeration pe = props.keys(); pe.hasMoreElements(); )
-            {
-                final String id = ( String ) pe.nextElement();
-
-                // ignore well known special properties
-                if ( !id.equals( Constants.SERVICE_PID ) && !id.equals( Constants.SERVICE_DESCRIPTION )
-                    && !id.equals( Constants.SERVICE_ID ) && !id.equals( Constants.SERVICE_VENDOR )
-                    && !id.equals( ConfigurationAdmin.SERVICE_BUNDLELOCATION )
-                    && !id.equals( ConfigurationAdmin.SERVICE_FACTORYPID ) )
-                {
-                    final Object value = props.get( id );
-                    final PropertyDescriptor ad = MetaTypeServiceSupport.createAttributeDefinition( id, value );
-                    json.key( id );
-                    MetaTypeServiceSupport.attributeToJson( json, ad, value );
-                }
-            }
-            json.endObject();
-        }
-
-        if ( config != null )
-        {
-            this.addConfigurationInfo( config, json, locale );
-        }
-    }
-*/
-
-    void addConfigurationInfo(Configuration config, JSONWriter json, String locale) throws JSONException
-    {
-
-        if (config.getFactoryPid() != null)
-        {
-            json.key(FACTORY_PID);
-            json.value(config.getFactoryPid());
-        }
-
-        String location;
-        if (config.getBundleLocation() == null)
-        {
-            location = ""; 
-        }
-        else
-        {
-            // if the configuration is bound to a bundle location which
-            // is not related to an installed bundle, we just print the
-            // raw bundle location binding
-            Bundle bundle = getBundle(this.getBundleContext(), config.getBundleLocation());
-            if (bundle == null)
-            {
-                location = config.getBundleLocation();
-            }
-            else
-            {
-                Dictionary headers = bundle.getHeaders(locale);
-                String name = (String) headers.get(Constants.BUNDLE_NAME);
-                if (name == null)
-                {
-                    location = bundle.getSymbolicName();
-                }
-                else
-                {
-                    location = name + " (" + bundle.getSymbolicName() + ')'; 
-                }
-
-                Version v = Version.parseVersion((String) headers.get(Constants.BUNDLE_VERSION));
-                location += ", Version " + v.toString();
-            }
-        }
-        json.key("bundleLocation"); 
-        json.value(location);
-        // raw bundle location and service locations
-        final String pid = config.getPid();
-        String serviceLocation = ""; 
-        try
-        {
-            final ServiceReference[] refs = getBundleContext().getServiceReferences(
-                    null,
-                    "(&(" + Constants.OBJECTCLASS + '=' + ManagedService.class.getName() 
-                            + ")(" + Constants.SERVICE_PID + '=' + pid + "))");  //$NON-NLS-2$
-            if (refs != null && refs.length > 0)
-            {
-                serviceLocation = refs[0].getBundle().getLocation();
-            }
-        }
-        catch (Throwable t)
-        {
-            logger.error("Error getting service associated with configuration " + pid, t);
-        }
-        json.key("bundle_location"); 
-        json.value(config.getBundleLocation());
-        json.key("service_location"); 
-        json.value(serviceLocation);
-    }
-
 
     private final Bundle getBoundBundle(Configuration config)
     {
@@ -558,7 +222,7 @@ class ConfigurationAdminExt
      * @param bundle the bundle which name to retrieve
      * @return the bundle name - see the description of the method for more details.
      */
-    public String getName(Bundle bundle)
+    String getName(Bundle bundle)
     {
         Locale locale = Locale.getDefault();
         final String loc = locale == null ? null : locale.toString();
@@ -764,14 +428,14 @@ class ConfigurationAdminExt
 
     /**
      * Gets the service with the specified class name. Will create a new
-     * {@link ServiceTracker} if the service is not already got.
+     * {@link ServiceTracker} if the service is not already retrieved.
      *
      * @param serviceName the service name to obtain
      * @return the service or <code>null</code> if missing.
      */
-    public final Object getService(String serviceName)
+    final Object getService(String serviceName)
     {
-        ServiceTracker serviceTracker = (ServiceTracker) services.get(serviceName);
+        ServiceTracker serviceTracker = services.get(serviceName);
         if (serviceTracker == null)
         {
             serviceTracker = new ServiceTracker(getBundleContext(), serviceName, null);
@@ -962,66 +626,4 @@ class ConfigurationAdminExt
         return metatypeMap;
     }
 
-    private static class PlaceholderConfiguration implements Configuration
-    {
-
-        private final String factoryPid;
-        private String bundleLocation;
-
-
-        PlaceholderConfiguration(String factoryPid)
-        {
-            this.factoryPid = factoryPid;
-        }
-
-
-        public String getPid()
-        {
-            return PLACEHOLDER_PID;
-        }
-
-
-        public String getFactoryPid()
-        {
-            return factoryPid;
-        }
-
-
-        public void setBundleLocation(String bundleLocation)
-        {
-            this.bundleLocation = bundleLocation;
-        }
-
-
-        public String getBundleLocation()
-        {
-            return bundleLocation;
-        }
-
-
-        public Dictionary getProperties()
-        {
-            // dummy configuration has no properties
-            return null;
-        }
-
-
-        public void update()
-        {
-            // dummy configuration cannot be updated
-        }
-
-
-        public void update(Dictionary properties)
-        {
-            // dummy configuration cannot be updated
-        }
-
-
-        public void delete()
-        {
-            // dummy configuration cannot be deleted
-        }
-
-    }
 }
