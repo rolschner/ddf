@@ -19,7 +19,7 @@
   <parent>
     <groupId>ddf.esb</groupId>
     <artifactId>esb</artifactId>
-    <version>1.2.3</version>
+    <version>1.2.4-SNAPSHOT</version>
   </parent>
   
   <artifactId>esb-app</artifactId>

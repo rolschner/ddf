@@ -24,7 +24,7 @@
   
   <groupId>ddf.content.core</groupId>
   <artifactId>content-core-pom</artifactId>
-  <version>1.2.3</version>  <!-- Should be same as ddf.esb.app.version defined in ddf-parent/pom -->
+  <version>1.2.4-SNAPSHOT</version>  <!-- Should be same as ddf.esb.app.version defined in ddf-parent/pom -->
   <packaging>pom</packaging>
   <name>DDF :: Content :: Core</name>
   
@@ -117,8 +117,4 @@
 			</build>
 		</profile>
 	</profiles>
-
-  <scm>
-    <tag>1.2.3</tag>
-  </scm>
 </project>
