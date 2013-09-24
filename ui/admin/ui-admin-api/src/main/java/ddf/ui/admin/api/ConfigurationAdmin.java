@@ -42,7 +42,6 @@ public class ConfigurationAdmin implements ConfigurationAdminMBean
 
     private org.osgi.service.cm.ConfigurationAdmin configurationAdmin;
     private ConfigurationAdminExt configAdminSupport;
-    private BundleContext bundleContext;
     private ObjectName objectName;
     private MBeanServer mBeanServer;
     private List<String> filterList;
@@ -55,10 +54,12 @@ public class ConfigurationAdmin implements ConfigurationAdminMBean
     public ConfigurationAdmin(BundleContext bundleContext, org.osgi.service.cm.ConfigurationAdmin configurationAdmin)
     {
         this.configurationAdmin = configurationAdmin;
-        this.bundleContext = bundleContext;
         configAdminSupport = new ConfigurationAdminExt(bundleContext, configurationAdmin);
     }
 
+    /**
+     * Initialize this MBean and register it with the MBean server
+     */
     public void init()
     {
         try
@@ -90,6 +91,9 @@ public class ConfigurationAdmin implements ConfigurationAdminMBean
         }
     }
 
+    /**
+     * Unregister this MBean with the MBean server
+     */
     public void destroy()
     {
         try
@@ -106,6 +110,9 @@ public class ConfigurationAdmin implements ConfigurationAdminMBean
         }
     }
 
+    /**
+     * @see ConfigurationAdminMBean#listDefaultFilteredFactoryConfigurations()
+     */
     public List<Map<String, Object>> listDefaultFilteredFactoryConfigurations()
     {
         List<Map<String, Object>> factoryConfigurations = listFactoryConfigurations(getDefaultLdapFilter());
@@ -113,6 +120,9 @@ public class ConfigurationAdmin implements ConfigurationAdminMBean
         return factoryConfigurations;
     }
 
+    /**
+     * @see ConfigurationAdminMBean#listConfigurations(String)
+     */
     public List<Map<String, Object>> listConfigurations(String pidFilter)
     {
         List<Map<String, Object>> json = new ArrayList<Map<String, Object>>();
@@ -134,6 +144,9 @@ public class ConfigurationAdmin implements ConfigurationAdminMBean
         return json;
     }
 
+    /**
+     * @see ConfigurationAdminMBean#listFactoryConfigurations(String)
+     */
     public List<Map<String, Object>> listFactoryConfigurations(String pidFilter)
     {
         List<Map<String, Object>> json = new ArrayList<Map<String, Object>>();
@@ -217,7 +230,7 @@ public class ConfigurationAdmin implements ConfigurationAdminMBean
         if (filter == null || filter.length() < 1) {
             throw new IOException("Argument filter cannot be null or empty");
         }
-        Configuration[] configuations = null;
+        Configuration[] configuations;
         try {
             configuations = configurationAdmin.listConfigurations(filter);
         } catch (InvalidSyntaxException e) {
@@ -250,7 +263,7 @@ public class ConfigurationAdmin implements ConfigurationAdminMBean
             throw new IOException("Argument filter cannot be null or empty");
         }
         List<String[]> result = new ArrayList<String[]>();
-        Configuration[] configurations = null;
+        Configuration[] configurations;
         try {
             configurations = configurationAdmin.listConfigurations(filter);
         } catch (InvalidSyntaxException e) {
