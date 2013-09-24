@@ -25,7 +25,7 @@
     <groupId>ddf.support</groupId>
     <artifactId>support-pom</artifactId>
 	<!-- Manually maintained and must be manually updated in the ddf-parent pom.xml properties -->
-	<version>1.1.1-SNAPSHOT</version>
+	<version>1.1.1</version>
     <name>DDF Support</name>
     <description>DDF Support module contains support files for builds and site report generation</description>
     <packaging>pom</packaging>
