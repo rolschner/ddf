@@ -21,7 +21,7 @@
 	
 	<groupId>ddf.catalog.transformer</groupId>
 	<artifactId>transformer</artifactId>
-	<version>1.5.5-SNAPSHOT</version>
+	<version>1.5.5</version>
 	<packaging>pom</packaging>
 	<name>DDF Catalog Transformers</name>
 		
@@ -76,4 +76,8 @@
 		-->
 		<module>catalog-transformer-app</module>
 	</modules>
+
+  <scm>
+    <tag>1.5.5</tag>
+  </scm>
 </project>

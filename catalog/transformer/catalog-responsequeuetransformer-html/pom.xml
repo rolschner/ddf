@@ -18,7 +18,7 @@
    <parent>
       <artifactId>transformer</artifactId>
       <groupId>ddf.catalog.transformer</groupId>
-      <version>1.5.5-SNAPSHOT</version>
+      <version>1.5.5</version>
    </parent>
    
    <artifactId>catalog-responsequeuetransformer-html</artifactId>
