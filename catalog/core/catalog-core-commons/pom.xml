@@ -18,7 +18,7 @@
   <parent>
 	<artifactId>core</artifactId>
     <groupId>ddf.catalog.core</groupId>
-    <version>2.3.0-SNAPSHOT</version>
+    <version>1.2.3-SNAPSHOT</version>
   </parent>
     
   <artifactId>catalog-core-commons</artifactId>
@@ -107,13 +107,13 @@
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
           <instructions>
-	        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+<!--	        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName> -->
             <Export-Package>
-           	  ddf.catalog.plugin.groomer;version=${project.version},
-              ddf.catalog.impl.filter;version=${project.version},
-              ddf.catalog.filter.delegate;version=${project.version},
-              ddf.common;version=${project.version},
-              ddf.util;version=${project.version}
+           	  ddf.catalog.plugin.groomer;version="${project.version}",
+              ddf.catalog.impl.filter;version="${project.version}",
+              ddf.catalog.filter.delegate;version="${project.version}",
+              ddf.common;version="${project.version}",
+              ddf.util;version="${project.version}"
 			</Export-Package>
           </instructions>
         </configuration>

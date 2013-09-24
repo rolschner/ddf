@@ -11,29 +11,40 @@
  * <http://www.gnu.org/licenses/lgpl.html>.
  *
  **/
--->
+
+ -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   
   <parent>
-      <groupId>ddf</groupId>
-	  <artifactId>ddf-parent</artifactId>
-      <version>1.0.0-SNAPSHOT</version>
-	  <relativePath>../../ddf-parent/pom.xml</relativePath>
+    <groupId>ddf</groupId>
+    <artifactId>ddf-parent</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <relativePath>../../ddf-parent/pom.xml</relativePath>
   </parent>
   
-  <groupId>ddf.metrics</groupId>
-  <artifactId>metrics</artifactId>
-  <version>1.2.3-SNAPSHOT</version>  <!-- Should be same as ddf.esb.app.version defined in ddf-parent/pom -->
+  <groupId>ddf.esb</groupId>
+  <artifactId>esb</artifactId>
+  <version>1.2.3-SNAPSHOT</version>
   <packaging>pom</packaging>
-  <name>DDF Metrics</name>
+  <name>DDF :: ESB</name>
   
   <modules>
-      <module>metrics-collector</module>
-      <module>metrics-reporting</module>
-      <module>metrics-webconsole-plugin</module>
-      <module>metrics-interceptor</module>
-      <!-- <module>metrics-reporting-app</module> -->
+      <module>../action</module>
+      <module>../mime</module>
+      <module>../measure</module>
+      <module>../metrics</module>
+      <module>../catalog/common</module>
+      <module>../catalog/core</module>
+      <module>../catalog/schematron</module>
+      <module>../catalog/transformer/catalog-transformer-attribute</module>
+      <module>../catalog/transformer/service-xslt-transformer</module>
+      <module>../catalog/transformer/catalog-transformer-resource</module>
+      <module>../catalog/transformer/catalog-transformer-metadata</module>
+      <module>../catalog/transformer/catalog-transformer-thumbnail</module>
+      <module>../content/core</module>
+      <module>../security/encryption</module>
+      <module>esb-app</module>
   </modules>
   
 </project>

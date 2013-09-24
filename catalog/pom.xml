@@ -14,22 +14,29 @@
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<parent>
-		<artifactId>ddf</artifactId>
 		<groupId>ddf</groupId>
-		<version>2.3.0-SNAPSHOT</version>
+		<artifactId>ddf-parent</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+		<relativePath>../../../../ddf-parent/pom.xml</relativePath>
 	</parent>
+	
 	<modelVersion>4.0.0</modelVersion>
+	
 	<groupId>ddf.catalog</groupId>
 	<artifactId>catalog</artifactId>
+	<version>1.6.6-SNAPSHOT</version>  <!-- Should be same as ddf.catalog.services.app.version defined in ddf-parent/pom -->
 	<packaging>pom</packaging>
 	<name>DDF Catalog</name>
 
+	<!-- Moved to ddf-parent/pom
 	<properties>
 		<abdera.version>1.1.2</abdera.version>
 	</properties>
+	-->
 
 	<dependencyManagement>
 		<dependencies>
+			<!--NEEDED???
 			<dependency>
 				<groupId>ddf.catalog.core</groupId>
 				<artifactId>ddf-pubsub</artifactId>
@@ -40,11 +47,7 @@
 				<artifactId>catalog-transformer-attribute</artifactId>
 				<version>${project.version}</version>
 			</dependency>
-			<dependency>
-				<groupId>ddf.catalog.transformer</groupId>
-				<artifactId>catalog-transformer-attribute</artifactId>
-				<version>${project.version}</version>
-			</dependency>
+			-->
 			<dependency>
 				<groupId>org.apache.abdera</groupId>
 				<artifactId>abdera-extensions-opensearch</artifactId>
@@ -65,17 +68,18 @@
 	</dependencyManagement>
 
 	<modules>
- 	    <module>common</module>
-		<module>core</module>
-		<module>transformer</module>
+ 	    <!-- <module>common</module>  Moved to ddf.esb.app -->
+		<!-- <module>core</module>  Moved to ddf.esb.app -->
+		<!-- <module>transformer</module>  Moved to transformer.app -->
         <module>endpoint</module>
         <module>plugin</module>
-        <module>fanout</module>
+        <!-- <module>fanout</module>  Moved to ddf.esb.app -->
         <module>kml</module>
-        <module>solr</module>
+        <!-- <module>solr</module>  Moved to solr.catalog.app -->
         <module>opensearch</module>
         <module>rest</module>
-        <module>schematron</module>
+        <!-- <module>schematron</module>  Moved to ddf.esb.app -->
+		<module>../metrics</module>  <!-- NEW to the catalog.services.app -->
 	</modules>
 
 </project>

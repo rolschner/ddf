@@ -13,12 +13,15 @@
 	<modelVersion>4.0.0</modelVersion>
 	
 	<parent>
-		<artifactId>transformer</artifactId>
-		<groupId>ddf.catalog.transformer</groupId>
-		<version>2.3.0-SNAPSHOT</version>
+	    <groupId>ddf</groupId>
+		<artifactId>ddf-parent</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+		<relativePath>../../../../ddf-parent/pom.xml</relativePath>
 	</parent>
 	
+	<groupId>ddf.catalog.transformer</groupId>
 	<artifactId>catalog-transformer-thumbnail</artifactId>
+	<version>1.2.3-SNAPSHOT</version>  <!-- Should be same as ddf.esb.app.version defined in ddf-parent/pom -->
 	<name>DDF :: Catalog :: Transformer :: Thumbnail</name>
 	<packaging>bundle</packaging>
 
@@ -26,6 +29,7 @@
 		<dependency>
 			<groupId>ddf.catalog.transformer</groupId>
 			<artifactId>catalog-transformer-attribute</artifactId>
+			<version>${project.version}</version>   <!-- Can eventually move to catalog core transformer aggregator pom when it is written -->
 		</dependency>
 	</dependencies>
 

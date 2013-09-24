@@ -16,19 +16,21 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<artifactId>catalog</artifactId>
-		<groupId>ddf.catalog</groupId>
-		<version>2.3.0-SNAPSHOT</version>
+		<groupId>ddf</groupId>
+		<artifactId>ddf-parent</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+		<relativePath>../../../ddf-parent/pom.xml</relativePath>
 	</parent>
 
 	<artifactId>catalog-schematron-pom</artifactId>
 	<groupId>ddf.catalog.schematron</groupId>
+	<version>1.2.3-SNAPSHOT</version>  <!-- Should be same as ddf.esb.app.version defined in ddf-parent/pom -->
 	<name>DDF Catalog Schematron</name>
 	<packaging>pom</packaging>
 
 	<modules>
 		<module>catalog-schematron-plugin</module>
-		<module>catalog-schematron-app</module>
+		<!-- <module>catalog-schematron-app</module> -->
 	</modules>
 	
 </project>

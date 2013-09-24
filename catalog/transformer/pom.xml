@@ -13,13 +13,15 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<artifactId>catalog</artifactId>
-		<groupId>ddf.catalog</groupId>
-		<version>2.3.0-SNAPSHOT</version>
+		<groupId>ddf</groupId>
+		<artifactId>ddf-parent</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+		<relativePath>../../../ddf-parent/pom.xml</relativePath>
 	</parent>
 	
 	<groupId>ddf.catalog.transformer</groupId>
 	<artifactId>transformer</artifactId>
+	<version>1.5.5-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>DDF Catalog Transformers</name>
 
@@ -28,13 +30,25 @@
 			<dependency>
 				<groupId>ddf.catalog.common</groupId>
 				<artifactId>geo-formatter</artifactId>
-				<version>${project.version}</version>
+				<version>${ddf.esb.app.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>ddf.catalog.transformer</groupId>
 				<artifactId>catalog-transformer-xml-binding</artifactId>
 				<version>${project.version}</version>
 			</dependency>
+			<!-- Moved from catalog/pom.xml -->
+			<dependency>
+				<groupId>org.apache.abdera</groupId>
+				<artifactId>abdera-extensions-opensearch</artifactId>
+				<version>${abdera.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.abdera</groupId>
+				<artifactId>abdera-extensions-geo</artifactId>
+				<version>${abdera.version}</version>
+			</dependency>
+			<!-- END move -->
 		</dependencies>
 	</dependencyManagement>
 
@@ -44,15 +58,17 @@
 		<module>geojson-metacard-transformer</module>
 		<module>geojson-queryresponse-transformer</module>
 		<module>service-atom-transformer</module>
-		<module>service-xslt-transformer</module>
+		<!-- <module>service-xslt-transformer</module>  Moved to DDF ESB app-->
 		<module>service-html-transformer</module>
 		<module>catalog-responsequeuetransformer-html</module>
 		<module>catalog-transformer-xml-binding</module>
 		<module>catalog-transformer-xml</module>
+		<!-- Moved to DDF ESB app
 		<module>catalog-transformer-resource</module>
 		<module>catalog-transformer-attribute</module>
 		<module>catalog-transformer-thumbnail</module>
 		<module>catalog-transformer-metadata</module>
+		-->
 		<module>catalog-transformer-app</module>
 	</modules>
 </project>
