@@ -21,7 +21,7 @@ import java.util.Map;
  */
 public interface ConfigurationAdminMBean
 {
-    static String OBJECTNAME = "ddf.ui.admin.api.ConfigurationAdmin"+":service=ui,version=2.3.0";
+    static String OBJECTNAME = "ddf.ui.admin.api.ConfigurationAdmin:service=ui,version=2.3.0";
 
     /**
      * Lists all ConfigurationAdmin Configurations that have been created. Filter is
