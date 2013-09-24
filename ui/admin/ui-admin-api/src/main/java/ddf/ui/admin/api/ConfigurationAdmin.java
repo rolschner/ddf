@@ -11,7 +11,6 @@
  **/
 package ddf.ui.admin.api;
 
-import org.apache.aries.jmx.codec.PropertyData;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.service.cm.Configuration;
@@ -21,20 +20,15 @@ import org.slf4j.ext.XLogger;
 import javax.management.InstanceAlreadyExistsException;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
-import javax.management.openmbean.CompositeData;
-import javax.management.openmbean.TabularData;
-import javax.management.openmbean.TabularDataSupport;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Dictionary;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
-
-import static org.osgi.jmx.JmxConstants.PROPERTIES_TYPE;
 
 /**
  * @author Scott Tustison
@@ -128,7 +122,7 @@ public class ConfigurationAdmin implements ConfigurationAdminMBean
         {
             try
             {
-                TabularData properties = getProperties((String) configuration.get("id"));
+                Map<String, Object> properties = getProperties((String) configuration.get("id"));
                 configuration.put("properties", properties);
             }
             catch (IOException e)
@@ -291,7 +285,7 @@ public class ConfigurationAdmin implements ConfigurationAdminMBean
     /**
      * @see ddf.ui.admin.api.ConfigurationAdminMBean#getProperties(java.lang.String)
      */
-    public TabularData getProperties(String pid) throws IOException {
+    public Map<String, Object> getProperties(String pid) throws IOException {
         return getPropertiesForLocation(pid, null);
     }
 
@@ -299,19 +293,18 @@ public class ConfigurationAdmin implements ConfigurationAdminMBean
      * @see ddf.ui.admin.api.ConfigurationAdminMBean#getPropertiesForLocation(java.lang.String, java.lang.String)
      */
     @SuppressWarnings("unchecked")
-    public TabularData getPropertiesForLocation(String pid, String location) throws IOException {
+    public Map<String, Object> getPropertiesForLocation(String pid, String location) throws IOException {
         if (pid == null || pid.length() < 1) {
             throw new IOException("Argument pid cannot be null or empty");
         }
-        TabularData propertiesTable = null;
+        Map<String,Object> propertiesTable = new HashMap<String, Object>();
         Configuration config = configurationAdmin.getConfiguration(pid, location);
         Dictionary<String, Object> properties = config.getProperties();
         if (properties != null) {
-            propertiesTable = new TabularDataSupport(PROPERTIES_TYPE);
             Enumeration<String> keys = properties.keys();
             while (keys.hasMoreElements()) {
                 String key = keys.nextElement();
-                propertiesTable.put(PropertyData.newInstance(key, properties.get(key)).toCompositeData());
+                propertiesTable.put(key, properties.get(key));
             }
         }
         return propertiesTable;
@@ -329,17 +322,17 @@ public class ConfigurationAdmin implements ConfigurationAdminMBean
     }
 
     /**
-     * @see ddf.ui.admin.api.ConfigurationAdminMBean#update(java.lang.String, javax.management.openmbean.TabularData)
+     * @see ddf.ui.admin.api.ConfigurationAdminMBean#update(java.lang.String, java.util.Map)
      */
-    public void update(String pid, TabularData configurationTable) throws IOException {
+    public void update(String pid, Map<String, Object> configurationTable) throws IOException {
         updateForLocation(pid, null, configurationTable);
     }
 
     /**
-     * @see ddf.ui.admin.api.ConfigurationAdminMBean#updateForLocation(java.lang.String, java.lang.String, javax.management.openmbean.TabularData)
+     * @see ddf.ui.admin.api.ConfigurationAdminMBean#updateForLocation(java.lang.String, java.lang.String, java.util.Map)
      */
     @SuppressWarnings("unchecked")
-    public void updateForLocation(String pid, String location, TabularData configurationTable) throws IOException {
+    public void updateForLocation(String pid, String location, Map<String, Object> configurationTable) throws IOException {
         if (pid == null || pid.length() < 1) {
             throw new IOException("Argument pid cannot be null or empty");
         }
@@ -347,15 +340,7 @@ public class ConfigurationAdmin implements ConfigurationAdminMBean
             throw new IOException("Argument configurationTable cannot be null");
         }
 
-        if (!PROPERTIES_TYPE.equals(configurationTable.getTabularType())) {
-            throw new IOException("Invalid TabularType ["  + configurationTable.getTabularType() + "]");
-        }
-        Dictionary<String, Object> configurationProperties = new Hashtable<String, Object>();
-        Collection<CompositeData> compositeData = (Collection<CompositeData>) configurationTable.values();
-        for (CompositeData row: compositeData) {
-            PropertyData<? extends Class> propertyData = PropertyData.from(row);
-            configurationProperties.put(propertyData.getKey(), propertyData.getValue());
-        }
+        Dictionary<String, Object> configurationProperties = new Hashtable<String, Object>(configurationTable);
         Configuration config = configurationAdmin.getConfiguration(pid, location);
         config.update(configurationProperties);
     }

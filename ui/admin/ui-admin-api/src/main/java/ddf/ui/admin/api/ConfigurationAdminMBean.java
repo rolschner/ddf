@@ -117,7 +117,7 @@ public interface ConfigurationAdminMBean
      * @throws IOException if the operation fails
      */
 
-    TabularData getProperties(String pid) throws IOException;
+    Map<String, Object> getProperties(String pid) throws IOException;
 
     /**
      * Answer the contents of the configuration <p/>
@@ -129,7 +129,7 @@ public interface ConfigurationAdminMBean
      * @return the table of contents
      * @throws IOException if the operation fails
      */
-    TabularData getPropertiesForLocation(String pid, String location) throws IOException;
+    Map<String, Object> getPropertiesForLocation(String pid, String location) throws IOException;
 
     /**
      * Answer the list of PID/Location pairs of the configurations managed by
@@ -162,7 +162,7 @@ public interface ConfigurationAdminMBean
      * @param properties the table of properties
      * @throws IOException if the operation fails
      */
-    void update(String pid, TabularData properties) throws IOException;
+    void update(String pid, Map<String, Object> configurationTable) throws IOException;
 
     /**
      * Update the configuration with the supplied properties For each property
@@ -175,6 +175,6 @@ public interface ConfigurationAdminMBean
      * @param properties the table of properties
      * @throws IOException if the operation fails
      */
-    void updateForLocation(String pid, String location, TabularData properties)
+    void updateForLocation(String pid, String location, Map<String, Object> configurationTable)
             throws IOException;
 }
