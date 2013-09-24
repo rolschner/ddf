@@ -23,9 +23,29 @@ public interface ConfigurationAdminMBean
 {
     static String OBJECTNAME = "ddf.ui.admin.api.ConfigurationAdmin"+":service=ui,version=2.3.0";
 
-    public List<Map<String, Object>> listConfigurations(String pidFilter);
-    public List<Map<String, Object>> listFactoryConfigurations(String pidFilter);
-    public List<Map<String, Object>> listDefaultFilteredFactoryConfigurations();
+    /**
+     * Lists all ConfigurationAdmin Configurations that have been created. Filter is
+     * an LDAP style filter.
+     * @param pidFilter the string representation of the
+     *        <code>org.osgi.framework.Filter</code>
+     * @return the List of all Configurations
+     */
+    List<Map<String, Object>> listConfigurations(String pidFilter);
+
+    /**
+     * Lists all ManagedServiceFactory instances with associated Configurations. Filter is
+     * an LDAP style filter.
+     * @param pidFilter the string representation of the
+     *        <code>org.osgi.framework.Filter</code>
+     * @return the List of all ManagedServiceFactory with associated Configurations
+     */
+    List<Map<String, Object>> listFactoryConfigurations(String pidFilter);
+
+    /**
+     * Lists all default filtered ManagedServiceFactory instances with associated Configurations.
+     * @return the List of all filtered ManagedServiceFactory with associated Configurations
+     */
+    List<Map<String, Object>> listDefaultFilteredFactoryConfigurations();
 
     /**
      * Create a new configuration instance for the supplied persistent id of the
