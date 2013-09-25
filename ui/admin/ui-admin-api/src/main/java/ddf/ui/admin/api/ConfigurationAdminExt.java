@@ -603,9 +603,9 @@ class ConfigurationAdminExt
         return metatypeList;
     }
 
-    private Map<String, Object> createMetatypeMap(AttributeDefinition[] definitions)
+    private List<Map<String, Object>> createMetatypeMap(AttributeDefinition[] definitions)
     {
-        Map<String, Object> metatypeMap = new HashMap<String, Object>();
+        List<Map<String, Object>> metatypeList = new ArrayList<Map<String, Object>>();
 
         if(definitions != null)
         {
@@ -619,11 +619,11 @@ class ConfigurationAdminExt
                 attributeMap.put("type", definition.getType());
                 attributeMap.put("optionLabels", definition.getOptionLabels());
                 attributeMap.put("optionValues", definition.getOptionValues());
-                metatypeMap.put(definition.getID(), attributeMap);
+                metatypeList.add(attributeMap);
             }
         }
 
-        return metatypeMap;
+        return metatypeList;
     }
 
 }
