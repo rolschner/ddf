@@ -612,6 +612,7 @@ class ConfigurationAdminExt
             for(AttributeDefinition definition : definitions)
             {
                 Map<String, Object> attributeMap = new HashMap<String, Object>();
+                attributeMap.put("id",definition.getID());
                 attributeMap.put("name", definition.getName());
                 attributeMap.put("cardinality", definition.getCardinality());
                 attributeMap.put("defaultValue", definition.getDefaultValue());
