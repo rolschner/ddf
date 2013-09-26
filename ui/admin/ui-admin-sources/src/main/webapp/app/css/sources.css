@@ -14,15 +14,12 @@
  **/
 
 .sourcesTable {
-    border : 1px solid black;
 }
 
 .sourcesTable th {
-    border : 1px solid black;
 }
 
 .sourcesTable td {
-    padding : 3px; 
 }
 
 .editLink {

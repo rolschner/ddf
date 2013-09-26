@@ -13,10 +13,10 @@
  *
  **/
 
-var pageHtml = "<a href='#' class='addSourceLink'>Add Source</a>"+
-        "<table class='sourcesTable'><thead><th>Status</th><th>Name</th>"+
+var pageHtml = "<a href='#' class='addSourceLink'><span class='icon-plus'/>Add Source</a>"+
+        "<table class='sourcesTable table table-striped'><thead><th>Status</th><th>Name</th>"+
         "<th>Version</th></thead><tbody></tbody></table>"+
-        "<button class='refreshButton'>Refresh</button>";
+        "<button class='refreshButton btn btn-info'>Refresh</button>";
 var sList;
 var sPage;
 
@@ -176,13 +176,23 @@ function initializeBackboneObjects(){
         },
         render: function() {
             this.$el.html(this.template({attrs: [
-                        this.model.sourceStatus,
-                        "<a href='#' class='editLink'>"+this.model.id+"</a>",
+                        this.createStatusHtml(this.model.sourceStatus),
+                        this.createNameHtml(this.model.id),
                         this.model.version]}));
             return this;
         },
-        createTd: function(val) {
-            return "<td>"+val+"</td>";
+        createNameHtml: function(id) {
+            return "<a href='#' class='editLink'>"+id+"</a>";
+        },
+        createStatusHtml: function(sourceStatus) {
+            var labelClass = "label ";
+            if(sourceStatus === "Available") {
+                labelClass += "label-success";
+            } else if(sourceStatus === "Not Available") {
+                labelClass += "label-important";
+            }
+
+            return "<span class='"+labelClass+"'>"+sourceStatus+"</span>";
         },
         editSource: function() {
             alert("TODO: Create Edit Dialog");
