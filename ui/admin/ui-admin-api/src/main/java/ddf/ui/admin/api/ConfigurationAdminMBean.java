@@ -33,6 +33,12 @@ public interface ConfigurationAdminMBean
     List<Map<String, Object>> listConfigurations(String pidFilter);
 
     /**
+     * Lists all default filtered Configuration instances.
+     * @return the List of all filtered Configurations
+     */
+    public List<Map<String, Object>> listDefaultFilteredConfigurations();
+
+    /**
      * Lists all ManagedServiceFactory instances with associated Configurations. Filter is
      * an LDAP style filter.
      * @param pidFilter the string representation of the
