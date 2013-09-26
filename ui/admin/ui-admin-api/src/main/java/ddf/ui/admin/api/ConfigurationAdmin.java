@@ -12,7 +12,6 @@
 package ddf.ui.admin.api;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.service.cm.Configuration;
@@ -119,9 +118,17 @@ public class ConfigurationAdmin implements ConfigurationAdminMBean
      */
     public List<Map<String, Object>> listDefaultFilteredFactoryConfigurations()
     {
-        List<Map<String, Object>> factoryConfigurations = listFactoryConfigurations(getDefaultLdapFilter());
+        List<Map<String, Object>> factoryConfigurations = listFactoryConfigurations(getDefaultFactoryLdapFilter());
 
         return factoryConfigurations;
+    }
+
+    /**
+     * @see ConfigurationAdminMBean#listConfigurations(String)
+     */
+    public List<Map<String, Object>> listDefaultFilteredConfigurations()
+    {
+        return listConfigurations(getDefaultLdapFilter());
     }
 
     /**
@@ -165,7 +172,7 @@ public class ConfigurationAdmin implements ConfigurationAdminMBean
         return json;
     }
 
-    private String getDefaultLdapFilter()
+    private String getDefaultFactoryLdapFilter()
     {
         if(CollectionUtils.isNotEmpty(filterList))
         {
@@ -187,6 +194,31 @@ public class ConfigurationAdmin implements ConfigurationAdminMBean
             return ldapFilter.toString();
         }
         return "("+SERVICE_FACTORYPID+"="+"*)";
+    }
+
+    private String getDefaultLdapFilter()
+    {
+        if(CollectionUtils.isNotEmpty(filterList))
+        {
+            StringBuilder ldapFilter = new StringBuilder();
+            ldapFilter.append("(");
+            ldapFilter.append("|");
+
+            for(String fpid : filterList)
+            {
+                ldapFilter.append("(");
+                ldapFilter.append(SERVICE_PID);
+                ldapFilter.append("=");
+                ldapFilter.append(fpid);
+                ldapFilter.append("*");
+                ldapFilter.append(")");
+            }
+
+            ldapFilter.append(")");
+
+            return ldapFilter.toString();
+        }
+        return "("+SERVICE_PID+"="+"*)";
     }
 
     /**
