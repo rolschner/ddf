@@ -1,0 +1,41 @@
+<html>
+<head>
+    <title>Example</title>
+
+    <script type="text/javascript" src="app/js/underscore.js"></script>
+    <script type="text/javascript" src="app/js/jquery.js"></script>
+    <script type="text/javascript" src="app/js/backbone.js"></script>
+    <script type="text/javascript" src="app/js/DataTables-1.9.4/media/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="app/js/iCanHaz.min.js"></script>
+    <script type="text/javascript" src="app/js/bootstrap/js/boostrap.js"></script>
+    <script type="text/javascript" src="app/client/views/example.view.js"></script>
+    <script type="text/javascript" src="app/client/models/example.model.js"></script>
+
+    </head>
+<body>
+  <h1>My Example of using Backbone</h1>
+  <div class="container-fluid">
+  <div class="row-fluid">This would be nice with some bootstrap</div>
+  <div class="row-fluid">Also, if you get into more complicated single-page apps, you should look at routing.</div>
+  <div>This has datatables, but it's not styled.</div>
+  <div>Click a column header to sort</div>
+  <hr/>
+  <div class="main"></div>
+</body>
+
+<script>
+    $(document).ready(function(){
+        $.getJSON('templates/templates.json', function (templates) {
+            _.each(templates, function (template) {
+                ich.addTemplate(template.name, template.template);
+            });
+            routeToView();
+        });
+    });
+    routeToView = function() {
+       var start = new Search.Page();
+       $(".main").html(start.render().el);
+    }
+
+</script>
+</html>
