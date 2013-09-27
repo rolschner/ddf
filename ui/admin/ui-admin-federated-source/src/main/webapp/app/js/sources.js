@@ -12,7 +12,7 @@
  * <http://www.gnu.org/licenses/lgpl.html>.
  *
  **/
-//NOTE: link to add page is temp fix need to view transitions handled by backbone
+
 var pageHtml = "<a href='add.html' class='addSourceLink'><span class='icon-plus'/>Add Source</a>"+
         "<table class='sourcesTable table table-striped'><thead><th>Status</th><th>Name</th>"+
         "<th>Version</th></thead><tbody></tbody></table>"+
@@ -75,9 +75,22 @@ function initializeBackboneObjects(){
         },
         initialize: function(sourceJson) {
 
+			// MBean AI Results
+			/*
+			var config = sourceJson.value[0].configurations[0];
+			console.log("config id = " + config.id);
+			console.log("shortName = " + config.properties.shortname);
+			*/
 			console.log(sourceJson);
+			//var sourceJson2 = sourceJson.value[0].configurations;
+			//console.log(sourceJson2);
 
-			//FIXME: Check API for status values when available...
+			/*
+			$.each( sourceJson.value[0].configurations, function( key, value ) {
+				alert( key + ": " + value );
+			});
+			*/
+			// Hardcoded for now
 			this.sourceStatus = "Available";
 
 			if(sourceJson.properties.shortname) {
@@ -87,6 +100,7 @@ function initializeBackboneObjects(){
             if(sourceJson.fpid) {
 				this.version = sourceJson.fpid;
             }
+
 
 			/*
             if(sourceJson.id) {
@@ -117,7 +131,6 @@ function initializeBackboneObjects(){
     SourceList = Backbone.Collection.extend({
         model: Source,
         //url: "/services/catalog/sources",
-        // Configuration Admin JMX Bridge (ui-admin feature plugin API call)
         url : "/hawtio/jolokia/exec/ddf.ui.admin.api.ConfigurationAdmin:service=ui,version=2.3.0/listDefaultFilteredFactoryConfigurations",
         sync: function(method, model, options) {
             //options.dataType = "jsonp";
