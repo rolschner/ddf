@@ -1,0 +1,22 @@
+ [  {
+        "name": "searchButton",
+        "template": "<div><button class='click-search'>Search Button</button></div><div class='results'></div>"
+    },
+     {
+         "name": "searchResults",
+         "template":"<table id='resultTable' class='table table-bordered table-striped table-hover'><thead><th>ID</th><th>Type</th><th>Name</th></thead><tbody>{{#results}}<tr><td>{{id}}</td><td>{{type}}</td><td>{{name}}</td></tr>{{/results}}</tbody></table>"
+     },
+     {
+         "name": "textType",
+         "template": "<div class='{{id}} metatype'><label>{{name}}</label><input type='text' class='{{id}} metatype' name='{{id}}' value='{{defaultValue}}{{.}}{{/defaultValue}}'>{{#description}}<a href='#' class='description' data-title='{{id}}'><i class='icon-question-sign'></i></a>{{/description}}</div>"
+     },
+     {
+         "name": "passwordType",
+         "template": "<div class='{{id}}' metatype'><label>{{name}}</label><input type='password' class='{{id}} metatype' name='{{id}}' value='{{defaultValue}}{{.}}{{/defaultValue}}'>{{#description}}<a href='#' class='description' data-title='{{id}}'><i class='icon-question-sign'></i></a>{{/description}}</div>"
+
+     },
+     {
+        "name": "checkboxType",
+         "template": "<div class='{{id}} metatype'><label class='checkbox'><input type='checkbox' name='{{id}}' {{#defaultValue}}{{#.}}checked{{/.}}{{/defaultValue}}>{{name}}{{#description}}<a href='#' class='description' data-title='{{id}}'><i class='icon-question-sign'></i></a>{{/description}}</label></div>"
+     }
+ ]
