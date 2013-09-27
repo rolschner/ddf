@@ -13,7 +13,7 @@ var AddFederatedView = Backbone.View.extend({
      * @param options
      */
     initialize: function(options) {
-        _.bindAll(this, "render", "toggleAdvance", "close", "setupPopOvers");
+        _.bindAll(this, "render", "close", "setupPopOvers", "renderDynamicFields", "submitData");
         if(_.isUndefined(options.modelToSend)) {
             options.modelToSend = new FederatedSource();
         }
