@@ -13,6 +13,7 @@
  *
  **/
 
+//NOTE:Hardcoded link to Kimo's page for now....
 var pageHtml = "<a href='add.html' class='addSourceLink'><span class='icon-plus'/>Add Source</a>"+
         "<table class='sourcesTable table table-striped'><thead><th>Status</th><th>Name</th>"+
         "<th>Version</th></thead><tbody></tbody></table>"+
@@ -76,20 +77,8 @@ function initializeBackboneObjects(){
         initialize: function(sourceJson) {
 
 			// MBean AI Results
-			/*
-			var config = sourceJson.value[0].configurations[0];
-			console.log("config id = " + config.id);
-			console.log("shortName = " + config.properties.shortname);
-			*/
 			console.log(sourceJson);
-			//var sourceJson2 = sourceJson.value[0].configurations;
-			//console.log(sourceJson2);
 
-			/*
-			$.each( sourceJson.value[0].configurations, function( key, value ) {
-				alert( key + ": " + value );
-			});
-			*/
 			// Hardcoded for now
 			this.sourceStatus = "Available";
 
