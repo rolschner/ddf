@@ -30,9 +30,8 @@
     <modules>
         <module>ui-admin-api</module>
         <module>ui-admin-example</module>
-        <module>ui-admin-sources</module>
-        <module>ui-admin-app</module>
         <module>ui-admin-federated-source</module>
+        <module>ui-admin-app</module>
     </modules>
 
 
