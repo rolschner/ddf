@@ -8,67 +8,66 @@
     <script type="text/javascript" src="app/js/jquery.js"></script>
 
     <script type="text/javascript" src="app/js/backbone.js"></script>
-	<script type="text/javascript" src="app/js/ICanHaz.min.js"></script>
-	<script type="text/javascript" src="app/js/bootstrap/js/bootstrap.js"></script>
-	<script type="text/javascript" src="app/js/modelbinder/Backbone.ModelBinder.js"></script>
-	<script type="text/javascript" src="app/js/modelbinder/Backbone.CollectionBinder.js"></script>
-	<script type="text/javascript" src="app/client/views/add.federated.source.view.js"></script>
-	<script type="text/javascript" src="app/client/models/add.federated.source.model.js"></script>
-	<script type="text/javascript" src="app/client/models/metatype.model.js"></script>
+    <script type="text/javascript" src="app/js/ICanHaz.min.js"></script>
+    <script type="text/javascript" src="app/js/bootstrap/js/bootstrap.js"></script>
+    <script type="text/javascript" src="app/js/modelbinder/Backbone.ModelBinder.js"></script>
+    <script type="text/javascript" src="app/js/modelbinder/Backbone.CollectionBinder.js"></script>
+    <script type="text/javascript" src="app/client/views/add.federated.source.view.js"></script>
+    <script type="text/javascript" src="app/client/models/add.federated.source.model.js"></script>
+    <script type="text/javascript" src="app/client/models/metatype.model.js"></script>
 
-	</head>
-	<body>
-	<div id="main" class="container-fluid"></div>
-	</body>
-	<script>
-	    /**
-	     * Loading all the templates and getting the listDefaultFilteredFactoryConfiguration.
-	     */
-	    $(document).ready(function(){
-	        var promises = [],
-	            url = "/hawtio/jolokia/exec/ddf.ui.admin.api.ConfigurationAdmin:service=ui,version=2.3.0/listDefaultFilteredFactoryConfigurations/";
+</head>
+<body>
+<h3>Admin UI - Federated Sources</h3>
+<a href="index.html">Home >></a> Add
+<div id="main" class="container-fluid"></div>
+</body>
+<script>
+    /**
+     * Loading all the templates and getting the listDefaultFilteredFactoryConfiguration.
+     */
+    $(document).ready(function(){
+        var promises = [],
+            url = "/hawtio/jolokia/exec/ddf.ui.admin.api.ConfigurationAdmin:service=ui,version=2.3.0/listDefaultFilteredFactoryConfigurations/";
 
-	        promises.push($.ajax("app/templates/mainPage.html"));
-	        promises.push($.ajax({url: "app/templates/templates.json", dataType:"json"}));
-	        promises.push($.ajax({url: url, dataType:"json"}));
-	        $.when.apply(null, promises).done(function(template1, template2, data){
-	           if (template1 && template1.length > 0 && template2 && template2.length > 0 && data && data.length > 0) {
+        promises.push($.ajax("app/templates/mainPage.html"));
+        promises.push($.ajax({url: "app/templates/templates.json", dataType:"json"}));
+        promises.push($.ajax({url: url, dataType:"json"}));
+        $.when.apply(null, promises).done(function(template1, template2, data){
+           if (template1 && template1.length > 0 && template2 && template2.length > 0 && data && data.length > 0) {
 
-	            ich.addTemplate("mainTemplate", template1[0]);
-	            _.each(template2[0], function(template) {
-	                ich.addTemplate(template.name, template.template);
-	            });
+            ich.addTemplate("mainTemplate", template1[0]);
+            _.each(template2[0], function(template) {
+                ich.addTemplate(template.name, template.template);
+            });
 
-	            updateData(data[0]);
-	           }
-	        }).fail(function(error){
-	             if (error.status === 403) {
-	                 window.location.replace("/hawtio/index.html#/login");
-	             } else {
-	                 alert("an error happened " + error.statusText);
-	             }
-	        });
-	    });
-	    /**
-	     * This should create a drop down of types of configurations.
-	     * Right now it is just OpenSearch, so no need for a dropdown, but viewData.value could be multiple config
-	     * types and the user should be able to select the one they want and the page should render appropriately.
-	     * @param viewData
-	     */
-	    updateData = function(viewData) {
-	        var collection,
-	            model = new Backbone.Model(),
-	            attributes = viewData.value[0].metatype,
-	            federatedView;
-	            model.set("name", viewData.value[0].name);
-	        collection = new MetaType.Collection(attributes);
-	        var modelToSend = new FederatedSource();
-	        modelToSend.serviceConfig = viewData.value[0].id;
-	        var federatedView = new AddFederatedView({collection: collection, model: model, modelToSend: modelToSend});
-	        $("#main").html(federatedView.render().el);
-	    }
+            updateData(data[0]);
+           }
+        }).fail(function(error){
+             if (error.status === 403) {
+                 window.location.replace("/hawtio/index.html#/login");
+             } else {
+                 alert("an error happened " + error.statusText);
+             }
+        });
+    });
+    /**
+     * This should create a drop down of types of configurations.
+     * Right now it is just OpenSearch, so no need for a dropdown, but viewData.value could be multiple config
+     * types and the user should be able to select the one they want and the page should render appropriately.
+     * @param viewData
+     */
+    updateData = function(viewData) {
+        var collection,
+            model = new Backbone.Model(),
+            attributes = viewData.value[0].metatype,
+            federatedView;
+            model.set("name", viewData.value[0].name);
+        collection = new MetaType.Collection(attributes);
+        var modelToSend = new FederatedSource();
+        modelToSend.serviceConfig = viewData.value[0].id;
+        var federatedView = new AddFederatedView({collection: collection, model: model, modelToSend: modelToSend});
+        $("#main").html(federatedView.render().el);
+    }
 </script>
 </html>
-
-
-
