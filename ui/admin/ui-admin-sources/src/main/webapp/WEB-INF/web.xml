@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
 /**
  * Copyright (c) Codice Foundation
@@ -11,17 +12,18 @@
  *
  **/
  -->
-<features name="${project.artifactId}-${project.version}">
+<web-app xmlns="http://java.sun.com/xml/ns/j2ee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee
+	      http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"
+         version="2.4">
 
-    <repository>mvn:io.hawt/hawtio-karaf/1.2-M16/xml/features</repository>
+    <description>Admin UI - Sources</description>
+    <display-name>Admin UI - Sources</display-name>
 
-    <feature name="ui-admin" version="${project.version}" description="Admin UI">
-        <feature>hawtio</feature>
-        <bundle>mvn:org.apache.aries.jmx/org.apache.aries.jmx.core/1.1.1</bundle>
-        <bundle>mvn:ddf.ui.admin/ui-admin-example/${project.version}/war</bundle>
-        <bundle>mvn:ddf.ui.admin/ui-admin-api/${project.version}</bundle>
-        <bundle>mvn:ddf.ui.admin/ui-admin-federated-add/${project.version}/war</bundle>
-        <bundle>mvn:ddf.ui.admin/ui-admin-sources/${project.version}/war</bundle>
-    </feature>
+    <!-- Default page to serve -->
+    <welcome-file-list>
+        <welcome-file>sources.html</welcome-file>
+    </welcome-file-list>
 
-</features>
+</web-app>
