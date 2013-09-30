@@ -15,8 +15,8 @@
 
 //NOTE:Hardcoded link to Kimo's page for now....
 var pageHtml = "<a href='add.html' class='addSourceLink'><span class='icon-plus'/>Add Source</a>"+
-        "<table class='sourcesTable table table-striped'><thead><th>Status</th><th>Name</th>"+
-        "<th>Type</th></thead><tbody></tbody></table>"+
+        "<table class='sourcesTable table table-striped'><thead><th>Name</th>"+
+        "<th>Type</th><th>Status</th></thead><tbody></tbody></table>"+
         "<button class='refreshButton btn btn-info'>Refresh</button>";
 var sList;
 var sPage;
@@ -200,9 +200,9 @@ function initializeBackboneObjects(){
         },
         render: function() {
             this.$el.html(this.template({attrs: [
-                        this.createStatusHtml(this.model.sourceStatus),
                         this.createNameHtml(this.model.id),
-                        this.model.version]}));
+                        this.model.version,
+                        this.createStatusHtml(this.model.sourceStatus)]}));
             return this;
         },
         createNameHtml: function(id) {
