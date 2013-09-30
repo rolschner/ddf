@@ -16,7 +16,7 @@
 //NOTE:Hardcoded link to Kimo's page for now....
 var pageHtml = "<a href='add.html' class='addSourceLink'><span class='icon-plus'/>Add Source</a>"+
         "<table class='sourcesTable table table-striped'><thead><th>Status</th><th>Name</th>"+
-        "<th>Version</th></thead><tbody></tbody></table>"+
+        "<th>Type</th></thead><tbody></tbody></table>"+
         "<button class='refreshButton btn btn-info'>Refresh</button>";
 var sList;
 var sPage;
@@ -120,14 +120,14 @@ function initializeBackboneObjects(){
     SourceList = Backbone.Collection.extend({
         model: Source,
         //url: "/services/catalog/sources",
-        url : "/hawtio/jolokia/exec/ddf.ui.admin.api.ConfigurationAdmin:service=ui,version=2.3.0/listDefaultFilteredFactoryConfigurations",
+        url : "/hawtio/jolokia/exec/ddf.ui.admin.api.ConfigurationAdmin:service=ui,version=2.3.0/listDefaultFilteredConfigurations",
         sync: function(method, model, options) {
             //options.dataType = "jsonp";
             options.dataType = "json";
             return Backbone.sync(method, model, options);
         },
         parse: function (response) {
-		   return response.value[0].configurations;
+		   return response.value;
 		}
     });
 
