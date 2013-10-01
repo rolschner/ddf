@@ -74,6 +74,7 @@ import ddf.catalog.resource.ResourceImpl;
 import ddf.catalog.resource.ResourceNotFoundException;
 import ddf.catalog.resource.ResourceNotSupportedException;
 import ddf.catalog.source.FederatedSource;
+import ddf.catalog.source.ConfiguredSource;
 import ddf.catalog.source.SourceMonitor;
 import ddf.catalog.source.UnsupportedQueryException;
 import ddf.catalog.transform.CatalogTransformerException;
@@ -85,7 +86,7 @@ import ddf.catalog.transform.InputTransformer;
  * usually performed via https which requires a keystore and trust store to be provided.
  *
  */
-public final class OpenSearchSource implements FederatedSource
+public final class OpenSearchSource implements FederatedSource, ConfiguredSource
 {
     static final String BAD_URL_MESSAGE = "Bad url given for remote source";
     static final String COULD_NOT_RETRIEVE_RESOURCE_MESSAGE = "Could not retrieve resource";
@@ -102,6 +103,7 @@ public final class OpenSearchSource implements FederatedSource
     private String endpointUrl;
     private String classification = "U";
     private String ownerProducer = "USA";
+    private String configPid = "";
 
     private InputTransformer inputTransformer;
     private static final String ORGANIZATION = "DDF";
@@ -158,6 +160,20 @@ public final class OpenSearchSource implements FederatedSource
     public void destroy()
     {
         logger.info( "Nothing to destroy.");
+    }
+  
+    /**
+     * Implementation of ConfiguredSource.setConfigurationPid
+     */
+    public void setConfigurationPid(String pid) {
+        this.configPid = pid;
+    }
+
+    /**
+     * Implementation of ConfiguredSource.getConfigurationPid
+     */
+    public String getConfigurationPid() {
+        return this.configPid;
     }
 
     /**
