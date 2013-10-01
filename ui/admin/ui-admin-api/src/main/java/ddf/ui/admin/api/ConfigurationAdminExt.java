@@ -52,6 +52,8 @@ class ConfigurationAdminExt
 
     private final Map<String, ServiceTracker> services = new HashMap<String, ServiceTracker>();
 
+    private Map<String, Boolean> statusMap = new HashMap<String, Boolean>();
+
     /**
      * @param bundleContext
      * @param service
@@ -120,6 +122,9 @@ class ConfigurationAdminExt
 
     final void listConfigurations(List<Map<String, Object>> json, String pidFilter)
     {
+        //Generate the map of configuration PIDs to source statuses
+        populateStatusMap();
+
         try
         {
             // Get ManagedService instances
@@ -200,12 +205,44 @@ class ConfigurationAdminExt
                         data.put("bundle", bundle.getBundleId());
                         data.put("bundle_name", getName(bundle));
                     }
+
+                    //If we have status info on the configuration, add it
+                    if(statusMap.containsKey(id.toString())){
+                        data.put("available", statusMap.get(id.toString()));
+                    }
                 }
             }
         }
         catch (Exception e)
         {
             logger.error("listConfigurations: Unexpected problem encountered", e);
+        }
+    }
+
+    /**
+     * Finds all Sources that implement the ConfiguredSource interface and
+     *  maps the configured sources' configuration PIDs to their statuses.
+     */
+    private void populateStatusMap() {
+        statusMap = new HashMap<String, Boolean>();
+        try{
+            ServiceReference[] refs = 
+                bundleContext.getAllServiceReferences("ddf.catalog.source.FederatedSource",null);
+            if(refs != null){
+                for(int i=0; i<refs.length; i++){
+                    Object superService = bundleContext.getService(refs[i]);
+                    if(superService instanceof ddf.catalog.source.FederatedSource
+                           && superService instanceof ddf.catalog.source.ConfiguredSource){
+                        ddf.catalog.source.ConfiguredSource cs = 
+                            (ddf.catalog.source.ConfiguredSource)superService;
+
+                        statusMap.put(cs.getConfigurationPid(), 
+                            ((ddf.catalog.source.FederatedSource)superService).isAvailable());
+                    }
+                }
+            }
+        } catch(org.osgi.framework.InvalidSyntaxException e) {
+            logger.error("Error getting services", e);
         }
     }
 
