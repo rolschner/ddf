@@ -185,7 +185,7 @@ public interface ConfigurationAdminMBean
      * @see org.osgi.jmx.JmxConstants#PROPERTIES_TYPE for the details of the TabularType
      *
      * @param pid the persistent identifier of the configuration
-     * @param properties the table of properties
+     * @param configurationTable the table of properties
      * @throws IOException if the operation fails
      */
     void update(String pid, Map<String, Object> configurationTable) throws IOException;
@@ -198,7 +198,7 @@ public interface ConfigurationAdminMBean
      *
      * @param pid the persistent identifier of the configuration
      * @param location the bundle location
-     * @param properties the table of properties
+     * @param configurationTable the table of properties
      * @throws IOException if the operation fails
      */
     void updateForLocation(String pid, String location, Map<String, Object> configurationTable)
@@ -219,5 +219,5 @@ public interface ConfigurationAdminMBean
      * @param servicePid that uniquely identifies the source to disable.
      * @throws IOException if the Source to be disabled cannot be located via the provided service PID.
      */
-    void disableSource(String servicePid) throws IOExcecdption;
+    void disableSource(String servicePid) throws IOException;
 }
