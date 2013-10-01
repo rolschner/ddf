@@ -5,7 +5,8 @@ var AddFederatedView = Backbone.View.extend({
      * I do not know where to go with the cancel button.
      */
     events: {
-        "click .submit-button": "submitData"
+        "click .submit-button": "submitData",
+        "click .enable-checkbox" : "toggleEnable" 
     },
 
     /**
@@ -18,6 +19,7 @@ var AddFederatedView = Backbone.View.extend({
             options.modelToSend = new FederatedSource();
         }
         this.modelToSend = options.modelToSend;
+        console.log("federated source model: " + this.modelToSend.isEnabled);
         this.modelBinder = new Backbone.ModelBinder();
     },
 
@@ -35,6 +37,7 @@ var AddFederatedView = Backbone.View.extend({
             jsonObj = view.model.toJSON();
         view.$el.append(ich.mainTemplate(jsonObj));
         view.$(".data-section").html("");
+        view.$(".data-section").append(ich.checkboxEnableType(view.modelToSend.toJSON()));
         view.renderDynamicFields();
         view.setupPopOvers();
         view.modelBinder.bind(view.modelToSend, view.$(".add-federated-source"),
@@ -96,8 +99,19 @@ var AddFederatedView = Backbone.View.extend({
             }
         });
 
+    },
+    
+    toggleEnable: function() {
+        var view = this;
+        console.log('toggling enable field of model'); 
+        if(this.modelToSend.isEnabled){
+            console.log('currently enabled.  disabling.'); 
+    	    this.modelToSend.isEnabled = false;
+    	}
+    	else {
+    	    console.log('currently disabled.  enabling.');
+    	    this.modelToSend.isEnabled = true;
+    	}
     }
-
-
 });
 
