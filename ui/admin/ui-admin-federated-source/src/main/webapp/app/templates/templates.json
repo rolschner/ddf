@@ -18,5 +18,9 @@
      {
         "name": "checkboxType",
          "template": "<div class='{{id}} metatype'><label class='checkbox'><input type='checkbox' name='{{id}}' {{#defaultValue}}{{#.}}checked{{/.}}{{/defaultValue}}>{{name}}{{#description}}<a href='#' class='description' data-title='{{id}}'><i class='icon-question-sign'></i></a>{{/description}}</label></div>"
+     },
+     {
+        "name": "checkboxEnableType",
+        "template": "<div class='enable-checkbox'><label class='checkbox'><input type='checkbox' name='thisName' {{#isEnabled}}{{#.}}checked{{/.}}{{/isEnabled}}>Enabled</div>"
      }
  ]

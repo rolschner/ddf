@@ -12,6 +12,7 @@
 package ddf.ui.admin.api;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.service.cm.Configuration;
@@ -404,7 +405,7 @@ public class ConfigurationAdmin implements ConfigurationAdminMBean
         this.filterList = filterList;
     }
     
- /*   public void disableSource(String servicePid) throws IOException{
+    public void disableSource(String servicePid) throws IOException{
 	if(StringUtils.isEmpty(servicePid)){
 	    throw new IOException("Service PID of Source to be disabled must be specified.  Service PID provided: " + servicePid);
 	}
@@ -454,5 +455,5 @@ public class ConfigurationAdmin implements ConfigurationAdminMBean
 	enabledConfiguration.update(properties);
 	
 	disabledConfig.delete();
-    }*/
+    }
 }
