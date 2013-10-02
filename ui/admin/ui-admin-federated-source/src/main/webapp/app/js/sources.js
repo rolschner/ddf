@@ -26,6 +26,7 @@ var Source;
 var SourceList;
 var SourceTable;
 var SourceRow;
+var editRouter;
 
 $(function(){
     //checkIfLoaded(0)();
@@ -59,6 +60,10 @@ function instantiateSources() {
         el: $(".sourcesMain")
     });
     sPage.render();
+    
+    editRouter = new EditRouter();
+
+    Backbone.history.start();
 }
 
 /**
@@ -67,48 +72,52 @@ function instantiateSources() {
 function initializeBackboneObjects(){
     Source = Backbone.Model.extend({
         defaults: {
-            "id" : "N/A",
-            "sourceStatus" : "N/A",
-            "version" : "N/A",
-            "action" : "N/A",
-            "sourceType" : "N/A",
-            "contentTypes" : []
+            "id": "N/A",
+            "bundle_name" : "N/A",
+            "name" : "N/A",
+            "fpid" : "N/A",
+            "bundle" : "N/A",
+            "shortName" : "N/A",
+            "sourceStatus" : "Available",
+            "properties" : {}
         },
         initialize: function(sourceJson) {
 
 			// MBean AI Results
 			console.log(sourceJson);
 
-			// Hardcoded for now
-			this.sourceStatus = "Available";
-
+			// it appears as the fields aren't getting set via their defaults
+			if(sourceJson.id){
+				this.id = sourceJson.id; 
+			}
+			if(sourceJson.bundle_name){
+				this.bundle_name = sourceJson.bundle_name; 
+			}
+			if(sourceJson.name){
+				this.name = sourceJson.name; 
+			}
+			if(sourceJson.fpid){
+				this.fpid = sourceJson.fpid; 
+			}
+			if(sourceJson.bundle){
+				this.bundle = sourceJson.bundle; 
+			}
 			if(sourceJson.properties.shortname) {
-			  this.id = sourceJson.properties.shortname;
-            }
+				  this.shortName = sourceJson.properties.shortname;
+	        }
+			this.sourceStatus = "Available";
+			if(sourceJson.properties){
+				this.properties = sourceJson.properties;
+			}
 
-            if(sourceJson.fpid) {
-				this.version = sourceJson.fpid;
-            }
-
-
-			/*
-            if(sourceJson.id) {
-                this.id = sourceJson.id;
-            }
-
+			/* 
+			 * TODO: implement actually checking the source's status
             if(sourceJson.available == true) {
                 this.sourceStatus = "Available";
             } else if (sourceJson.available == false) {
                 this.sourceStatus = "Not Available";
             }
 
-            if(sourceJson.version) {
-                this.version = sourceJson.version;
-            }
-
-            if(sourceJson.contentTypes){
-                this.contentTypes = sourceJson.contentTypes;
-            }
             */
         },
         getContentTypesAsString: function() {
@@ -195,18 +204,18 @@ function initializeBackboneObjects(){
     SourceRow = Backbone.View.extend({
         tagName: "tr",
         template: _.template("<% _.each(attrs, function(value) { %> <td><%= value %></td> <% }); %>"),
-        events: {
-            'click .editLink' : 'editSource'
-        },
+//        events: {
+//            'click .editLink' : 'editSource'
+//        },
         render: function() {
             this.$el.html(this.template({attrs: [
-                        this.createNameHtml(this.model.id),
-                        this.model.version,
+                        this.createNameHtml(this.model.shortName),
+                        this.model.fpid,
                         this.createStatusHtml(this.model.sourceStatus)]}));
             return this;
         },
-        createNameHtml: function(id) {
-            return "<a href='#' class='editLink'>"+id+"</a>";
+        createNameHtml: function(shortname) {
+            return "<a href='#edit/" + this.model.id +"' class='editLink'>"+shortname+"</a>";
         },
         createStatusHtml: function(sourceStatus) {
             var labelClass = "label ";
@@ -219,7 +228,30 @@ function initializeBackboneObjects(){
             return "<span class='"+labelClass+"'>"+sourceStatus+"</span>";
         },
         editSource: function() {
-            alert("TODO: Create Edit Dialog");
+            alert("TODO: Create Edit Dialog" + this.model.id);
+//            var editFedSourceView = new AddFederatedView({collection: collection, model: model, modelToSend: modelToSend});
+//            $("#sourcesMain").html(editFedSourceView.render().el);
+//            window.location.href = "add.html"
         }
+    });
+    
+    EditRouter = Backbone.Router.extend({
+    	routes: {
+    		"edit/:servicepid" : "edit"
+    	},
+    	edit: function(servicepid){
+    		alert("Edit Route" + servicepid);
+//            var model = new Backbone.Model();
+//            var collection = new MetaType.Collection();
+//            var managedServiceFactory = new ManagedServiceFactory();
+//            managedServiceFactory.serviceFactoryPid = "cool-id";
+//            managedServiceFactory.name = "cool-name";
+//    		this.navigate("add.html?servicepid=" +servicepid);
+    		
+//    		window.location = "add.html?servicepid=" + servicepid;
+//    		var federatedView = new AddFederatedView({collection: collection, model: model, managedServiceFactory: managedServiceFactory});
+//    		$("#sourcesMain").html(federatedView.render().el);
+    	}
+    	
     });
 }

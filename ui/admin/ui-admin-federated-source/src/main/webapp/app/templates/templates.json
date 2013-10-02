@@ -4,7 +4,7 @@
     },
      {
          "name": "searchResults",
-         "template":"<table id='resultTable' class='table table-bordered table-striped table-hover'><thead><th>ID</th><th>Type</th><th>Name</th></thead><tbody>{{#results}}<tr><td>{{id}}</td><td>{{type}}</td><td>{{name}}</td></tr>{{/results}}</tbody></table>"
+         "template": "<table id='resultTable' class='table table-bordered table-striped table-hover'><thead><th>ID</th><th>Type</th><th>Name</th></thead><tbody>{{#results}}<tr><td>{{id}}</td><td>{{type}}</td><td>{{name}}</td></tr>{{/results}}</tbody></table>"
      },
      {
          "name": "textType",

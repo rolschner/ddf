@@ -10,16 +10,16 @@ var AddFederatedView = Backbone.View.extend({
     },
 
     /**
-     * Initialize  the binder with the FederatedSource model.
+     * Initialize  the binder with the ManagedServiceFactory model.
      * @param options
      */
     initialize: function(options) {
         _.bindAll(this, "render", "close", "setupPopOvers", "renderDynamicFields", "submitData");
-        if(_.isUndefined(options.modelToSend)) {
-            options.modelToSend = new FederatedSource();
+        if(_.isUndefined(options.managedServiceFactory)) {
+            options.managedServiceFactory = new ManagedServiceFactory();
         }
-        this.modelToSend = options.modelToSend;
-        console.log("federated source model: " + this.modelToSend.isEnabled);
+        this.managedServiceFactory = options.managedServiceFactory;
+        console.log("federated source model: " + this.managedServiceFactory.isEnabled);
         this.modelBinder = new Backbone.ModelBinder();
     },
 
@@ -34,13 +34,13 @@ var AddFederatedView = Backbone.View.extend({
      */
     render: function() {
         var view = this,
-            jsonObj = view.model.toJSON();
+            jsonObj = view.managedServiceFactory.toJSON();
         view.$el.append(ich.mainTemplate(jsonObj));
         view.$(".data-section").html("");
-        view.$(".data-section").append(ich.checkboxEnableType(view.modelToSend.toJSON()));
+//        view.$(".data-section").append(ich.checkboxEnableType(view.managedServiceFactory.toJSON()));
         view.renderDynamicFields();
         view.setupPopOvers();
-        view.modelBinder.bind(view.modelToSend, view.$(".add-federated-source"),
+        view.modelBinder.bind(view.managedServiceFactory, view.$(".add-federated-source"),
             null, {initialCopyDirection: Backbone.ModelBinder.Constants.ViewToModel});
         return view;
     },
@@ -72,7 +72,7 @@ var AddFederatedView = Backbone.View.extend({
      */
     submitData: function() {
       var view = this;
-      view.modelToSend.save();
+      view.managedServiceFactory.save();
     },
     /**
      * unbind the model and dom during close.
@@ -104,13 +104,13 @@ var AddFederatedView = Backbone.View.extend({
     toggleEnable: function() {
         var view = this;
         console.log('toggling enable field of model'); 
-        if(this.modelToSend.isEnabled){
+        if(this.managedServiceFactory.isEnabled){
             console.log('currently enabled.  disabling.'); 
-    	    this.modelToSend.isEnabled = false;
+    	    this.managedServiceFactory.isEnabled = false;
     	}
     	else {
     	    console.log('currently disabled.  enabling.');
-    	    this.modelToSend.isEnabled = true;
+    	    this.managedServiceFactory.isEnabled = true;
     	}
     }
 });
