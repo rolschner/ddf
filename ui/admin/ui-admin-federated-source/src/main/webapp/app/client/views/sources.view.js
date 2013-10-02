@@ -20,7 +20,3 @@ var Sources = {};
         alert("what happened?");
     }
    });
-  
-
-
-   });

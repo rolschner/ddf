@@ -1,10 +1,12 @@
-var FederatedSource = Backbone.Model.extend({
+var ManagedServiceFactory = Backbone.Model.extend({
 
     // done really need this, but it's here to make things clearer
-    serviceConfig: "data",
+    serviceFactoryPid: "data",
     //This is probably better off in a properties file.
     configUrl: "/hawtio/jolokia/exec/ddf.ui.admin.api.ConfigurationAdmin:service=ui,version=2.3.0",
+    name: "name",
 
+    
     /**
      * Bind all things
      */
@@ -30,7 +32,7 @@ var FederatedSource = Backbone.Model.extend({
     },
 
     /**
-     * Get the serviceConfig PID
+     * Get the serviceFactoryPid PID
      * @param model, this is really this model.
      * @returns an ajax promis
      */
@@ -38,7 +40,7 @@ var FederatedSource = Backbone.Model.extend({
         if (!model) {
             return;
         }
-        var configUrl = [model.configUrl, "createFactoryConfiguration", model.serviceConfig].join("/");
+        var configUrl = [model.configUrl, "createFactoryConfiguration", model.serviceFactoryPid].join("/");
         return $.ajax({type: 'GET',
             url: configUrl
         });
