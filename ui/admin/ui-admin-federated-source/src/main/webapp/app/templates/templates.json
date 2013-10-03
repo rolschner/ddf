@@ -22,5 +22,9 @@
      {
         "name": "checkboxEnableType",
         "template": "<div class='enable-checkbox'><label class='checkbox'><input type='checkbox' name='thisName' {{#isEnabled}}{{#.}}checked{{/.}}{{/isEnabled}}>Enabled</div>"
+     },
+     {
+         "name": "optionListType",
+         "template": "{{#list}}<option value='{{id}}'>{{name}}</option>{{/list}}"
      }
  ]
