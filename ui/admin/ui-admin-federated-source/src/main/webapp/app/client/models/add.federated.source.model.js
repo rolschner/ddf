@@ -76,3 +76,6 @@ var ManagedServiceFactory = Backbone.Model.extend({
     }
 });
 
+ManagedServiceFactory.Collection = Backbone.Collection.extend({
+    model : ManagedServiceFactory
+});

@@ -6,7 +6,8 @@ var AddFederatedView = Backbone.View.extend({
      */
     events: {
         "click .submit-button": "submitData",
-        "click .enable-checkbox" : "toggleEnable" 
+        "click .enable-checkbox" : "toggleEnable",
+        "change .sourceTypesSelect" : "selectSourceType"
     },
 
     /**
@@ -19,12 +20,13 @@ var AddFederatedView = Backbone.View.extend({
             options.managedServiceFactory = new ManagedServiceFactory();
         }
         this.managedServiceFactory = options.managedServiceFactory;
+        this.managedServiceFactoryList = options.managedServiceFactoryList;
         console.log("federated source model: " + this.managedServiceFactory.isEnabled);
         this.modelBinder = new Backbone.ModelBinder();
     },
 
     /**
-     * This is where everything is rendered and the model is binded to the dom.
+     * This is where everything is rendered and the model is bound to the dom.
      * Add the main template
      * Clear whats in there now
      * Render the fields available
@@ -36,6 +38,20 @@ var AddFederatedView = Backbone.View.extend({
         var view = this,
             jsonObj = view.managedServiceFactory.toJSON();
         view.$el.append(ich.mainTemplate(jsonObj));
+        return view.renderDisplay();
+    },
+
+    /**
+     * This is where everything is rendered and the model is bound to the dom.
+     * Add the main template
+     * Clear whats in there now
+     * Render the fields available
+     * Setup popovers for description
+     * Bind the model to the dom
+     * return view for rendering to where the caller wants it to render.
+     */
+    renderDisplay: function() {
+        var view = this;
         view.$(".data-section").html("");
 //        view.$(".data-section").append(ich.checkboxEnableType(view.managedServiceFactory.toJSON()));
         view.renderDynamicFields();
@@ -52,6 +68,8 @@ var AddFederatedView = Backbone.View.extend({
      */
     renderDynamicFields: function() {
         var view = this;
+
+        view.$(".sourceTypesSelect").append(ich.optionListType({"list": view.managedServiceFactoryList.toJSON()}));
 
         view.collection.forEach(function(each) {
            var type = each.get("type");
@@ -103,7 +121,7 @@ var AddFederatedView = Backbone.View.extend({
     
     toggleEnable: function() {
         var view = this;
-        console.log('toggling enable field of model'); 
+        console.log('toggling enable field of model');
         if(this.managedServiceFactory.isEnabled){
             console.log('currently enabled.  disabling.'); 
     	    this.managedServiceFactory.isEnabled = false;
@@ -112,6 +130,19 @@ var AddFederatedView = Backbone.View.extend({
     	    console.log('currently disabled.  enabling.');
     	    this.managedServiceFactory.isEnabled = true;
     	}
+    },
+
+    selectSourceType: function() {
+        var view = this;
+        var selectedValue = view.$(".sourceTypesSelect").val();
+        view.managedServiceFactoryList.forEach(function(each) {
+            if(each.get("id") === selectedValue) {
+                view.managedServiceFactory.name = each.get("name");
+                view.managedServiceFactory.serviceFactoryPid = each.get("id");
+                view.collection = new MetaType.Collection(each.get("metatype"));
+            }
+        });
+        view.renderDisplay();
     }
 });
 

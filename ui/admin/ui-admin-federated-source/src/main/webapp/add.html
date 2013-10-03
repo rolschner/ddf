@@ -58,12 +58,12 @@
      * @param viewData
      */
     updateData = function(viewData) {
-        var model = new Backbone.Model();
         var collection = new MetaType.Collection(viewData.value[0].metatype);
         var managedServiceFactory = new ManagedServiceFactory();
+        var managedServiceFactoryList = new ManagedServiceFactory.Collection(viewData.value);
         managedServiceFactory.serviceFactoryPid = viewData.value[0].id;
         managedServiceFactory.name = viewData.value[0].name;
-        var federatedView = new AddFederatedView({collection: collection, model: model, managedServiceFactory: managedServiceFactory});
+        var federatedView = new AddFederatedView({collection: collection, managedServiceFactoryList: managedServiceFactoryList, managedServiceFactory: managedServiceFactory});
         $("#main").html(federatedView.render().el);
     }
 </script>
