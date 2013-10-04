@@ -36,12 +36,12 @@
         $.when.apply(null, promises).done(function(template1, template2, data){
            if (template1 && template1.length > 0 && template2 && template2.length > 0 && data && data.length > 0) {
 
-            ich.addTemplate("mainTemplate", template1[0]);
-            _.each(template2[0], function(template) {
-                ich.addTemplate(template.name, template.template);
-            });
+                ich.addTemplate("mainTemplate", template1[0]);
+                _.each(template2[0], function(template) {
+                    ich.addTemplate(template.name, template.template);
+                });
 
-            updateData(data[0]);
+                updateData(data[0]);
            }
         }).fail(function(error){
              if (error.status === 403) {
