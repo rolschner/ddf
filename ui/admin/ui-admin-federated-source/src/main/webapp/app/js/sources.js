@@ -56,6 +56,14 @@ function instantiateSources() {
     sList = new SourceList();
     sList.fetch();
 
+    var options = {
+        // default delay is 1000ms
+        delay: 30000
+    }
+
+    var poller = Backbone.Poller.get(sList, options);
+    poller.start();
+
     sPage = new SourcePage({
         el: $(".sourcesMain")
     });
@@ -90,22 +98,37 @@ function initializeBackboneObjects(){
 			if(sourceJson.id){
 				this.id = sourceJson.id; 
 			}
+
 			if(sourceJson.bundle_name){
 				this.bundle_name = sourceJson.bundle_name; 
 			}
+
 			if(sourceJson.name){
 				this.name = sourceJson.name; 
 			}
+
 			if(sourceJson.fpid){
 				this.fpid = sourceJson.fpid; 
 			}
+
 			if(sourceJson.bundle){
 				this.bundle = sourceJson.bundle; 
 			}
+
 			if(sourceJson.properties.shortname) {
 				  this.shortName = sourceJson.properties.shortname;
 	        }
-			this.sourceStatus = "Available";
+
+            if(sourceJson.available === true) {
+                this.sourceStatus = "Available";
+            }
+            else if(sourceJson.available === false) {
+                this.sourceStatus = "Not Available";
+            }
+            else {
+                this.sourceStatus = "Unknown";
+            }
+
 			if(sourceJson.properties){
 				this.properties = sourceJson.properties;
 			}
@@ -221,8 +244,12 @@ function initializeBackboneObjects(){
             var labelClass = "label ";
             if(sourceStatus === "Available") {
                 labelClass += "label-success";
-            } else if(sourceStatus === "Not Available") {
+            }
+            else if(sourceStatus === "Not Available") {
                 labelClass += "label-important";
+            }
+            else if(sourceStatus === "Unknown") {
+                labelClass += "label-warning";
             }
 
             return "<span class='"+labelClass+"'>"+sourceStatus+"</span>";
