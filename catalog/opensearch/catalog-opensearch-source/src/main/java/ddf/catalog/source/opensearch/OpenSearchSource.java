@@ -12,47 +12,6 @@
 package ddf.catalog.source.opensearch;
 
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Serializable;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Dictionary;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.security.auth.Subject;
-import javax.xml.namespace.QName;
-import javax.xml.transform.TransformerException;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
-
-import org.apache.abdera.Abdera;
-import org.apache.abdera.ext.opensearch.OpenSearchConstants;
-import org.apache.abdera.model.Category;
-import org.apache.abdera.model.Element;
-import org.apache.abdera.model.Entry;
-import org.apache.abdera.model.Feed;
-import org.apache.abdera.parser.Parser;
-import org.apache.commons.io.IOUtils;
-import org.geotools.filter.FilterTransformer;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
-import org.osgi.service.cm.Configuration;
-import org.osgi.service.cm.ConfigurationAdmin;
-import org.slf4j.LoggerFactory;
-import org.slf4j.ext.XLogger;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-
 import ddf.catalog.Constants;
 import ddf.catalog.data.BinaryContent;
 import ddf.catalog.data.ContentType;
@@ -73,12 +32,51 @@ import ddf.catalog.operation.SourceResponseImpl;
 import ddf.catalog.resource.ResourceImpl;
 import ddf.catalog.resource.ResourceNotFoundException;
 import ddf.catalog.resource.ResourceNotSupportedException;
+import ddf.catalog.service.ConfiguredService;
 import ddf.catalog.source.FederatedSource;
-import ddf.catalog.source.ConfiguredSource;
 import ddf.catalog.source.SourceMonitor;
 import ddf.catalog.source.UnsupportedQueryException;
 import ddf.catalog.transform.CatalogTransformerException;
 import ddf.catalog.transform.InputTransformer;
+import org.apache.abdera.Abdera;
+import org.apache.abdera.ext.opensearch.OpenSearchConstants;
+import org.apache.abdera.model.Category;
+import org.apache.abdera.model.Element;
+import org.apache.abdera.model.Entry;
+import org.apache.abdera.model.Feed;
+import org.apache.abdera.parser.Parser;
+import org.apache.commons.io.IOUtils;
+import org.geotools.filter.FilterTransformer;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
+import org.osgi.service.cm.Configuration;
+import org.osgi.service.cm.ConfigurationAdmin;
+import org.slf4j.LoggerFactory;
+import org.slf4j.ext.XLogger;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+
+import javax.security.auth.Subject;
+import javax.xml.namespace.QName;
+import javax.xml.transform.TransformerException;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Serializable;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.Dictionary;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 
 /**
@@ -86,7 +84,7 @@ import ddf.catalog.transform.InputTransformer;
  * usually performed via https which requires a keystore and trust store to be provided.
  *
  */
-public final class OpenSearchSource implements FederatedSource, ConfiguredSource
+public final class OpenSearchSource implements FederatedSource, ConfiguredService
 {
     static final String BAD_URL_MESSAGE = "Bad url given for remote source";
     static final String COULD_NOT_RETRIEVE_RESOURCE_MESSAGE = "Could not retrieve resource";
@@ -103,7 +101,6 @@ public final class OpenSearchSource implements FederatedSource, ConfiguredSource
     private String endpointUrl;
     private String classification = "U";
     private String ownerProducer = "USA";
-    private String configPid = "";
 
     private InputTransformer inputTransformer;
     private static final String ORGANIZATION = "DDF";
@@ -126,6 +123,7 @@ public final class OpenSearchSource implements FederatedSource, ConfiguredSource
     
     // expensive creation, meant to be done once
     private static final Abdera ABDERA = new Abdera();
+    private String configurationPid;
 
     /**
      * Creates an OpenSearch Site instance. Sets an initial default
@@ -160,20 +158,6 @@ public final class OpenSearchSource implements FederatedSource, ConfiguredSource
     public void destroy()
     {
         logger.info( "Nothing to destroy.");
-    }
-  
-    /**
-     * Implementation of ConfiguredSource.setConfigurationPid
-     */
-    public void setConfigurationPid(String pid) {
-        this.configPid = pid;
-    }
-
-    /**
-     * Implementation of ConfiguredSource.getConfigurationPid
-     */
-    public String getConfigurationPid() {
-        return this.configPid;
     }
 
     /**
@@ -1177,4 +1161,16 @@ public final class OpenSearchSource implements FederatedSource, ConfiguredSource
 	    
 	    logger.exit( methodName + ":   endpointUrl = " + endpointUrl );
 	}
+
+    @Override
+    public String getConfigurationPid()
+    {
+        return configurationPid;
+    }
+
+    @Override
+    public void setConfigurationPid(String configurationPid)
+    {
+        this.configurationPid = configurationPid;
+    }
 }

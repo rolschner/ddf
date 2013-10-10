@@ -12,45 +12,6 @@
 package ddf.catalog.source.opensearch;
 
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Serializable;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URL;
-import java.net.URLConnection;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Dictionary;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLSocketFactory;
-import javax.security.auth.Subject;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
-
-import org.apache.commons.io.IOUtils;
-import org.geotools.filter.FilterTransformer;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
-import org.osgi.service.cm.Configuration;
-import org.osgi.service.cm.ConfigurationAdmin;
-import org.slf4j.LoggerFactory;
-import org.slf4j.ext.XLogger;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import ddf.catalog.Constants;
 import ddf.catalog.data.BinaryContent;
 import ddf.catalog.data.ContentType;
@@ -68,10 +29,45 @@ import ddf.catalog.operation.SourceResponse;
 import ddf.catalog.operation.SourceResponseImpl;
 import ddf.catalog.resource.ResourceNotFoundException;
 import ddf.catalog.resource.ResourceNotSupportedException;
+import ddf.catalog.service.ConfiguredService;
 import ddf.catalog.source.FederatedSource;
 import ddf.catalog.source.SourceMonitor;
 import ddf.catalog.source.UnsupportedQueryException;
 import ddf.util.XPathHelper;
+import org.apache.commons.io.IOUtils;
+import org.geotools.filter.FilterTransformer;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
+import org.osgi.service.cm.Configuration;
+import org.osgi.service.cm.ConfigurationAdmin;
+import org.slf4j.LoggerFactory;
+import org.slf4j.ext.XLogger;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import javax.net.ssl.SSLSocketFactory;
+import javax.security.auth.Subject;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Serializable;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.Dictionary;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 
 
@@ -80,7 +76,7 @@ import ddf.util.XPathHelper;
  * usually performed via https which requires a keystore and trust store to be provided.
  *
  */
-public final class CddaOpenSearchSite implements FederatedSource
+public final class CddaOpenSearchSite implements FederatedSource, ConfiguredService
 {
     private boolean isInitialized = false;
     
@@ -124,8 +120,9 @@ public final class CddaOpenSearchSite implements FederatedSource
     private Configuration siteSecurityConfig;
 
     private SecureRemoteConnection connection;
+    private String configurationPid;
 
-    
+
     /**
      * Creates an OpenSearch Site instance. Sets an initial default
      * endpointUrl that can be overwritten using the setter methods.
@@ -1018,4 +1015,15 @@ public final class CddaOpenSearchSite implements FederatedSource
 	    logger.exit( methodName + ":   endpointUrl = " + endpointUrl );
 	}
 
+    @Override
+    public String getConfigurationPid()
+    {
+        return configurationPid;
+    }
+
+    @Override
+    public void setConfigurationPid(String configurationPid)
+    {
+        this.configurationPid = configurationPid;
+    }
 }

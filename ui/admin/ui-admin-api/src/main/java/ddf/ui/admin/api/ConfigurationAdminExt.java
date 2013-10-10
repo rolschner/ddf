@@ -12,6 +12,7 @@
 package ddf.ui.admin.api;
 
 
+import ddf.ui.admin.api.plugin.ConfigurationAdminPlugin;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
@@ -32,6 +33,7 @@ import org.slf4j.ext.XLogger;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -52,7 +54,7 @@ class ConfigurationAdminExt
 
     private final Map<String, ServiceTracker> services = new HashMap<String, ServiceTracker>();
 
-    private Map<String, Boolean> statusMap = new HashMap<String, Boolean>();
+    private List<ConfigurationAdminPlugin> configurationAdminPluginList;
 
     /**
      * @param bundleContext
@@ -122,9 +124,6 @@ class ConfigurationAdminExt
 
     final void listConfigurations(List<Map<String, Object>> json, String pidFilter)
     {
-        //Generate the map of configuration PIDs to source statuses
-        populateStatusMap();
-
         try
         {
             // Get ManagedService instances
@@ -206,9 +205,10 @@ class ConfigurationAdminExt
                         data.put("bundle_name", getName(bundle));
                     }
 
-                    //If we have status info on the configuration, add it
-                    if(statusMap.containsKey(id.toString())){
-                        data.put("available", statusMap.get(id.toString()));
+                    Map<String, Object> pluginDataMap = getConfigurationPluginData(id.toString(), Collections.unmodifiableMap(data));
+                    if(pluginDataMap != null && !pluginDataMap.isEmpty())
+                    {
+                        data.putAll(pluginDataMap);
                     }
                 }
             }
@@ -219,31 +219,18 @@ class ConfigurationAdminExt
         }
     }
 
-    /**
-     * Finds all Sources that implement the ConfiguredSource interface and
-     *  maps the configured sources' configuration PIDs to their statuses.
-     */
-    private void populateStatusMap() {
-        statusMap = new HashMap<String, Boolean>();
-        try{
-            ServiceReference[] refs = 
-                bundleContext.getAllServiceReferences("ddf.catalog.source.FederatedSource",null);
-            if(refs != null){
-                for(int i=0; i<refs.length; i++){
-                    Object superService = bundleContext.getService(refs[i]);
-                    if(superService instanceof ddf.catalog.source.FederatedSource
-                           && superService instanceof ddf.catalog.source.ConfiguredSource){
-                        ddf.catalog.source.ConfiguredSource cs = 
-                            (ddf.catalog.source.ConfiguredSource)superService;
-
-                        statusMap.put(cs.getConfigurationPid(), 
-                            ((ddf.catalog.source.FederatedSource)superService).isAvailable());
-                    }
-                }
+    private Map<String, Object> getConfigurationPluginData(String servicePid, Map<String, Object> dataMap)
+    {
+        Map<String, Object> allPluginMap = new HashMap<String, Object>();
+        if(configurationAdminPluginList != null)
+        {
+            for(ConfigurationAdminPlugin plugin : configurationAdminPluginList)
+            {
+                Map<String, Object> pluginDataMap = plugin.getConfigurationData(servicePid, dataMap, bundleContext);
+                allPluginMap.putAll(pluginDataMap);
             }
-        } catch(org.osgi.framework.InvalidSyntaxException e) {
-            logger.error("Error getting services", e);
         }
+        return allPluginMap;
     }
 
     /**
@@ -290,6 +277,11 @@ class ConfigurationAdminExt
             }
         }
         return true;
+    }
+
+    public void setConfigurationAdminPluginList(List<ConfigurationAdminPlugin> configurationAdminPluginList)
+    {
+        this.configurationAdminPluginList = configurationAdminPluginList;
     }
 
     /**

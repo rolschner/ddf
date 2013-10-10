@@ -9,29 +9,13 @@
  * <http://www.gnu.org/licenses/lgpl.html>.
  *
  **/
-package ddf.catalog.source;
+package ddf.catalog.service;
 
 /**
- * Describes a source that is created by a factory, and allows the source
- *  to be aware of its configuration pid for reliable matching between 
- *  configuration and source.
+ * @author Scott Tustison
  */
-public interface ConfiguredSource {
-
-    /**
-     * Sets the PID of this source's corresponding configuration
-     * 
-     * @param pid The unique PID of the configuration that corresponds to this
-     *  source
-     */
-    public void setConfigurationPid(String pid);
-
-    /**
-     * Returns the PID of this source's corresponding configuration
-     * 
-     * @return The unique PID of the configuration that corresponds to this
-     *  source
-     */
+public interface ConfiguredService
+{
     public String getConfigurationPid();
-
+    public void setConfigurationPid(String configurationPid);
 }

@@ -9,7 +9,7 @@
  * <http://www.gnu.org/licenses/lgpl.html>.
  *
  **/
-package ddf.catalog.source;
+package ddf.ui.admin.configuration.plugin;
 
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.cm.ConfigurationPlugin;
@@ -21,15 +21,15 @@ import java.util.Dictionary;
  * service (in this case a Source) so that the two can be correlated in the 
  * future.
  */
-public class SourceConfigurationPlugin implements ConfigurationPlugin {
+public class ConfigurationPluginImpl implements ConfigurationPlugin {
 
-    public SourceConfigurationPlugin() {
+    public ConfigurationPluginImpl() {
     }
 
-    public void init(){
+    public void init() {
     }
 
-    public void destroy(){
+    public void destroy() {
     }
 
     /**
@@ -46,4 +46,5 @@ public class SourceConfigurationPlugin implements ConfigurationPlugin {
     public void modifyConfiguration(ServiceReference<?> reference, Dictionary<String, Object> properties) {
         properties.put("configurationPid", properties.get("service.pid"));
     }
+
 }

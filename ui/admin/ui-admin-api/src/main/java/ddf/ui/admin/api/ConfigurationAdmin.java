@@ -11,6 +11,7 @@
  **/
 package ddf.ui.admin.api;
 
+import ddf.ui.admin.api.plugin.ConfigurationAdminPlugin;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.osgi.framework.BundleContext;
@@ -44,11 +45,12 @@ public class ConfigurationAdmin implements ConfigurationAdminMBean
     private static final String SERVICE_PID = "service.pid";
     private static final String SERVICE_FACTORYPID = "service.factorypid";
 
-    private org.osgi.service.cm.ConfigurationAdmin configurationAdmin;
-    private ConfigurationAdminExt configAdminSupport;
+    private final org.osgi.service.cm.ConfigurationAdmin configurationAdmin;
+    private final ConfigurationAdminExt configurationAdminExt;
     private ObjectName objectName;
     private MBeanServer mBeanServer;
     private List<String> filterList;
+    private List<ConfigurationAdminPlugin> configurationAdminPluginList;
 
     /**
      * Constructs a ConfigurationAdmin implementation
@@ -58,7 +60,7 @@ public class ConfigurationAdmin implements ConfigurationAdminMBean
     public ConfigurationAdmin(BundleContext bundleContext, org.osgi.service.cm.ConfigurationAdmin configurationAdmin)
     {
         this.configurationAdmin = configurationAdmin;
-        configAdminSupport = new ConfigurationAdminExt(bundleContext, configurationAdmin);
+        configurationAdminExt = new ConfigurationAdminExt(bundleContext, configurationAdmin);
     }
 
     /**
@@ -114,6 +116,17 @@ public class ConfigurationAdmin implements ConfigurationAdminMBean
         }
     }
 
+    public List<ConfigurationAdminPlugin> getConfigurationAdminPluginList()
+    {
+        return configurationAdminPluginList;
+    }
+
+    public void setConfigurationAdminPluginList(List<ConfigurationAdminPlugin> configurationAdminPluginList)
+    {
+        this.configurationAdminPluginList = configurationAdminPluginList;
+        configurationAdminExt.setConfigurationAdminPluginList(configurationAdminPluginList);
+    }
+
     /**
      * @see ConfigurationAdminMBean#listDefaultFilteredFactoryConfigurations()
      */
@@ -139,7 +152,7 @@ public class ConfigurationAdmin implements ConfigurationAdminMBean
     {
         List<Map<String, Object>> json = new ArrayList<Map<String, Object>>();
 
-        configAdminSupport.listConfigurations(json, pidFilter);
+        configurationAdminExt.listConfigurations(json, pidFilter);
         for(Map<String, Object> configuration : json)
         {
             try
@@ -163,7 +176,7 @@ public class ConfigurationAdmin implements ConfigurationAdminMBean
     {
         List<Map<String, Object>> json = new ArrayList<Map<String, Object>>();
 
-        configAdminSupport.listFactoryConfigurations(json, pidFilter);
+        configurationAdminExt.listFactoryConfigurations(json, pidFilter);
         for(Map<String, Object> factoryConfiguration : json)
         {
             List<Map<String, Object>> configurations = listConfigurations("(" + SERVICE_FACTORYPID + "=" + factoryConfiguration.get("id") + ")");
@@ -405,12 +418,12 @@ public class ConfigurationAdmin implements ConfigurationAdminMBean
         this.filterList = filterList;
     }
     
-    public void disableSource(String servicePid) throws IOException{
+    public void disableConfiguration(String servicePid) throws IOException{
 	if(StringUtils.isEmpty(servicePid)){
 	    throw new IOException("Service PID of Source to be disabled must be specified.  Service PID provided: " + servicePid);
 	}
 	
-	Configuration originalConfig = configAdminSupport.getConfiguration(servicePid);
+	Configuration originalConfig = configurationAdminExt.getConfiguration(servicePid);
 	
 	if(originalConfig == null){
 	    throw new IOException("No Source exists with the service PID: " + servicePid);
@@ -432,12 +445,12 @@ public class ConfigurationAdmin implements ConfigurationAdminMBean
 	originalConfig.delete();
     }
     
-    public void enableSource(String servicePid) throws IOException{
+    public void enableConfiguration(String servicePid) throws IOException{
 	if(StringUtils.isEmpty(servicePid)){
 	    throw new IOException("Service PID of Source to be disabled must be specified.  Service PID provided: " + servicePid);
 	}
 	
-	Configuration disabledConfig = configAdminSupport.getConfiguration(servicePid);
+	Configuration disabledConfig = configurationAdminExt.getConfiguration(servicePid);
 	
 	if(disabledConfig == null){
 	    throw new IOException("No Source exists with the service PID: " + servicePid);
