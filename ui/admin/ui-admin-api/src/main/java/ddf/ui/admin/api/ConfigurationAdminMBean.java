@@ -210,7 +210,7 @@ public interface ConfigurationAdminMBean
      * @param servicePid that uniquely identifies the source to enable.
      * @throws IOException if the Source to be enabled cannot be located via the provided service PID.
      */
-    void enableSource(String servicePid) throws IOException;
+    void enableConfiguration(String servicePid) throws IOException;
     
     /**
      * Disables a {@link Source} to prevent it from being queried by the {@link CatalogFramework} but preserves
@@ -219,5 +219,5 @@ public interface ConfigurationAdminMBean
      * @param servicePid that uniquely identifies the source to disable.
      * @throws IOException if the Source to be disabled cannot be located via the provided service PID.
      */
-    void disableSource(String servicePid) throws IOException;
+    void disableConfiguration(String servicePid) throws IOException;
 }

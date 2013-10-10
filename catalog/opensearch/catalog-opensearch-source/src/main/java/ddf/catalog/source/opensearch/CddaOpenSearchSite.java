@@ -70,17 +70,20 @@ import ddf.catalog.operation.SourceResponse;
 import ddf.catalog.operation.SourceResponseImpl;
 import ddf.catalog.resource.ResourceNotFoundException;
 import ddf.catalog.resource.ResourceNotSupportedException;
+import ddf.catalog.service.ConfiguredService;
 import ddf.catalog.source.FederatedSource;
 import ddf.catalog.source.SourceMonitor;
 import ddf.catalog.source.UnsupportedQueryException;
 import ddf.util.XPathHelper;
+
+
 
 /**
  * Federated site that talks via OpenSearch to the DDF platform. Communication is usually performed
  * via https which requires a keystore and trust store to be provided.
  * 
  */
-public final class CddaOpenSearchSite implements FederatedSource {
+public final class CddaOpenSearchSite implements FederatedSource, ConfiguredService {
     private boolean isInitialized = false;
 
     // service properties
@@ -145,6 +148,7 @@ public final class CddaOpenSearchSite implements FederatedSource {
     private Configuration siteSecurityConfig;
 
     private SecureRemoteConnection connection;
+    private String configurationPid;
 
     /**
      * Creates an OpenSearch Site instance. Sets an initial default endpointUrl that can be
@@ -906,4 +910,15 @@ public final class CddaOpenSearchSite implements FederatedSource {
         logger.exit(methodName + ":   endpointUrl = " + endpointUrl);
     }
 
+    @Override
+    public String getConfigurationPid()
+    {
+        return configurationPid;
+    }
+
+    @Override
+    public void setConfigurationPid(String configurationPid)
+    {
+        this.configurationPid = configurationPid;
+    }
 }

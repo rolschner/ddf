@@ -97,14 +97,4 @@
 
     </osgix:managed-service-factory>
 
-    <!--
-      Defines the Configuration Plugin for OpenSearch sources
-    -->
-    <beans:bean id="OpenSearchConfigPlugin" class="ddf.catalog.source.SourceConfigurationPlugin"
-                init-method="init" destroy-method="destroy">
-    </beans:bean>
-
-    <osgi:service id="OpenSearchConfigService" ref="OpenSearchConfigPlugin" 
-                interface="org.osgi.service.cm.ConfigurationPlugin" />
-
 </beans:beans>

@@ -21,7 +21,9 @@
         <version>2.3.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <name>DDF :: UI :: Admin :: API</name>
+
+    <artifactId>ui-admin-configadminplugin</artifactId>
+    <name>DDF :: UI :: Admin :: ConfigurationAdmin Plugin</name>
     <packaging>bundle</packaging>
 
     <dependencies>
@@ -30,21 +32,9 @@
             <artifactId>catalog-core-api</artifactId>
         </dependency>
         <dependency>
-            <artifactId>org.apache.aries.jmx.api</artifactId>
-            <groupId>org.apache.aries.jmx</groupId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.aries.jmx</groupId>
-            <artifactId>org.apache.aries.jmx.core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.json</groupId>
-            <artifactId>org.json</artifactId>
-            <version>chargebee-1.0</version>
+            <groupId>ddf.ui.admin</groupId>
+            <artifactId>ui-admin-api</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.osgi</groupId>
@@ -63,16 +53,14 @@
             <artifactId>slf4j-ext</artifactId>
         </dependency>
         <dependency>
-        	<groupId>commons-lang</groupId>
-        	<artifactId>commons-lang</artifactId>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
         </dependency>
         <dependency>
-        	<groupId>commons-collections</groupId>
-        	<artifactId>commons-collections</artifactId>
+            <groupId>commons-collections</groupId>
+            <artifactId>commons-collections</artifactId>
         </dependency>
     </dependencies>
-
-    <artifactId>ui-admin-api</artifactId>
 
     <build>
         <plugins>
@@ -87,6 +75,5 @@
             </plugin>
         </plugins>
     </build>
-
 
 </project>
