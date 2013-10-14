@@ -11,40 +11,7 @@
  **/
 package ddf.catalog.source.solr;
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Properties;
-import java.util.Set;
-import java.util.UUID;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.log4j.Logger;
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrQuery.ORDER;
-import org.apache.solr.client.solrj.SolrRequest.METHOD;
-import org.apache.solr.client.solrj.SolrServer;
-import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.request.AbstractUpdateRequest.ACTION;
-import org.apache.solr.client.solrj.response.FacetField;
-import org.apache.solr.client.solrj.response.PivotField;
-import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.client.solrj.response.SolrPingResponse;
-import org.apache.solr.common.SolrDocument;
-import org.apache.solr.common.SolrDocumentList;
-import org.apache.solr.common.SolrException;
-import org.apache.solr.common.SolrInputDocument;
-import org.opengis.filter.sort.SortBy;
-import org.opengis.filter.sort.SortOrder;
-
 import com.spatial4j.core.distance.DistanceUtils;
-
 import ddf.catalog.data.AttributeImpl;
 import ddf.catalog.data.AttributeType.AttributeFormat;
 import ddf.catalog.data.ContentType;
@@ -71,6 +38,7 @@ import ddf.catalog.operation.UpdateImpl;
 import ddf.catalog.operation.UpdateRequest;
 import ddf.catalog.operation.UpdateResponse;
 import ddf.catalog.operation.UpdateResponseImpl;
+import ddf.catalog.service.ConfiguredService;
 import ddf.catalog.source.CatalogProvider;
 import ddf.catalog.source.IngestException;
 import ddf.catalog.source.SourceMonitor;
@@ -78,6 +46,37 @@ import ddf.catalog.source.UnsupportedQueryException;
 import ddf.catalog.util.MaskableImpl;
 import ddf.measure.Distance;
 import ddf.measure.Distance.LinearUnit;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.log4j.Logger;
+import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrQuery.ORDER;
+import org.apache.solr.client.solrj.SolrRequest.METHOD;
+import org.apache.solr.client.solrj.SolrServer;
+import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.request.AbstractUpdateRequest.ACTION;
+import org.apache.solr.client.solrj.response.FacetField;
+import org.apache.solr.client.solrj.response.PivotField;
+import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.client.solrj.response.SolrPingResponse;
+import org.apache.solr.common.SolrDocument;
+import org.apache.solr.common.SolrDocumentList;
+import org.apache.solr.common.SolrException;
+import org.apache.solr.common.SolrInputDocument;
+import org.opengis.filter.sort.SortBy;
+import org.opengis.filter.sort.SortOrder;
+
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Properties;
+import java.util.Set;
+import java.util.UUID;
 
 /**
  * {@link CatalogProvider} implementation using Apache Solr 4.0
@@ -87,7 +86,8 @@ import ddf.measure.Distance.LinearUnit;
  * 
  */
 public class SolrCatalogProvider extends MaskableImpl implements
-        CatalogProvider {
+        CatalogProvider, ConfiguredService
+{
 
     private static final String COULD_NOT_COMPLETE_DELETE_REQUEST_MESSAGE = "Could not complete delete request.";
 
@@ -127,6 +127,8 @@ public class SolrCatalogProvider extends MaskableImpl implements
         }
 
     }
+
+    private String configurationPid;
 
     /**
      * Constructor that creates a new instance and allows for a custom
@@ -965,4 +967,15 @@ public class SolrCatalogProvider extends MaskableImpl implements
         server.shutdown();
     }
 
+    @Override
+    public String getConfigurationPid()
+    {
+        return configurationPid;
+    }
+
+    @Override
+    public void setConfigurationPid(String configurationPid)
+    {
+        this.configurationPid = configurationPid;
+    }
 }
