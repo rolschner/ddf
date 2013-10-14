@@ -12,10 +12,20 @@
 package ddf.catalog.service;
 
 /**
+ * Describes a service that is created via ConfigurationAdmin.
  * @author Scott Tustison
  */
 public interface ConfiguredService
 {
+    /**
+     * Returns the PID of the configuration that corresponds to this service
+     * @return The unique PID of the configuration associated with this service
+     */
     public String getConfigurationPid();
+
+    /**
+     * Sets the PID of this service's corresponding configuration
+     * @param configurationPid The unique PID of the configuration associated with this service
+     */
     public void setConfigurationPid(String configurationPid);
 }
