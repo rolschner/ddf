@@ -249,7 +249,7 @@ function initializeBackboneObjects(){
                 labelClass += "label-important";
             }
             else if(sourceStatus === "Unknown") {
-                labelClass += "label-warning";
+                labelClass += "disabled";
             }
 
             return "<span class='"+labelClass+"'>"+sourceStatus+"</span>";
