@@ -128,10 +128,31 @@ class ConfigurationAdminExt
         {
             // Get ManagedService instances
             List<Map<String, Object>> serviceList = getServices(ManagedService.class.getName(), pidFilter, true);
-            json.addAll(serviceList);
+
             // Get Metatypes
             List<Map<String, Object>> metatypeList = addMetaTypeNamesToMap(getPidObjectClasses(), pidFilter, Constants.SERVICE_PID);
-            json.addAll(metatypeList);
+
+            for(Map<String, Object> metatype : metatypeList)
+            {
+                if(metatype.get("id") != null)
+                {
+                    boolean exists = false;
+                    for(Map<String, Object> service : serviceList)
+                    {
+                        if(service.get("id") != null && metatype.get("id").equals(service.get("id")))
+                        {
+                            exists = true;
+                            service.putAll(metatype);
+                        }
+                    }
+                    if(!exists)
+                    {
+                        json.add(metatype);
+                    }
+                }
+            }
+            json.addAll(serviceList);
+
             // Get configurations
             Configuration[] cfgs = service.listConfigurations(pidFilter);
             for (int i = 0; cfgs != null && i < cfgs.length; i++)
@@ -205,6 +226,16 @@ class ConfigurationAdminExt
                         data.put("bundle_name", getName(bundle));
                     }
 
+                    Map<String, Object> pluginDataMap = getConfigurationPluginData(id.toString(), Collections.unmodifiableMap(data));
+                    if(pluginDataMap != null && !pluginDataMap.isEmpty())
+                    {
+                        data.putAll(pluginDataMap);
+                    }
+                }
+                else
+                {
+                    //this could be an unconfigured service if this is null so we can ignore the configuration steps
+                    //but we still need to check our plugins to see if they know about this service
                     Map<String, Object> pluginDataMap = getConfigurationPluginData(id.toString(), Collections.unmodifiableMap(data));
                     if(pluginDataMap != null && !pluginDataMap.isEmpty())
                     {
@@ -526,8 +557,29 @@ class ConfigurationAdminExt
             List<Map<String, Object>> metatypeList = addMetaTypeNamesToMap(getFactoryPidObjectClasses(), pidFilter,
                     ConfigurationAdmin.SERVICE_FACTORYPID);
 
+
+
+            for(Map<String, Object> metatype : metatypeList)
+            {
+                if(metatype.get("id") != null)
+                {
+                    boolean exists = false;
+                    for(Map<String, Object> service : serviceList)
+                    {
+                        if(service.get("id") != null && metatype.get("id").equals(service.get("id")))
+                        {
+                            exists = true;
+                            service.putAll(metatype);
+                        }
+                    }
+                    if(!exists)
+                    {
+                        json.add(metatype);
+                    }
+                }
+            }
+
             json.addAll(serviceList);
-            json.addAll(metatypeList);
         }
         catch (Exception e)
         {
@@ -554,7 +606,7 @@ class ConfigurationAdminExt
         List<Map<String, Object>> serviceList = new ArrayList<Map<String, Object>>();
 
         // find all ManagedServiceFactories to get the factoryPIDs
-        ServiceReference[] refs = this.getBundleContext().getServiceReferences(serviceClass, serviceFilter);
+        ServiceReference[] refs = this.getBundleContext().getAllServiceReferences(serviceClass, serviceFilter);
         for (int i = 0; refs != null && i < refs.length; i++)
         {
             Object pidObject = refs[i].getProperty(Constants.SERVICE_PID);

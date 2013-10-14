@@ -15,6 +15,7 @@ import ddf.catalog.CatalogFramework;
 import ddf.catalog.operation.SourceInfoRequestEnterprise;
 import ddf.catalog.operation.SourceInfoResponse;
 import ddf.catalog.service.ConfiguredService;
+import ddf.catalog.source.CatalogProvider;
 import ddf.catalog.source.FederatedSource;
 import ddf.catalog.source.SourceDescriptor;
 import ddf.catalog.source.SourceUnavailableException;
@@ -25,7 +26,10 @@ import org.osgi.framework.ServiceReference;
 import org.slf4j.LoggerFactory;
 import org.slf4j.ext.XLogger;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -74,29 +78,44 @@ public class SourceConfigurationAdminPlugin implements ConfigurationAdminPlugin
         Map<String, Object> statusMap = new HashMap<String, Object>();
         try
         {
-            ServiceReference[] refs = bundleContext.getAllServiceReferences(FederatedSource.class.getCanonicalName(), null);
-            if (refs != null)
+            ServiceReference[] fedRefs = bundleContext.getAllServiceReferences(FederatedSource.class.getCanonicalName(), null);
+            ServiceReference[] provRefs = bundleContext.getAllServiceReferences(CatalogProvider.class.getCanonicalName(), null);
+            List<ServiceReference> refs = new ArrayList<ServiceReference>();
+            if(fedRefs != null)
+            {
+                refs.addAll(Arrays.asList(fedRefs));
+            }
+            if(provRefs != null)
+            {
+                refs.addAll(Arrays.asList(provRefs));
+            }
+            Set<SourceDescriptor> sources = null;
+            if(catalogFramework != null)
+            {
+                SourceInfoResponse response = catalogFramework.getSourceInfo(new SourceInfoRequestEnterprise(true));
+                sources = response.getSourceInfo();
+            }
+            if (!refs.isEmpty())
             {
                 for (ServiceReference ref : refs)
                 {
                     Object superService = bundleContext.getService(ref);
-                    //it should already be an instance of FederatedSource since that's what we asked for, but doesn't
-                    //hurt to check it again
-                    if (superService instanceof FederatedSource && superService instanceof ConfiguredService)
+                    if ((superService instanceof FederatedSource || superService instanceof CatalogProvider)
+                            && superService instanceof ConfiguredService)
                     {
                         ConfiguredService cs = (ConfiguredService) superService;
 
                         if (StringUtils.isNotEmpty(cs.getConfigurationPid()) && cs.getConfigurationPid().equals(configurationPid))
                         {
-                            if(catalogFramework != null)
+                            if(sources != null)
                             {
-                                SourceInfoResponse response = catalogFramework.getSourceInfo(new SourceInfoRequestEnterprise(true));
-                                Set<SourceDescriptor> sources = response.getSourceInfo();
                                 for(SourceDescriptor descriptor : sources)
                                 {
-                                    if(descriptor.getSourceId().equals(((FederatedSource) superService).getId()))
+                                    if(superService instanceof FederatedSource && descriptor.getSourceId().equals(((FederatedSource) superService).getId())
+                                            || superService instanceof CatalogProvider && descriptor.getSourceId().equals(((CatalogProvider) superService).getId()))
                                     {
                                         statusMap.put("available", descriptor.isAvailable());
+                                        return statusMap;
                                     }
                                 }
                             }
@@ -104,7 +123,30 @@ public class SourceConfigurationAdminPlugin implements ConfigurationAdminPlugin
                             {
                                 //we don't want to call isAvailable because that can potentially block execution
                                 //but if for some reason we have no catalog framework, just hit the source directly
-                                statusMap.put("available", ((FederatedSource) superService).isAvailable());
+                                if(superService instanceof FederatedSource)
+                                {
+                                    statusMap.put("available", ((FederatedSource) superService).isAvailable());
+                                    return statusMap;
+                                }
+                                else if(superService instanceof CatalogProvider)
+                                {
+                                    statusMap.put("available", ((CatalogProvider) superService).isAvailable());
+                                    return statusMap;
+                                }
+                            }
+                        }
+                        else if(StringUtils.isEmpty(cs.getConfigurationPid()))
+                        {
+                            //might be an unconfigured source so we'll make a best guess as to which source this
+                            //configuration belongs to
+                            for(SourceDescriptor descriptor : sources)
+                            {
+                                if(superService instanceof FederatedSource && descriptor.getSourceId().equals(((FederatedSource) superService).getId())
+                                        || superService instanceof CatalogProvider && descriptor.getSourceId().equals(((CatalogProvider) superService).getId()))
+                                {
+                                    statusMap.put("available", descriptor.isAvailable());
+                                    return statusMap;
+                                }
                             }
                         }
                     }
