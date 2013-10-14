@@ -24,6 +24,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <name>DDF :: UI :: Admin</name>
+    <description>Admin UI for DDF</description>
     <groupId>ddf.ui.admin</groupId>
     <artifactId>admin</artifactId>
     <packaging>pom</packaging>
