@@ -232,7 +232,7 @@ function initializeBackboneObjects(){
 //        },
         render: function() {
             this.$el.html(this.template({attrs: [
-                        this.createNameHtml(this.model.shortName),
+                        this.createNameHtml((this.model.shortName) ? this.model.shortName : this.model.id),
                         this.model.fpid,
                         this.createStatusHtml(this.model.sourceStatus)]}));
             return this;
