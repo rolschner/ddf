@@ -41,7 +41,7 @@ public class TikaMimeTypeResolver implements MimeTypeResolver
     
     
     /**
-     * Constructs the Tika instance that will be used for mime type resolution.
+     * Constructs the Tika instance to be used for mime type resolution.
      */
     public TikaMimeTypeResolver()
     {
