@@ -21,10 +21,10 @@
         <version>2.3.0-SNAPSHOT</version>
     </parent>
 
-    <name>DDF :: UI :: Admin :: Sources</name>
+    <name>DDF :: UI :: Admin :: Main</name>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>ui-admin-sources</artifactId>
+    <artifactId>ui-admin-main</artifactId>
     <packaging>war</packaging>
 
     <properties>
@@ -32,7 +32,7 @@
         <plugin-context>/hawtio/${project.artifactId}</plugin-context>
         <plugin-name>${project.artifactId}</plugin-name>
         <plugin-domain></plugin-domain>
-        <plugin-scripts>app/js/hawt-io-tab.js,app/lib/underscore/underscore.js,app/lib/backbone/backbone.js,app/js/sources.js</plugin-scripts>
+        <plugin-scripts>app/js/hawt-io-tab.js,app/js/underscore/underscore.js,app/js/backbone.js,app/client/views/ManagedServiceFactory.view.js</plugin-scripts>
 
     </properties>
 

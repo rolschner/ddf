@@ -18,11 +18,10 @@
     <feature name="ui-admin" version="${project.version}" description="Admin UI">
         <feature>hawtio</feature>
         <bundle>mvn:org.apache.aries.jmx/org.apache.aries.jmx.core/1.1.1</bundle>
-        <bundle>mvn:ddf.ui.admin/ui-admin-example/${project.version}/war</bundle>
         <bundle>mvn:ddf.ui.admin/ui-admin-api/${project.version}</bundle>
         <bundle>mvn:ddf.ui.admin/ui-admin-configadminplugin/${project.version}</bundle>
         <bundle>mvn:ddf.ui.admin/ui-admin-configplugin/${project.version}</bundle>
-        <bundle>mvn:ddf.ui.admin/ui-admin-federated-add/${project.version}/war</bundle>
+        <bundle>mvn:ddf.ui.admin/ui-admin-main/${project.version}/war</bundle>
     </feature>
 
 </features>
