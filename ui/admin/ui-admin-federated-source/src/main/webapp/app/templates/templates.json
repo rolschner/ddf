@@ -8,20 +8,20 @@
      },
      {
          "name": "textType",
-         "template": "<div class='{{id}} metatype'><label>{{name}}</label><input type='text' class='{{id}} metatype' name='{{id}}' value='{{defaultValue}}{{.}}{{/defaultValue}}'>{{#description}}<a href='#' class='description' data-title='{{id}}'><i class='icon-question-sign'></i></a>{{/description}}</div>"
+         "template": "<div class='{{id}} metatype'><label>{{name}}</label><input type='text' class='{{id}} metatype' name='{{id}}' id='{{id}}' value='{{defaultValue}}{{.}}{{/defaultValue}}'>{{#description}}<a href='#' class='description' data-title='{{id}}'><i class='icon-question-sign'></i></a>{{/description}}</div>"
      },
      {
          "name": "passwordType",
-         "template": "<div class='{{id}}' metatype'><label>{{name}}</label><input type='password' class='{{id}} metatype' name='{{id}}' value='{{defaultValue}}{{.}}{{/defaultValue}}'>{{#description}}<a href='#' class='description' data-title='{{id}}'><i class='icon-question-sign'></i></a>{{/description}}</div>"
+         "template": "<div class='{{id}}' metatype'><label>{{name}}</label><input type='password' class='{{id}} metatype' name='{{id}}' id='{{id}}' value='{{defaultValue}}{{.}}{{/defaultValue}}'>{{#description}}<a href='#' class='description' data-title='{{id}}'><i class='icon-question-sign'></i></a>{{/description}}</div>"
 
      },
      {
         "name": "checkboxType",
-         "template": "<div class='{{id}} metatype'><label class='checkbox'><input type='checkbox' name='{{id}}' {{#defaultValue}}{{#.}}checked{{/.}}{{/defaultValue}}>{{name}}{{#description}}<a href='#' class='description' data-title='{{id}}'><i class='icon-question-sign'></i></a>{{/description}}</label></div>"
+         "template": "<div class='{{id}} metatype'><label class='checkbox'><input type='checkbox' name='{{id}}' id='{{id}}' {{#defaultValue}}{{#.}}checked{{/.}}{{/defaultValue}}>{{name}}{{#description}}<a href='#' class='description' data-title='{{id}}'><i class='icon-question-sign'></i></a>{{/description}}</label></div>"
      },
      {
         "name": "checkboxEnableType",
-        "template": "<div class='enable-checkbox'><label class='checkbox'><input type='checkbox' name='thisName' {{#isEnabled}}{{#.}}checked{{/.}}{{/isEnabled}}>Enabled</div>"
+        "template": "<div class='enable-checkbox'><label class='checkbox'><input type='checkbox' name='thisName' id='{{id}}' {{#isEnabled}}{{#.}}checked{{/.}}{{/isEnabled}}>Enabled</div>"
      },
      {
          "name": "optionListType",

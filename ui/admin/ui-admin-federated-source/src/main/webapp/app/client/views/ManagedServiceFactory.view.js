@@ -1,13 +1,14 @@
 /** Main view page for add. */
-var AddFederatedView = Backbone.View.extend({
+var ManagedServiceFactoryView = Backbone.View.extend({
     /**
      * Button events, right now there's a submit button
      * I do not know where to go with the cancel button.
      */
     events: {
         "click .submit-button": "submitData",
+        "click #cancel": "cancel",
         "click .enable-checkbox" : "toggleEnable",
-        "change .sourceTypesSelect" : "selectSourceType"
+        "change .sourceTypesSelect" : "renderDisplay"
     },
 
     /**
@@ -15,13 +16,17 @@ var AddFederatedView = Backbone.View.extend({
      * @param options
      */
     initialize: function(options) {
-        _.bindAll(this, "render", "close", "setupPopOvers", "renderDynamicFields", "submitData");
+        _.bindAll(this, "render", "close", "cancel", "setupPopOvers", "renderDisplay", "renderDynamicFields", "submitData", "setSelectedType", "toggleEnable");
         if(_.isUndefined(options.managedServiceFactory)) {
             options.managedServiceFactory = new ManagedServiceFactory();
         }
+        if(!_.isUndefined(options.sourceModel))
+        {
+            options.managedServiceFactory.attributes = _.clone(options.sourceModel.properties);
+        }
         this.managedServiceFactory = options.managedServiceFactory;
         this.managedServiceFactoryList = options.managedServiceFactoryList;
-        console.log("federated source model: " + this.managedServiceFactory.isEnabled);
+        this.model = options.sourceModel;
         this.modelBinder = new Backbone.ModelBinder();
     },
 
@@ -37,7 +42,9 @@ var AddFederatedView = Backbone.View.extend({
     render: function() {
         var view = this,
             jsonObj = view.managedServiceFactory.toJSON();
-        view.$el.append(ich.mainTemplate(jsonObj));
+        view.$el.append(ich.editTemplate(jsonObj));
+        view.$(".sourceTypesSelect").html("");
+        view.renderTypeDropdown();
         return view.renderDisplay();
     },
 
@@ -53,12 +60,23 @@ var AddFederatedView = Backbone.View.extend({
     renderDisplay: function() {
         var view = this;
         view.$(".data-section").html("");
-//        view.$(".data-section").append(ich.checkboxEnableType(view.managedServiceFactory.toJSON()));
+        view.setSelectedType();
         view.renderDynamicFields();
         view.setupPopOvers();
         view.modelBinder.bind(view.managedServiceFactory, view.$(".add-federated-source"),
             null, {initialCopyDirection: Backbone.ModelBinder.Constants.ViewToModel});
         return view;
+    },
+    /**
+     * Renders the type dropdown box
+     */
+    renderTypeDropdown: function() {
+        var view = this;
+        view.$(".sourceTypesSelect").append(ich.optionListType({"list": view.managedServiceFactoryList.toJSON()}));
+        if(view.model)
+        {
+            view.$(".sourceTypesSelect").val(view.model.fpid);
+        }
     },
 
     /**
@@ -68,8 +86,7 @@ var AddFederatedView = Backbone.View.extend({
      */
     renderDynamicFields: function() {
         var view = this;
-
-        view.$(".sourceTypesSelect").append(ich.optionListType({"list": view.managedServiceFactoryList.toJSON()}));
+        //view.$(".data-section").append(ich.checkboxEnableType(view.managedServiceFactory.toJSON()));
 
         view.collection.forEach(function(each) {
            var type = each.get("type");
@@ -84,13 +101,22 @@ var AddFederatedView = Backbone.View.extend({
 
            }
         });
+
+        if(view.model)
+        {
+            for(var property in view.model.properties)
+            {
+                view.$("#"+property).val(view.model.properties[property]);
+            }
+        }
     },
     /**
      * Submit to the backend.
      */
     submitData: function() {
-      var view = this;
-      view.managedServiceFactory.save();
+        var view = this;
+        view.managedServiceFactory.save();
+        view.cancel();
     },
     /**
      * unbind the model and dom during close.
@@ -98,6 +124,18 @@ var AddFederatedView = Backbone.View.extend({
     close: function(){
       var view = this;
       view.modelBinder.unbind();
+    },
+    /**
+     * returns the user to the source list page without saving
+     */
+    cancel: function(){
+        var view = this;
+        view.close();
+        var sPage = new SourcePage({
+            el: $("#main")
+        });
+        sPage.render();
+        sPage.refreshSources();
     },
     /**
      * Set up the popovers based on if the selector has a description.
@@ -131,8 +169,10 @@ var AddFederatedView = Backbone.View.extend({
     	    this.managedServiceFactory.isEnabled = true;
     	}
     },
-
-    selectSourceType: function() {
+    /**
+     * Sets the selected type from the dropdown
+     */
+    setSelectedType: function() {
         var view = this;
         var selectedValue = view.$(".sourceTypesSelect").val();
         view.managedServiceFactoryList.forEach(function(each) {
@@ -142,7 +182,6 @@ var AddFederatedView = Backbone.View.extend({
                 view.collection = new MetaType.Collection(each.get("metatype"));
             }
         });
-        view.renderDisplay();
     }
 });
 
