@@ -14,6 +14,7 @@
  **/
 
 .sourcesTable {
+    display: table;
 }
 
 .sourcesTable th {
@@ -27,5 +28,17 @@
 }
 
 .addSourceLink {
+
+}
+
+.sourcesRow {
+    display: table-row;
+}
+
+.sourcesCell {
+    display: table-cell;
+}
+
+.sources {
 
 }

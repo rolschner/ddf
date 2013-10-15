@@ -54,9 +54,11 @@ var ManagedServiceFactory = Backbone.Model.extend({
     sync: function () {
         var deferred = $.Deferred(),
             model = this,
-            addUrl = [model.configUrl, "add"].join("/")
-        model.makeConfigCall(model).done(function (data) {
-            var collect = model.collectedData(JSON.parse(data).value),
+            addUrl = [model.configUrl, "add"].join("/");
+        //if it has a pid we are editing an existing record
+        if(model.attributes["service.pid"])
+        {
+            var collect = model.collectedData(model.attributes["service.pid"]),
                 jData = JSON.stringify(collect);
 
             return $.ajax({
@@ -69,13 +71,39 @@ var ManagedServiceFactory = Backbone.Model.extend({
                 }).fail(function (error) {
                     deferred.fail(error);
                 });
-        }).fail(function (error) {
-                deferred.fail(error);
-            });
+        }
+        else //no pid means this is a new record
+        {
+            model.makeConfigCall(model).done(function (data) {
+                var collect = model.collectedData(JSON.parse(data).value),
+                    jData = JSON.stringify(collect);
+
+                return $.ajax({
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: jData,
+                    url: addUrl
+                }).done(function (result) {
+                        deferred.resolve(result);
+                    }).fail(function (error) {
+                        deferred.fail(error);
+                    });
+            }).fail(function (error) {
+                    deferred.fail(error);
+                });
+        }
         return deferred;
     }
 });
 
 ManagedServiceFactory.Collection = Backbone.Collection.extend({
-    model : ManagedServiceFactory
+    model : ManagedServiceFactory,
+    url : "/hawtio/jolokia/exec/ddf.ui.admin.api.ConfigurationAdmin:service=ui,version=2.3.0/listDefaultFilteredFactoryConfigurations/",
+    sync: function(method, model, options) {
+        options.dataType = "json";
+        return Backbone.sync(method, model, options);
+    },
+    parse: function (response) {
+        return response.value;
+    }
 });

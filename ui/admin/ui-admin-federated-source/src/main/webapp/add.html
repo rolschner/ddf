@@ -12,9 +12,9 @@
     <script type="text/javascript" src="app/js/bootstrap/js/bootstrap.js"></script>
     <script type="text/javascript" src="app/js/modelbinder/Backbone.ModelBinder.js"></script>
     <script type="text/javascript" src="app/js/modelbinder/Backbone.CollectionBinder.js"></script>
-    <script type="text/javascript" src="app/client/views/add.federated.source.view.js"></script>
-    <script type="text/javascript" src="app/client/models/add.federated.source.model.js"></script>
-    <script type="text/javascript" src="app/client/models/metatype.model.js"></script>
+    <script type="text/javascript" src="app/client/views/ManagedServiceFactory.view.js"></script>
+    <script type="text/javascript" src="app/client/models/ManagedServiceFactory.js"></script>
+    <script type="text/javascript" src="app/client/models/Metatype.js"></script>
 
 </head>
 <body>
@@ -63,7 +63,7 @@
         var managedServiceFactoryList = new ManagedServiceFactory.Collection(viewData.value);
         managedServiceFactory.serviceFactoryPid = viewData.value[0].id;
         managedServiceFactory.name = viewData.value[0].name;
-        var federatedView = new AddFederatedView({collection: collection, managedServiceFactoryList: managedServiceFactoryList, managedServiceFactory: managedServiceFactory});
+        var federatedView = new ManagedServiceFactoryView({collection: collection, managedServiceFactoryList: managedServiceFactoryList, managedServiceFactory: managedServiceFactory});
         $("#main").html(federatedView.render().el);
     }
 </script>

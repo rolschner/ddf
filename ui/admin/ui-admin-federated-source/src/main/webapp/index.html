@@ -31,14 +31,75 @@
 	    <script type="text/javascript" src="app/js/modelbinder/Backbone.ModelBinder.js"></script>
 	    <script type="text/javascript" src="app/js/modelbinder/Backbone.CollectionBinder.js"></script>
         <script type="text/javascript" src="app/js/backbone.poller.min.js"></script>
-        <script type="text/javascript" src="app/client/views/add.federated.source.view.js"></script>
-    	<script type="text/javascript" src="app/client/models/add.federated.source.model.js"></script>
-    	<script type="text/javascript" src="app/client/models/metatype.model.js"></script>
-    	
-    	<script type="text/javascript" src="app/js/sources.js"></script>
+        <script type="text/javascript" src="app/client/views/ManagedServiceFactory.view.js"></script>
+    	<script type="text/javascript" src="app/client/models/ManagedServiceFactory.js"></script>
+    	<script type="text/javascript" src="app/client/models/Metatype.js"></script>
+        <script type="text/javascript" src="app/client/models/Source.js"></script>
+        <script type="text/javascript" src="app/client/views/Source.view.js"></script>
     </head>
     <body>
         <h3>Admin UI - Federated Sources</h3>
-        <div class="sourcesMain"></div>
+        <div id="breadcrum"></div>
+        <div id="main" class="container-fluid"></div>
     </body>
+    <script>
+        var sList;
+        var msfList;
+
+        /**
+         * Loading all the templates and getting the listDefaultFilteredFactoryConfiguration.
+         */
+        $(document).ready(function(){
+            var promises = [];
+
+            promises.push($.ajax("app/templates/editSourceTemplate.html"));
+            promises.push($.ajax("app/templates/listSourceTemplate.html"));
+            promises.push($.ajax({url: "app/templates/templates.json", dataType:"json"}));
+            $.when.apply(null, promises).done(function(template1, template2, template3, data){
+                if (template1 && template1.length > 0 && template2 && template2.length > 0 && template3 && template3.length > 0) {
+
+                    ich.addTemplate("editTemplate", template1[0]);
+                    ich.addTemplate("listTemplate", template2[0]);
+                    _.each(template3[0], function(template) {
+                        ich.addTemplate(template.name, template.template);
+                    });
+                }
+
+                init();
+            }).fail(function(error){
+                if (error.status === 403) {
+                    window.location.replace("/hawtio/index.html#/login");
+                } else {
+                    alert("an error happened " + error.statusText);
+                }
+            });
+
+
+        });
+
+        init = function() {
+            sList = new SourceList();
+            sList.fetch();
+
+            msfList = new ManagedServiceFactory.Collection();
+            msfList.fetch();
+
+            var options = {
+                // default delay is 1000ms
+                delay: 30000
+            }
+
+            var poller = Backbone.Poller.get(sList, options);
+            poller.start();
+
+            var sPage = new SourcePage({
+                el: $("#main")
+            });
+            sPage.render();
+
+            editRouter = new EditRouter();
+
+            Backbone.history.start();
+        }
+    </script>
 </html>
