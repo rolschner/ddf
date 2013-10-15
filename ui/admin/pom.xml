@@ -32,9 +32,7 @@
         <module>ui-admin-api</module>
         <module>ui-admin-configplugin</module>
         <module>ui-admin-configadminplugin</module>
-        <module>ui-admin-example</module>
-        <module>ui-admin-federated-source</module>
-        <module>ui-admin-sources</module>
+        <module>ui-admin-main</module>
         <module>ui-admin-app</module>
     </modules>
 
