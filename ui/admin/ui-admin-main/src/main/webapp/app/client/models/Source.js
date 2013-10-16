@@ -56,6 +56,10 @@ var Source = Backbone.Model.extend({
         if(sourceJson.properties){
             this.properties = sourceJson.properties;
         }
+
+        if(sourceJson.metatype){
+            this.metatype = sourceJson.metatype;
+        }
     },
     getContentTypesAsString: function() {
         return this.contentTypes.toString();

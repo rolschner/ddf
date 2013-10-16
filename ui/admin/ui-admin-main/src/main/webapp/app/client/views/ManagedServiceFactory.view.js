@@ -26,7 +26,7 @@ var ManagedServiceFactoryView = Backbone.View.extend({
         }
         this.managedServiceFactory = options.managedServiceFactory;
         this.managedServiceFactoryList = options.managedServiceFactoryList;
-        this.model = options.sourceModel;
+        this.configuration = options.sourceModel;
         this.modelBinder = new Backbone.ModelBinder();
     },
 
@@ -73,9 +73,23 @@ var ManagedServiceFactoryView = Backbone.View.extend({
     renderTypeDropdown: function() {
         var view = this;
         view.$(".sourceTypesSelect").append(ich.optionListType({"list": view.managedServiceFactoryList.toJSON()}));
-        if(view.model)
+
+        //set the selected type so the page is rendered correctly if we are editing
+        if(view.configuration)
         {
-            view.$(".sourceTypesSelect").val(view.model.fpid);
+            //if this doesn't have an fpid it isn't a managed service factory
+            //if it isn't a managed service factory then we can't select anything in the drop down
+            if(view.configuration.fpid)
+            {
+                view.$(".sourceTypesSelect").val(view.configuration.fpid);
+            }
+            else
+            {
+                view.$(".sourceTypesSelect").prop('disabled', 'disabled');
+                view.$(".sourceTypesSelect").html("");
+                view.$("#config-name").text(view.configuration.name);
+                view.collection = new MetaType.Collection(_.clone(view.configuration.metatype));
+            }
         }
     },
 
@@ -102,11 +116,12 @@ var ManagedServiceFactoryView = Backbone.View.extend({
            }
         });
 
-        if(view.model)
+        //set the values of all the fields that are rendered on the page if we are editing
+        if(view.configuration)
         {
-            for(var property in view.model.properties)
+            for(var property in view.configuration.properties)
             {
-                view.$("#"+property).val(view.model.properties[property]);
+                view.$("#"+property).val(view.configuration.properties[property]);
             }
         }
     },
@@ -134,8 +149,8 @@ var ManagedServiceFactoryView = Backbone.View.extend({
         var sPage = new SourcePage({
             el: $("#main")
         });
-        sPage.render();
         sPage.refreshSources();
+        sPage.render();
     },
     /**
      * Set up the popovers based on if the selector has a description.
@@ -154,7 +169,6 @@ var ManagedServiceFactoryView = Backbone.View.extend({
                 view.$(selector).popover(options);
             }
         });
-
     },
     
     toggleEnable: function() {
@@ -180,6 +194,7 @@ var ManagedServiceFactoryView = Backbone.View.extend({
                 view.managedServiceFactory.name = each.get("name");
                 view.managedServiceFactory.serviceFactoryPid = each.get("id");
                 view.collection = new MetaType.Collection(each.get("metatype"));
+                view.$("#config-name").text(view.managedServiceFactory.name);
             }
         });
     }
