@@ -26,5 +26,9 @@
      {
          "name": "optionListType",
          "template": "{{#list}}<option value='{{id}}'>{{name}}</option>{{/list}}"
+     },
+     {
+         "name": "sourceRow",
+         "template": "<td><a href='#' class='editLink'>{{name}}</a></td><td>{{type}}</td><td><span class='{{statusClass}}'>{{status}}</span></td>"
      }
  ]

@@ -62,37 +62,31 @@ var SourceTable = Backbone.View.extend({
 
 var SourceRow = Backbone.View.extend({
     tagName: "tr",
-    template: _.template("<% _.each(attrs, function(value) { %> <td><%= value %></td> <% }); %>"),
     events: {
         'click .editLink' : 'editSource'
     },
     render: function() {
-        this.$el.html(this.template({attrs: [
-            this.createNameHtml((this.model.configuration.get("shortname")) ? this.model.configuration.get("shortname") : this.model.id),
-            this.model.get("name"),
-            this.createStatusHtml(this.model.get("available"))]}));
-        return this;
-    },
-    createNameHtml: function(shortname) {
-        return "<a href='#' class='editLink'>"+shortname+"</a>";
-    },
-    createStatusHtml: function(available) {
-        var labelClass = "label ";
-        var sourceStatus;
+        //just build a temp object to hold the data how the template wants it
+        var sourceRowObj = {};
+        sourceRowObj["name"] = this.model.configuration.get("shortname") ? this.model.configuration.get("shortname") : this.model.id;
+        sourceRowObj["type"] = this.model.get("name");
+
+        var available = this.model.get("available");
         if(available === true) {
-            labelClass += "label-success";
-            sourceStatus = "Available";
+            sourceRowObj["statusClass"] = "label label-success";
+            sourceRowObj["status"] = "Available";
         }
         else if(available === false) {
-            labelClass += "label-important";
-            sourceStatus = "Not Available";
+            sourceRowObj["statusClass"] = "label label-important";
+            sourceRowObj["status"] = "Not Available";
         }
         else if(!available) {
-            labelClass += "label-warning";
-            sourceStatus = "Unknown";
+            sourceRowObj["statusClass"] = "label disabled";
+            sourceRowObj["status"] = "Unknown";
         }
 
-        return "<span class='"+labelClass+"'>"+sourceStatus+"</span>";
+        this.$el.html(ich.sourceRow(sourceRowObj));
+        return this;
     },
     editSource: function() {
         //we can edit either managed service factories or managed services
