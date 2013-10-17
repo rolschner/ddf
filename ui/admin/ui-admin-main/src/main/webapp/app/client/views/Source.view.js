@@ -68,30 +68,43 @@ var SourceRow = Backbone.View.extend({
     },
     render: function() {
         this.$el.html(this.template({attrs: [
-            this.createNameHtml((this.model.shortName) ? this.model.shortName : this.model.id),
-            this.model.fpid,
-            this.createStatusHtml(this.model.sourceStatus)]}));
+            this.createNameHtml((this.model.configuration.get("shortname")) ? this.model.configuration.get("shortname") : this.model.id),
+            this.model.get("name"),
+            this.createStatusHtml(this.model.get("available"))]}));
         return this;
     },
     createNameHtml: function(shortname) {
         return "<a href='#' class='editLink'>"+shortname+"</a>";
     },
-    createStatusHtml: function(sourceStatus) {
+    createStatusHtml: function(available) {
         var labelClass = "label ";
-        if(sourceStatus === "Available") {
+        var sourceStatus;
+        if(available === true) {
             labelClass += "label-success";
+            sourceStatus = "Available";
         }
-        else if(sourceStatus === "Not Available") {
+        else if(available === false) {
             labelClass += "label-important";
+            sourceStatus = "Not Available";
         }
-        else if(sourceStatus === "Unknown") {
+        else if(!available) {
             labelClass += "label-warning";
+            sourceStatus = "Unknown";
         }
 
         return "<span class='"+labelClass+"'>"+sourceStatus+"</span>";
     },
     editSource: function() {
-        var federatedView = new ManagedServiceFactoryView({sourceModel:this.model, managedServiceFactoryList: msfList});
-        $("#main").html(federatedView.render().el);
+        //we can edit either managed service factories or managed services
+        if(this.model.get("fpid"))
+        {
+            var federatedView = new ManagedServiceFactoryView({sourceModel:this.model, managedServiceFactoryList: msfList});
+            $("#main").html(federatedView.render().el);
+        }
+        else
+        {
+            var federatedView = new ManagedServiceView({sourceModel:this.model, managedServiceList: msList});
+            $("#main").html(federatedView.render().el);
+        }
     }
 });

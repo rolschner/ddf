@@ -8,7 +8,7 @@ var ManagedServiceFactoryView = Backbone.View.extend({
         "click .submit-button": "submitData",
         "click #cancel": "cancel",
         "click .enable-checkbox" : "toggleEnable",
-        "change .sourceTypesSelect" : "renderDisplay"
+        "change .sourceTypesSelect" : "render"
     },
 
     /**
@@ -16,17 +16,28 @@ var ManagedServiceFactoryView = Backbone.View.extend({
      * @param options
      */
     initialize: function(options) {
-        _.bindAll(this, "render", "close", "cancel", "setupPopOvers", "renderDisplay", "renderDynamicFields", "submitData", "setSelectedType", "toggleEnable");
+        _.bindAll(this, "render", "close", "cancel", "setupPopOvers", "renderDynamicFields", "submitData", "captureSelectedType", "toggleEnable");
         if(_.isUndefined(options.managedServiceFactory)) {
-            options.managedServiceFactory = new ManagedServiceFactory();
+            if(options.managedServiceFactoryList.at(0))
+            {
+                options.managedServiceFactory = options.managedServiceFactoryList.at(0);
+            }
+            else
+            {
+                options.managedServiceFactory = new ManagedServiceFactory();
+            }
         }
-        if(!_.isUndefined(options.sourceModel))
+        if(_.isUndefined(options.collection)) {
+            options.collection = new MetaType.Collection(options.managedServiceFactory.get("metatype"));
+        }
+        if(_.isUndefined(options.sourceModel))
         {
-            options.managedServiceFactory.attributes = _.clone(options.sourceModel.properties);
+            options.sourceModel = new Source();
         }
         this.managedServiceFactory = options.managedServiceFactory;
         this.managedServiceFactoryList = options.managedServiceFactoryList;
-        this.configuration = options.sourceModel;
+        this.source = options.sourceModel;
+        this.collection = options.collection;
         this.modelBinder = new Backbone.ModelBinder();
     },
 
@@ -40,30 +51,18 @@ var ManagedServiceFactoryView = Backbone.View.extend({
      * return view for rendering to where the caller wants it to render.
      */
     render: function() {
-        var view = this,
-            jsonObj = view.managedServiceFactory.toJSON();
+        var view = this;
+        var selectedType = view.captureSelectedType();
+        var jsonObj = view.managedServiceFactory.toJSON();
+        view.$el.html("");
         view.$el.append(ich.editTemplate(jsonObj));
         view.$(".sourceTypesSelect").html("");
         view.renderTypeDropdown();
-        return view.renderDisplay();
-    },
-
-    /**
-     * This is where everything is rendered and the model is bound to the dom.
-     * Add the main template
-     * Clear whats in there now
-     * Render the fields available
-     * Setup popovers for description
-     * Bind the model to the dom
-     * return view for rendering to where the caller wants it to render.
-     */
-    renderDisplay: function() {
-        var view = this;
+        view.$(".sourceTypesSelect").val(selectedType);
         view.$(".data-section").html("");
-        view.setSelectedType();
         view.renderDynamicFields();
         view.setupPopOvers();
-        view.modelBinder.bind(view.managedServiceFactory, view.$(".add-federated-source"),
+        view.modelBinder.bind(view.source.configuration, view.$(".add-federated-source"),
             null, {initialCopyDirection: Backbone.ModelBinder.Constants.ViewToModel});
         return view;
     },
@@ -75,20 +74,20 @@ var ManagedServiceFactoryView = Backbone.View.extend({
         view.$(".sourceTypesSelect").append(ich.optionListType({"list": view.managedServiceFactoryList.toJSON()}));
 
         //set the selected type so the page is rendered correctly if we are editing
-        if(view.configuration)
+        //see if the source has an id, if it does, we are editing
+        if(view.source.id)
         {
             //if this doesn't have an fpid it isn't a managed service factory
             //if it isn't a managed service factory then we can't select anything in the drop down
-            if(view.configuration.fpid)
+            if(view.source.get("fpid"))
             {
-                view.$(".sourceTypesSelect").val(view.configuration.fpid);
+                view.$(".sourceTypesSelect").val(view.source.get("fpid"));
             }
             else
             {
                 view.$(".sourceTypesSelect").prop('disabled', 'disabled');
                 view.$(".sourceTypesSelect").html("");
-                view.$("#config-name").text(view.configuration.name);
-                view.collection = new MetaType.Collection(_.clone(view.configuration.metatype));
+                view.collection = new MetaType.Collection(_.clone(view.source.get("metatype")));
             }
         }
     },
@@ -117,11 +116,11 @@ var ManagedServiceFactoryView = Backbone.View.extend({
         });
 
         //set the values of all the fields that are rendered on the page if we are editing
-        if(view.configuration)
+        if(view.source.get("id"))
         {
-            for(var property in view.configuration.properties)
+            for(var property in view.source.get("properties"))
             {
-                view.$("#"+property).val(view.configuration.properties[property]);
+                view.$("#"+property).val(view.source.get("properties")[property]);
             }
         }
     },
@@ -130,7 +129,7 @@ var ManagedServiceFactoryView = Backbone.View.extend({
      */
     submitData: function() {
         var view = this;
-        view.managedServiceFactory.save();
+        view.source.configuration.save();
         view.cancel();
     },
     /**
@@ -186,17 +185,27 @@ var ManagedServiceFactoryView = Backbone.View.extend({
     /**
      * Sets the selected type from the dropdown
      */
-    setSelectedType: function() {
+    captureSelectedType: function() {
         var view = this;
         var selectedValue = view.$(".sourceTypesSelect").val();
-        view.managedServiceFactoryList.forEach(function(each) {
-            if(each.get("id") === selectedValue) {
-                view.managedServiceFactory.name = each.get("name");
-                view.managedServiceFactory.serviceFactoryPid = each.get("id");
-                view.collection = new MetaType.Collection(each.get("metatype"));
-                view.$("#config-name").text(view.managedServiceFactory.name);
-            }
-        });
+        if(selectedValue)
+        {
+            view.managedServiceFactoryList.forEach(function(each) {
+                if(each.get("id") === selectedValue) {
+                    view.managedServiceFactory = each;
+                    view.collection = new MetaType.Collection(each.get("metatype"));
+                    view.source.set({"fpid": view.managedServiceFactory.get("id")});
+                    view.source.configuration.set({"service.factoryPid": view.managedServiceFactory.get("id")});
+                }
+            });
+        }
+        else //this is only for first load where this component isn't even rendered yet
+        {
+            selectedValue = view.managedServiceFactory.get("id")
+            view.source.set({"fpid": view.managedServiceFactory.get("id")});
+            view.source.configuration.set({"service.factoryPid": view.managedServiceFactory.get("id")});
+        }
+        return selectedValue;
     }
 });
 

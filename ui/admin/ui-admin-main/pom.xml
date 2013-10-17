@@ -29,20 +29,20 @@
 
     <properties>
         <!-- filtered plugin properties -->
-        <plugin-context>/hawtio/${project.artifactId}</plugin-context>
+        <plugin-context>/${project.artifactId}</plugin-context>
         <plugin-name>${project.artifactId}</plugin-name>
         <plugin-domain></plugin-domain>
         <plugin-scripts>app/js/hawt-io-tab.js,app/js/underscore/underscore.js,app/js/backbone.js,app/client/views/ManagedServiceFactory.view.js</plugin-scripts>
 
     </properties>
 
-    <dependencies>
-        <dependency>
-            <groupId>io.hawt</groupId>
-            <artifactId>hawtio-plugin-mbean</artifactId>
-            <version>1.2-M16</version>
-        </dependency>
-    </dependencies>
+    <!--<dependencies>-->
+        <!--<dependency>-->
+            <!--<groupId>io.hawt</groupId>-->
+            <!--<artifactId>hawtio-plugin-mbean</artifactId>-->
+            <!--<version>1.2-M16</version>-->
+        <!--</dependency>-->
+    <!--</dependencies>-->
 
     <build>
         <resources>
