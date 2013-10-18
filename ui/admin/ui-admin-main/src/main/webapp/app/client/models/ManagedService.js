@@ -1,5 +1,7 @@
 var ManagedService = Backbone.Model.extend({
-
+    initialize: function(options) {
+        this.metatype = new MetaType.Collection(options.metatype);
+    }
 });
 
 ManagedService.Collection = Backbone.Collection.extend({

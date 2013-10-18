@@ -94,16 +94,27 @@ var Source = Backbone.Model.extend({
     /**
      * Bind all things
      */
-    initialize: function(sourceJson) {
-        _.bindAll(this, "sync");
-        if(!_.isUndefined(sourceJson) && !_.isUndefined(sourceJson.properties))
+    initialize: function(options) {
+        _.bindAll(this, "sync", "initializeConfigurationFromMetatype", "initializeFromMSF");
+        if(!_.isUndefined(options) && !_.isUndefined(options.properties)) //a config already exists so we just initialize it
         {
-            this.configuration = new Configuration(sourceJson.properties);
+            this.configuration = new Configuration(options.properties);
         }
-        else
-        {
-            this.configuration = new Configuration();
-        }
+    },
+    initializeFromMSF: function(msf) {
+        this.set({"fpid":msf.get("id")});
+        this.set({"name":msf.get("name")});
+        this.initializeConfigurationFromMetatype(msf.get("metatype"));
+        this.configuration.set({"service.factoryPid": msf.get("id")});
+    },
+    initializeConfigurationFromMetatype: function(metatype) {
+        var src = this;
+        src.configuration = new Configuration();
+        metatype.forEach(function(obj){
+            var id = obj["id"];
+            var val = obj["defaultValue"];
+            src.configuration.set(id, (val) ? val.toString() : null);
+        });
     }
 });
 

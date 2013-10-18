@@ -1,5 +1,13 @@
 var ManagedServiceFactory = Backbone.Model.extend({
-
+    initialize: function(options) {
+        _.bindAll(this,"createNewSource");
+        this.metatype = new MetaType.Collection(options.metatype);
+    },
+    createNewSource: function() {
+        var source = new Source();
+        source.initializeFromMSF(this);
+        return source;
+    }
 });
 
 ManagedServiceFactory.Collection = Backbone.Collection.extend({
