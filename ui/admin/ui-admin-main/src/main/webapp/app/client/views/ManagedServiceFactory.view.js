@@ -27,17 +27,13 @@ var ManagedServiceFactoryView = Backbone.View.extend({
                 options.managedServiceFactory = new ManagedServiceFactory();
             }
         }
-        if(_.isUndefined(options.collection)) {
-            options.collection = new MetaType.Collection(options.managedServiceFactory.get("metatype"));
-        }
         if(_.isUndefined(options.sourceModel))
         {
-            options.sourceModel = new Source();
+            options.sourceModel = options.managedServiceFactory.createNewSource();
         }
         this.managedServiceFactory = options.managedServiceFactory;
         this.managedServiceFactoryList = options.managedServiceFactoryList;
         this.source = options.sourceModel;
-        this.collection = options.collection;
         this.modelBinder = new Backbone.ModelBinder();
     },
 
@@ -62,8 +58,7 @@ var ManagedServiceFactoryView = Backbone.View.extend({
         view.$(".data-section").html("");
         view.renderDynamicFields();
         view.setupPopOvers();
-        view.modelBinder.bind(view.source.configuration, view.$(".add-federated-source"),
-            null, {initialCopyDirection: Backbone.ModelBinder.Constants.ViewToModel});
+        view.modelBinder.bind(view.source.configuration, view.$(".add-federated-source"));
         return view;
     },
     /**
@@ -83,12 +78,6 @@ var ManagedServiceFactoryView = Backbone.View.extend({
             {
                 view.$(".sourceTypesSelect").val(view.source.get("fpid"));
             }
-            else
-            {
-                view.$(".sourceTypesSelect").prop('disabled', 'disabled');
-                view.$(".sourceTypesSelect").html("");
-                view.collection = new MetaType.Collection(_.clone(view.source.get("metatype")));
-            }
         }
     },
 
@@ -101,28 +90,37 @@ var ManagedServiceFactoryView = Backbone.View.extend({
         var view = this;
         //view.$(".data-section").append(ich.checkboxEnableType(view.managedServiceFactory.toJSON()));
 
-        view.collection.forEach(function(each) {
-           var type = each.get("type");
-           if(!_.isUndefined(type)) {
-               if (type === 1) {
-                   view.$(".data-section").append(ich.textType(each.toJSON()));
-               } else if (type === 11) {
-                   view.$(".data-section").append(ich.checkboxType(each.toJSON()));
-               } else if (type === 12) {
-                   view.$(".data-section").append(ich.passwordType(each.toJSON()));
-               }
-
-           }
-        });
-
-        //set the values of all the fields that are rendered on the page if we are editing
-        if(view.source.get("id"))
-        {
-            for(var property in view.source.get("properties"))
-            {
-                view.$("#"+property).val(view.source.get("properties")[property]);
+        view.managedServiceFactory.metatype.forEach(function(each) {
+            var type = each.get("type");
+            var cardinality = each.get("cardinality"); //this is ignored for now and lists will be rendered as a ',' separated list
+            if(!_.isUndefined(type)) {
+                //from the Metatype specification
+                // int STRING = 1;
+                // int LONG = 2;
+                // int INTEGER = 3;
+                // int SHORT = 4;
+                // int CHARACTER = 5;
+                // int BYTE = 6;
+                // int DOUBLE = 7;
+                // int FLOAT = 8;
+                // int BIGINTEGER = 9;
+                // int BIGDECIMAL = 10;
+                // int BOOLEAN = 11;
+                // int PASSWORD = 12;
+                if (type === 1 || type === 5 || type === 6 || (type >= 7 && type <= 10)) {
+                    view.$(".data-section").append(ich.textType(each.toJSON()));
+                }
+                else if (type === 11) {
+                    view.$(".data-section").append(ich.checkboxType(each.toJSON()));
+                }
+                else if (type === 12) {
+                    view.$(".data-section").append(ich.passwordType(each.toJSON()));
+                }
+                else if (type === 2 || type === 3 || type === 4) { //this type can only be used for integers
+                    view.$(".data-section").append(ich.numberType(each.toJSON()));
+                }
             }
-        }
+        });
     },
     /**
      * Submit to the backend.
@@ -156,7 +154,7 @@ var ManagedServiceFactoryView = Backbone.View.extend({
      */
     setupPopOvers: function() {
         var view = this;
-        view.collection.forEach(function(each) {
+        view.managedServiceFactory.metatype.forEach(function(each) {
             if(!_.isUndefined(each.get("description"))) {
                var options,
                     selector = ".description[data-title=" + each.id + "]";
@@ -193,19 +191,14 @@ var ManagedServiceFactoryView = Backbone.View.extend({
             view.managedServiceFactoryList.forEach(function(each) {
                 if(each.get("id") === selectedValue) {
                     view.managedServiceFactory = each;
-                    view.collection = new MetaType.Collection(each.get("metatype"));
-                    view.source.set({"fpid": view.managedServiceFactory.get("id")});
-                    view.source.configuration.set({"service.factoryPid": view.managedServiceFactory.get("id")});
+                    view.source = view.managedServiceFactory.createNewSource();
                 }
             });
         }
         else //this is only for first load where this component isn't even rendered yet
         {
-            selectedValue = view.managedServiceFactory.get("id")
-            view.source.set({"fpid": view.managedServiceFactory.get("id")});
-            view.source.configuration.set({"service.factoryPid": view.managedServiceFactory.get("id")});
+            selectedValue = view.managedServiceFactory.get("id");
         }
         return selectedValue;
     }
 });
-

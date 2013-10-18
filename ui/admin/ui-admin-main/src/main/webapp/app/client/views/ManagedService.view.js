@@ -28,11 +28,9 @@ var ManagedServiceView = Backbone.View.extend({
                 }
             });
         }
-        if(_.isUndefined(options.collection)) {
-            options.collection = new MetaType.Collection(options.managedService.get("metatype"));
-        }
-        this.collection = options.collection;
         this.managedService = options.managedService;
+        //the configuration won't have the service.pid set unless a configuration exists
+        //managed services are a little different from managed service factories
         this.source.configuration.set({"service.pid": this.managedService.id});
         this.modelBinder = new Backbone.ModelBinder();
     },
@@ -55,8 +53,7 @@ var ManagedServiceView = Backbone.View.extend({
         view.$(".data-section").html("");
         view.renderDynamicFields();
         view.setupPopOvers();
-        view.modelBinder.bind(view.source.configuration, view.$(".add-federated-source"),
-            null, {initialCopyDirection: Backbone.ModelBinder.Constants.ViewToModel});
+        view.modelBinder.bind(view.source.configuration, view.$(".add-federated-source"));
         return view;
     },
 
@@ -68,28 +65,37 @@ var ManagedServiceView = Backbone.View.extend({
     renderDynamicFields: function() {
         var view = this;
 
-        view.collection.forEach(function(each) {
+        view.managedService.metatype.forEach(function(each) {
             var type = each.get("type");
+            var cardinality = each.get("cardinality"); //this is ignored for now and lists will be rendered as a ',' separated list
             if(!_.isUndefined(type)) {
-                if (type === 1) {
+                //from the Metatype specification
+                // int STRING = 1;
+                // int LONG = 2;
+                // int INTEGER = 3;
+                // int SHORT = 4;
+                // int CHARACTER = 5;
+                // int BYTE = 6;
+                // int DOUBLE = 7;
+                // int FLOAT = 8;
+                // int BIGINTEGER = 9;
+                // int BIGDECIMAL = 10;
+                // int BOOLEAN = 11;
+                // int PASSWORD = 12;
+                if (type === 1 || type === 5 || type === 6 || (type >= 7 && type <= 10)) {
                     view.$(".data-section").append(ich.textType(each.toJSON()));
-                } else if (type === 11) {
+                }
+                else if (type === 11) {
                     view.$(".data-section").append(ich.checkboxType(each.toJSON()));
-                } else if (type === 12) {
+                }
+                else if (type === 12) {
                     view.$(".data-section").append(ich.passwordType(each.toJSON()));
                 }
-
+                else if (type === 2 || type === 3 || type === 4) { //this type can only be used for integers
+                    view.$(".data-section").append(ich.numberType(each.toJSON()));
+                }
             }
         });
-
-        //set the values of all the fields that are rendered on the page if we are editing
-        if(view.source.get("id"))
-        {
-            for(var property in view.source.get("properties"))
-            {
-                view.$("#"+property).val(view.source.get("properties")[property]);
-            }
-        }
     },
     /**
      * Submit to the backend.
@@ -123,7 +129,7 @@ var ManagedServiceView = Backbone.View.extend({
      */
     setupPopOvers: function() {
         var view = this;
-        view.collection.forEach(function(each) {
+        view.managedService.metatype.forEach(function(each) {
             if(!_.isUndefined(each.get("description"))) {
                 var options,
                     selector = ".description[data-title=" + each.id + "]";

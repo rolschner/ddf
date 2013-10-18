@@ -11,8 +11,12 @@
          "template": "<div class='{{id}} metatype'><label>{{name}}</label><input type='text' class='{{id}} metatype' name='{{id}}' id='{{id}}' value='{{defaultValue}}{{.}}{{/defaultValue}}'>{{#description}}<a href='#' class='description' data-title='{{id}}'><i class='icon-question-sign'></i></a>{{/description}}</div>"
      },
      {
+         "name": "numberType",
+         "template": "<div class='{{id}} metatype'><label>{{name}}</label><input type='number' class='{{id}} metatype' name='{{id}}' id='{{id}}' value='{{defaultValue}}{{.}}{{/defaultValue}}'>{{#description}}<a href='#' class='description' data-title='{{id}}'><i class='icon-question-sign'></i></a>{{/description}}</div>"
+     },
+     {
          "name": "passwordType",
-         "template": "<div class='{{id}}' metatype'><label>{{name}}</label><input type='password' class='{{id}} metatype' name='{{id}}' id='{{id}}' value='{{defaultValue}}{{.}}{{/defaultValue}}'>{{#description}}<a href='#' class='description' data-title='{{id}}'><i class='icon-question-sign'></i></a>{{/description}}</div>"
+         "template": "<div class='{{id}} metatype'><label>{{name}}</label><input type='password' class='{{id}} metatype' name='{{id}}' id='{{id}}' value='{{defaultValue}}{{.}}{{/defaultValue}}'>{{#description}}<a href='#' class='description' data-title='{{id}}'><i class='icon-question-sign'></i></a>{{/description}}</div>"
 
      },
      {

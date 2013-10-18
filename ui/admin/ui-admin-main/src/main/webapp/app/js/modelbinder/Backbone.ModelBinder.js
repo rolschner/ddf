@@ -1,14 +1,14 @@
-// Backbone.ModelBinder v1.0.4
+// Backbone.ModelBinder v1.0.5
 // (c) 2013 Bart Wood
 // Distributed Under MIT License
 
 (function (factory) {
     if (typeof define === 'function' && define.amd) {
         // AMD. Register as an anonymous module.
-        define(['../underscore', 'jquery', 'backbone'], factory);
+        define(['underscore', 'jquery', 'backbone'], factory);
     } else {
         // Browser globals
-        factory(_, $, Backbone);
+        factory(_, jQuery, Backbone);
     }
 }(function(_, $, Backbone){
 
@@ -26,7 +26,7 @@
     };
 
     // Current version of the library.
-    Backbone.ModelBinder.VERSION = '1.0.4';
+    Backbone.ModelBinder.VERSION = '1.0.5';
     Backbone.ModelBinder.Constants = {};
     Backbone.ModelBinder.Constants.ModelToView = 'ModelToView';
     Backbone.ModelBinder.Constants.ViewToModel = 'ViewToModel';
@@ -406,19 +406,9 @@
             if(el.attr('type')){
                 switch (el.attr('type')) {
                     case 'radio':
-                        if (el.val() === convertedValue) {
-                            // must defer the change trigger or the change will actually fire with the old value
-                            el.prop('checked') || _.defer(function() { el.trigger('change'); });
-                            el.prop('checked', true);
-                        }
-                        else {
-                            // must defer the change trigger or the change will actually fire with the old value
-                            el.prop('checked', false);
-                        }
+                        el.prop('checked', el.val() === convertedValue);
                         break;
                     case 'checkbox':
-                         // must defer the change trigger or the change will actually fire with the old value
-                         el.prop('checked') === !!convertedValue || _.defer(function() { el.trigger('change') });
                          el.prop('checked', !!convertedValue);
                         break;
                     case 'file':
