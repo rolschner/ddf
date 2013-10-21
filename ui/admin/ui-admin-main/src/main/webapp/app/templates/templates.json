@@ -8,24 +8,24 @@
      },
      {
          "name": "textType",
-         "template": "<div class='{{id}} metatype'><label>{{name}}</label><input type='text' class='{{id}} metatype' name='{{id}}' id='{{id}}' value='{{defaultValue}}{{.}}{{/defaultValue}}'>{{#description}}<a href='#' class='description' data-title='{{id}}'><i class='icon-question-sign'></i></a>{{/description}}</div>"
+         "template": "<div class='{{id}} metatype control-group'><label class='control-label' for='{{id}}'>{{name}}</label><div class='controls'><input class='input-xxlarge' type='text' class='{{id}} metatype' name='{{id}}' id='{{id}}' value='{{defaultValue}}{{.}}{{/defaultValue}}'>{{#description}}<a href='#' class='description' data-title='{{id}}'><i class='icon-question-sign'></i></a>{{/description}}</div></div>"
      },
      {
          "name": "numberType",
-         "template": "<div class='{{id}} metatype'><label>{{name}}</label><input type='number' class='{{id}} metatype' name='{{id}}' id='{{id}}' value='{{defaultValue}}{{.}}{{/defaultValue}}'>{{#description}}<a href='#' class='description' data-title='{{id}}'><i class='icon-question-sign'></i></a>{{/description}}</div>"
+         "template": "<div class='{{id}} metatype control-group'><label class='control-label' for='{{id}}'>{{name}}</label><div class='controls'><input class='input-xlarge' type='number' class='{{id}} metatype' name='{{id}}' id='{{id}}' value='{{defaultValue}}{{.}}{{/defaultValue}}'>{{#description}}<a href='#' class='description' data-title='{{id}}'><i class='icon-question-sign'></i></a>{{/description}}</div></div>"
      },
      {
          "name": "passwordType",
-         "template": "<div class='{{id}} metatype'><label>{{name}}</label><input type='password' class='{{id}} metatype' name='{{id}}' id='{{id}}' value='{{defaultValue}}{{.}}{{/defaultValue}}'>{{#description}}<a href='#' class='description' data-title='{{id}}'><i class='icon-question-sign'></i></a>{{/description}}</div>"
+         "template": "<div class='{{id}} metatype control-group'><label class='control-label' for='{{id}}'>{{name}}</label><div class='controls'><input class='input-xlarge' type='password' class='{{id}} metatype' name='{{id}}' id='{{id}}' value='{{defaultValue}}{{.}}{{/defaultValue}}'>{{#description}}<a href='#' class='description' data-title='{{id}}'><i class='icon-question-sign'></i></a>{{/description}}</div></div>"
 
      },
      {
         "name": "checkboxType",
-         "template": "<div class='{{id}} metatype'><label class='checkbox'><input type='checkbox' name='{{id}}' id='{{id}}' {{#defaultValue}}{{#.}}checked{{/.}}{{/defaultValue}}>{{name}}{{#description}}<a href='#' class='description' data-title='{{id}}'><i class='icon-question-sign'></i></a>{{/description}}</label></div>"
+         "template": "<div class='{{id}} metatype control-group'><div class='controls'><label class='checkbox'><input type='checkbox' name='{{id}}' id='{{id}}' {{#defaultValue}}{{#.}}checked{{/.}}{{/defaultValue}}>{{name}}{{#description}}<a href='#' class='description' data-title='{{id}}'><i class='icon-question-sign'></i></a>{{/description}}</label></div></div>"
      },
      {
         "name": "checkboxEnableType",
-        "template": "<div class='enable-checkbox'><label class='checkbox'><input type='checkbox' name='thisName' id='{{id}}' {{#isEnabled}}{{#.}}checked{{/.}}{{/isEnabled}}>Enabled</div>"
+        "template": "<div class='enable-checkbox control-group'><label class='checkbox'><input type='checkbox' name='thisName' id='{{id}}' {{#isEnabled}}{{#.}}checked{{/.}}{{/isEnabled}}>Enabled</div>"
      },
      {
          "name": "optionListType",
@@ -33,6 +33,6 @@
      },
      {
          "name": "sourceRow",
-         "template": "<td><a href='#' class='editLink'>{{name}}</a></td><td>{{type}}</td><td><span class='{{statusClass}}'>{{status}}</span></td>"
+         "template": "<td><a href='#' class='editLink'>{{name}}</a></td><td>{{type}}</td><td><span class='{{statusClass}}'>{{status}}</span></td><td><a href='#' class='removeLink icon-remove'></a></td>"
      }
  ]

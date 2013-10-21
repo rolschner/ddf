@@ -42,7 +42,7 @@ var Configuration = Backbone.Model.extend({
     /**
      * When a model calls save the sync is called in Backbone.  I override it because this isn't a typical backbone
      * object
-     * @return Return a deferred which is a hadler with the success and failure callback.
+     * @return Return a deferred which is a handler with the success and failure callback.
      */
     sync: function () {
         var deferred = $.Deferred(),
