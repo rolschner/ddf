@@ -403,6 +403,14 @@ public class ConfigurationAdmin implements ConfigurationAdminMBean
             throw new IOException("Argument configurationTable cannot be null");
         }
 
+        for(String key : configurationTable.keySet()) //sanity check to make sure no values are null
+        {
+            if(configurationTable.get(key) == null)
+            {
+                configurationTable.put(key, "");
+            }
+        }
+
         Dictionary<String, Object> configurationProperties = new Hashtable<String, Object>(configurationTable);
         Configuration config = configurationAdmin.getConfiguration(pid, location);
         config.update(configurationProperties);
@@ -419,54 +427,54 @@ public class ConfigurationAdmin implements ConfigurationAdminMBean
     }
     
     public void disableConfiguration(String servicePid) throws IOException{
-	if(StringUtils.isEmpty(servicePid)){
-	    throw new IOException("Service PID of Source to be disabled must be specified.  Service PID provided: " + servicePid);
-	}
-	
-	Configuration originalConfig = configurationAdminExt.getConfiguration(servicePid);
-	
-	if(originalConfig == null){
-	    throw new IOException("No Source exists with the service PID: " + servicePid);
-	}
-	
-	Dictionary properties = originalConfig.getProperties();
-	String originalFactoryPid = (String) properties.get(org.osgi.service.cm.ConfigurationAdmin.SERVICE_FACTORYPID);
-	if(StringUtils.endsWith(originalFactoryPid, DISABLED)){
-	    throw new IOException("Source is already disabled.");
-	}
-	
-	//Copy configuration from the original configuration and change its factory PID to end with "disabled"
-	String disabledServiceFactoryPid = originalFactoryPid + DISABLED;
-	properties.put(org.osgi.service.cm.ConfigurationAdmin.SERVICE_FACTORYPID, disabledServiceFactoryPid);
-	Configuration disabledConfig = configurationAdmin.createFactoryConfiguration(disabledServiceFactoryPid, null);
-	disabledConfig.update(properties);
-	
-	//remove original configuration
-	originalConfig.delete();
+        if(StringUtils.isEmpty(servicePid)){
+            throw new IOException("Service PID of Source to be disabled must be specified.  Service PID provided: " + servicePid);
+        }
+
+        Configuration originalConfig = configurationAdminExt.getConfiguration(servicePid);
+
+        if(originalConfig == null){
+            throw new IOException("No Source exists with the service PID: " + servicePid);
+        }
+
+        Dictionary properties = originalConfig.getProperties();
+        String originalFactoryPid = (String) properties.get(org.osgi.service.cm.ConfigurationAdmin.SERVICE_FACTORYPID);
+        if(StringUtils.endsWith(originalFactoryPid, DISABLED)){
+            throw new IOException("Source is already disabled.");
+        }
+
+        //Copy configuration from the original configuration and change its factory PID to end with "disabled"
+        String disabledServiceFactoryPid = originalFactoryPid + DISABLED;
+        properties.put(org.osgi.service.cm.ConfigurationAdmin.SERVICE_FACTORYPID, disabledServiceFactoryPid);
+        Configuration disabledConfig = configurationAdmin.createFactoryConfiguration(disabledServiceFactoryPid, null);
+        disabledConfig.update(properties);
+
+        //remove original configuration
+        originalConfig.delete();
     }
     
     public void enableConfiguration(String servicePid) throws IOException{
-	if(StringUtils.isEmpty(servicePid)){
-	    throw new IOException("Service PID of Source to be disabled must be specified.  Service PID provided: " + servicePid);
-	}
-	
-	Configuration disabledConfig = configurationAdminExt.getConfiguration(servicePid);
-	
-	if(disabledConfig == null){
-	    throw new IOException("No Source exists with the service PID: " + servicePid);
-	}
-	
-	Dictionary properties = disabledConfig.getProperties();
-	String disabledFactoryPid = (String) properties.get(org.osgi.service.cm.ConfigurationAdmin.SERVICE_FACTORYPID);
-	if(!StringUtils.endsWith(disabledFactoryPid, DISABLED)){
-	    throw new IOException("Source is already enabled.");
-	}
-	
-	String enabledFactoryPid = StringUtils.removeEnd(disabledFactoryPid, DISABLED);
-	properties.put(org.osgi.service.cm.ConfigurationAdmin.SERVICE_FACTORYPID, enabledFactoryPid);
-	Configuration enabledConfiguration = configurationAdmin.createFactoryConfiguration(enabledFactoryPid, null); 
-	enabledConfiguration.update(properties);
-	
-	disabledConfig.delete();
+        if(StringUtils.isEmpty(servicePid)){
+            throw new IOException("Service PID of Source to be disabled must be specified.  Service PID provided: " + servicePid);
+        }
+
+        Configuration disabledConfig = configurationAdminExt.getConfiguration(servicePid);
+
+        if(disabledConfig == null){
+            throw new IOException("No Source exists with the service PID: " + servicePid);
+        }
+
+        Dictionary properties = disabledConfig.getProperties();
+        String disabledFactoryPid = (String) properties.get(org.osgi.service.cm.ConfigurationAdmin.SERVICE_FACTORYPID);
+        if(!StringUtils.endsWith(disabledFactoryPid, DISABLED)){
+            throw new IOException("Source is already enabled.");
+        }
+
+        String enabledFactoryPid = StringUtils.removeEnd(disabledFactoryPid, DISABLED);
+        properties.put(org.osgi.service.cm.ConfigurationAdmin.SERVICE_FACTORYPID, enabledFactoryPid);
+        Configuration enabledConfiguration = configurationAdmin.createFactoryConfiguration(enabledFactoryPid, null);
+        enabledConfiguration.update(properties);
+
+        disabledConfig.delete();
     }
 }
