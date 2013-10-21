@@ -33,7 +33,7 @@ var SourceTable = Backbone.View.extend({
         this.collection.bind("change", this.changeSource);
     },
     render: function() {
-        for(m in this.collection.models){
+        for(var m in this.collection.models){
             var newRow = new SourceRow({model: this.collection.models[m]});
             this.sourceRows.push(newRow);
             this.$el.append(newRow.render().el);
@@ -46,7 +46,7 @@ var SourceTable = Backbone.View.extend({
         this.$el.append(newRow.render().el);
     },
     removeSource: function(s) {
-        for(i in this.sourceRows) {
+        for(var i in this.sourceRows) {
             if(this.sourceRows[i].model.id == s.id) {
                 this.sourceRows[i].remove();
                 this.sourceRows.splice(i,1);
@@ -68,7 +68,9 @@ var SourceRow = Backbone.View.extend({
     render: function() {
         //just build a temp object to hold the data how the template wants it
         var sourceRowObj = {};
-        sourceRowObj["name"] = this.model.configuration.get("shortname") ? this.model.configuration.get("shortname") : this.model.id;
+        sourceRowObj["name"] = this.model.get("sourceId") ?
+            this.model.get("sourceId") : this.model.configuration.get("shortname") ?
+            this.model.configuration.get("shortname") : this.model.id;
         sourceRowObj["type"] = this.model.get("name");
 
         var available = this.model.get("available");
