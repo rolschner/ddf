@@ -115,6 +115,7 @@ public class SourceConfigurationAdminPlugin implements ConfigurationAdminPlugin
                                             || superService instanceof CatalogProvider && descriptor.getSourceId().equals(((CatalogProvider) superService).getId()))
                                     {
                                         statusMap.put("available", descriptor.isAvailable());
+                                        statusMap.put("sourceId", descriptor.getSourceId());
                                         return statusMap;
                                     }
                                 }
@@ -135,7 +136,12 @@ public class SourceConfigurationAdminPlugin implements ConfigurationAdminPlugin
                                 }
                             }
                         }
-                        else if(StringUtils.isEmpty(cs.getConfigurationPid()))
+                        //For now we're just going to assume that the metatype pid is the same as the class because we have no other way to
+                        //match these things up. Obviously, this won't always be the case and this isn't necessarily a good way to do this.
+                        //However, at the moment, there doesn't seem to be any other way to match up this metatype pid (which is what it ends
+                        //up being in the case of a ManagedService) with the actual service that gets created. If, as in the solr case, the
+                        //metatype pid is actually the fully qualified class name, then we can match them up this way.
+                        else if(StringUtils.isEmpty(cs.getConfigurationPid()) && cs.getClass().getCanonicalName().equals(configurationPid))
                         {
                             //might be an unconfigured source so we'll make a best guess as to which source this
                             //configuration belongs to
@@ -145,6 +151,7 @@ public class SourceConfigurationAdminPlugin implements ConfigurationAdminPlugin
                                         || superService instanceof CatalogProvider && descriptor.getSourceId().equals(((CatalogProvider) superService).getId()))
                                 {
                                     statusMap.put("available", descriptor.isAvailable());
+                                    statusMap.put("sourceId", descriptor.getSourceId());
                                     return statusMap;
                                 }
                             }
