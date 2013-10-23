@@ -63,7 +63,8 @@ var SourceTable = Backbone.View.extend({
 var SourceRow = Backbone.View.extend({
     tagName: "tr",
     events: {
-        'click .editLink' : 'editSource'
+        'click .editLink' : 'editSource',
+        'click .removeLink' : 'removeSource'
     },
     render: function() {
         //just build a temp object to hold the data how the template wants it
@@ -87,6 +88,10 @@ var SourceRow = Backbone.View.extend({
             sourceRowObj["status"] = "Unknown";
         }
 
+        if(this.model.configuration && this.model.configuration.get("service.pid")) {
+            sourceRowObj["configuration"] = true;
+        }
+
         this.$el.html(ich.sourceRow(sourceRowObj));
         return this;
     },
@@ -101,6 +106,15 @@ var SourceRow = Backbone.View.extend({
         {
             var federatedView = new ManagedServiceView({sourceModel:this.model, managedServiceList: msList});
             $("#main").html(federatedView.render().el);
+        }
+    },
+    removeSource: function() {
+        var viewModel = this;
+        var question = "Are you sure you want to remove the configuration: "+viewModel.model.configuration.get("service.pid")+"?";
+        var confirmation = window.confirm(question);
+        if(confirmation) {
+            this.model.configuration.destroy();
+            sList.remove(this.model);
         }
     }
 });

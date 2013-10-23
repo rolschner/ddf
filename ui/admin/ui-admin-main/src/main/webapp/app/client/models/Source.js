@@ -4,7 +4,7 @@ var Configuration = Backbone.Model.extend({
      * Bind all things
      */
     initialize: function(sourceJson) {
-        _.bindAll(this, "sync", "collectedData");
+        _.bindAll(this, "sync", "destroy", "collectedData");
     },
 
     /**
@@ -86,6 +86,20 @@ var Configuration = Backbone.Model.extend({
                 });
         }
         return deferred;
+    },
+    destroy: function() {
+        var deferred = $.Deferred(),
+            model = this;
+        var deleteUrl = [model.configUrl, "delete", model.get("service.pid")].join("/");
+
+        return $.ajax({
+            type: 'GET',
+            url: deleteUrl
+        }).done(function (result) {
+              deferred.resolve(result);
+            }).fail(function (error) {
+                deferred.fail(error);
+            });
     }
 });
 
@@ -100,6 +114,12 @@ var Source = Backbone.Model.extend({
         {
             this.configuration = new Configuration(options.properties);
         }
+    },
+    hasConfiguration: function() {
+        if(this.configuration) {
+            return true;
+        }
+        return false;
     },
     initializeFromMSF: function(msf) {
         this.set({"fpid":msf.get("id")});

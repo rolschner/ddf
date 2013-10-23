@@ -33,6 +33,6 @@
      },
      {
          "name": "sourceRow",
-         "template": "<td><a href='#' class='editLink'>{{name}}</a></td><td>{{type}}</td><td><span class='{{statusClass}}'>{{status}}</span></td><td><a href='#' class='removeLink icon-remove'></a></td>"
+         "template": "<td><a href='#' class='editLink'>{{name}}</a></td><td>{{type}}</td><td><span class='{{statusClass}}'>{{status}}</span></td><td>{{#configuration}}<a href='#' class='removeLink icon-remove'></a>{{/configuration}}</td>"
      }
  ]
