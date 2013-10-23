@@ -1,5 +1,5 @@
 var Configuration = Backbone.Model.extend({
-    configUrl: "/jolokia/exec/ddf.ui.admin.api.ConfigurationAdmin:service=ui,version=2.3.0",
+    configUrl: "/jolokia/exec/org.codice.ddf.ui.admin.api.ConfigurationAdmin:service=ui,version=2.3.0",
     /**
      * Bind all things
      */
@@ -16,7 +16,7 @@ var Configuration = Backbone.Model.extend({
         var model = this;
         var data = {
             type: 'EXEC',
-            mbean: 'ddf.ui.admin.api.ConfigurationAdmin:service=ui,version=2.3.0',
+            mbean: 'org.codice.ddf.ui.admin.api.ConfigurationAdmin:service=ui,version=2.3.0',
             operation: 'update'
         };
         data.arguments = [pid];
@@ -104,7 +104,7 @@ var Configuration = Backbone.Model.extend({
 });
 
 var Source = Backbone.Model.extend({
-    configUrl: "/jolokia/exec/ddf.ui.admin.api.ConfigurationAdmin:service=ui,version=2.3.0",
+    configUrl: "/jolokia/exec/org.codice.ddf.ui.admin.api.ConfigurationAdmin:service=ui,version=2.3.0",
     /**
      * Bind all things
      */
@@ -140,7 +140,7 @@ var Source = Backbone.Model.extend({
 
 var SourceList = Backbone.Collection.extend({
     model: Source,
-    url : "/jolokia/exec/ddf.ui.admin.api.ConfigurationAdmin:service=ui,version=2.3.0/listDefaultFilteredConfigurations",
+    url : "/jolokia/exec/org.codice.ddf.ui.admin.api.ConfigurationAdmin:service=ui,version=2.3.0/listDefaultFilteredConfigurations",
     sync: function(method, model, options) {
         options.dataType = "json";
         return Backbone.sync(method, model, options);

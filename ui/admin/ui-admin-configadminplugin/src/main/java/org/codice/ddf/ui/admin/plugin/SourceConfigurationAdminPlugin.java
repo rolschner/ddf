@@ -1,18 +1,15 @@
 /**
  * Copyright (c) Codice Foundation
- * 
- * This is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser
- * General Public License as published by the Free Software Foundation, either version 3 of the
- * License, or any later version.
- * 
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details. A copy of the GNU Lesser General Public License
- * is distributed along with this program and can be found at
+ *
+ * This is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation, either
+ * version 3 of the License, or any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details. A copy of the GNU Lesser General Public License is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
- * 
+ *
  **/
-package ddf.ui.admin.plugin;
+package org.codice.ddf.ui.admin.plugin;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
@@ -35,7 +33,7 @@ import ddf.catalog.source.CatalogProvider;
 import ddf.catalog.source.FederatedSource;
 import ddf.catalog.source.SourceDescriptor;
 import ddf.catalog.source.SourceUnavailableException;
-import ddf.ui.admin.api.plugin.ConfigurationAdminPlugin;
+import org.codice.ddf.ui.admin.api.plugin.ConfigurationAdminPlugin;
 
 /**
  * @author Scott Tustison
@@ -87,10 +85,10 @@ public class SourceConfigurationAdminPlugin implements ConfigurationAdminPlugin 
             ServiceReference[] provRefs = bundleContext.getAllServiceReferences(
                     CatalogProvider.class.getCanonicalName(), null);
             List<ServiceReference> refs = new ArrayList<ServiceReference>();
-            if (fedRefs != null) {
+            if (fedRefs != null && fedRefs.length > 0) {
                 refs.addAll(Arrays.asList(fedRefs));
             }
-            if (provRefs != null) {
+            if (provRefs != null && provRefs.length > 0) {
                 refs.addAll(Arrays.asList(provRefs));
             }
             Set<SourceDescriptor> sources = null;
@@ -99,7 +97,7 @@ public class SourceConfigurationAdminPlugin implements ConfigurationAdminPlugin 
                         .getSourceInfo(new SourceInfoRequestEnterprise(true));
                 sources = response.getSourceInfo();
             }
-            if (!refs.isEmpty()) {
+            if (CollectionUtils.isNotEmpty(refs)) {
                 for (ServiceReference ref : refs) {
                     Object superService = bundleContext.getService(ref);
                     if ((superService instanceof FederatedSource || superService instanceof CatalogProvider)
@@ -108,7 +106,7 @@ public class SourceConfigurationAdminPlugin implements ConfigurationAdminPlugin 
 
                         if (StringUtils.isNotEmpty(cs.getConfigurationPid())
                                 && cs.getConfigurationPid().equals(configurationPid)) {
-                            if (sources != null) {
+                            if (CollectionUtils.isNotEmpty(sources)) {
                                 for (SourceDescriptor descriptor : sources) {
                                     if (superService instanceof FederatedSource
                                             && descriptor.getSourceId().equals(
@@ -152,16 +150,19 @@ public class SourceConfigurationAdminPlugin implements ConfigurationAdminPlugin 
                             // might be an unconfigured source so we'll make a best guess as to
                             // which source this
                             // configuration belongs to
-                            for (SourceDescriptor descriptor : sources) {
-                                if (superService instanceof FederatedSource
-                                        && descriptor.getSourceId().equals(
-                                                ((FederatedSource) superService).getId())
-                                        || superService instanceof CatalogProvider
-                                        && descriptor.getSourceId().equals(
-                                                ((CatalogProvider) superService).getId())) {
-                                    statusMap.put("available", descriptor.isAvailable());
-                                    statusMap.put("sourceId", descriptor.getSourceId());
-                                    return statusMap;
+                            if(CollectionUtils.isNotEmpty(sources))
+                            {
+                                for (SourceDescriptor descriptor : sources) {
+                                    if (superService instanceof FederatedSource
+                                            && descriptor.getSourceId().equals(
+                                                    ((FederatedSource) superService).getId())
+                                            || superService instanceof CatalogProvider
+                                            && descriptor.getSourceId().equals(
+                                                    ((CatalogProvider) superService).getId())) {
+                                        statusMap.put("available", descriptor.isAvailable());
+                                        statusMap.put("sourceId", descriptor.getSourceId());
+                                        return statusMap;
+                                    }
                                 }
                             }
                         }
