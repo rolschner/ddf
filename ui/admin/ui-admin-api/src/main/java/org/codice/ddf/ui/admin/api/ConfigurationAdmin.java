@@ -1,20 +1,17 @@
 /**
  * Copyright (c) Codice Foundation
- * 
- * This is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser
- * General Public License as published by the Free Software Foundation, either version 3 of the
- * License, or any later version.
- * 
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details. A copy of the GNU Lesser General Public License
- * is distributed along with this program and can be found at
+ *
+ * This is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation, either
+ * version 3 of the License, or any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details. A copy of the GNU Lesser General Public License is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
- * 
+ *
  **/
-package ddf.ui.admin.api;
+package org.codice.ddf.ui.admin.api;
 
-import ddf.ui.admin.api.plugin.ConfigurationAdminPlugin;
+import org.codice.ddf.ui.admin.api.plugin.ConfigurationAdminPlugin;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.osgi.framework.BundleContext;
@@ -216,14 +213,14 @@ public class ConfigurationAdmin implements ConfigurationAdminMBean {
     }
 
     /**
-     * @see ddf.ui.admin.api.ConfigurationAdminMBean#createFactoryConfiguration(java.lang.String)
+     * @see ConfigurationAdminMBean#createFactoryConfiguration(java.lang.String)
      */
     public String createFactoryConfiguration(String factoryPid) throws IOException {
         return createFactoryConfigurationForLocation(factoryPid, null);
     }
 
     /**
-     * @see ddf.ui.admin.api.ConfigurationAdminMBean#createFactoryConfigurationForLocation(java.lang.String,
+     * @see ConfigurationAdminMBean#createFactoryConfigurationForLocation(java.lang.String,
      *      java.lang.String)
      */
     public String createFactoryConfigurationForLocation(String factoryPid, String location)
@@ -237,14 +234,14 @@ public class ConfigurationAdmin implements ConfigurationAdminMBean {
     }
 
     /**
-     * @see ddf.ui.admin.api.ConfigurationAdminMBean#delete(java.lang.String)
+     * @see ConfigurationAdminMBean#delete(java.lang.String)
      */
     public void delete(String pid) throws IOException {
         deleteForLocation(pid, null);
     }
 
     /**
-     * @see ddf.ui.admin.api.ConfigurationAdminMBean#deleteForLocation(java.lang.String,
+     * @see ConfigurationAdminMBean#deleteForLocation(java.lang.String,
      *      java.lang.String)
      */
     public void deleteForLocation(String pid, String location) throws IOException {
@@ -256,7 +253,7 @@ public class ConfigurationAdmin implements ConfigurationAdminMBean {
     }
 
     /**
-     * @see ddf.ui.admin.api.ConfigurationAdminMBean#deleteConfigurations(java.lang.String)
+     * @see ConfigurationAdminMBean#deleteConfigurations(java.lang.String)
      */
     public void deleteConfigurations(String filter) throws IOException {
         if (filter == null || filter.length() < 1) {
@@ -276,7 +273,7 @@ public class ConfigurationAdmin implements ConfigurationAdminMBean {
     }
 
     /**
-     * @see ddf.ui.admin.api.ConfigurationAdminMBean#getBundleLocation(java.lang.String)
+     * @see ConfigurationAdminMBean#getBundleLocation(java.lang.String)
      */
     public String getBundleLocation(String pid) throws IOException {
         if (pid == null || pid.length() < 1) {
@@ -289,7 +286,7 @@ public class ConfigurationAdmin implements ConfigurationAdminMBean {
     }
 
     /**
-     * @see ddf.ui.admin.api.ConfigurationAdminMBean#getConfigurations(java.lang.String)
+     * @see ConfigurationAdminMBean#getConfigurations(java.lang.String)
      */
     public String[][] getConfigurations(String filter) throws IOException {
         if (filter == null || filter.length() < 1) {
@@ -311,14 +308,14 @@ public class ConfigurationAdmin implements ConfigurationAdminMBean {
     }
 
     /**
-     * @see ddf.ui.admin.api.ConfigurationAdminMBean#getFactoryPid(java.lang.String)
+     * @see ConfigurationAdminMBean#getFactoryPid(java.lang.String)
      */
     public String getFactoryPid(String pid) throws IOException {
         return getFactoryPidForLocation(pid, null);
     }
 
     /**
-     * @see ddf.ui.admin.api.ConfigurationAdminMBean#getFactoryPidForLocation(java.lang.String,
+     * @see ConfigurationAdminMBean#getFactoryPidForLocation(java.lang.String,
      *      java.lang.String)
      */
     public String getFactoryPidForLocation(String pid, String location) throws IOException {
@@ -330,14 +327,14 @@ public class ConfigurationAdmin implements ConfigurationAdminMBean {
     }
 
     /**
-     * @see ddf.ui.admin.api.ConfigurationAdminMBean#getProperties(java.lang.String)
+     * @see ConfigurationAdminMBean#getProperties(java.lang.String)
      */
     public Map<String, Object> getProperties(String pid) throws IOException {
         return getPropertiesForLocation(pid, null);
     }
 
     /**
-     * @see ddf.ui.admin.api.ConfigurationAdminMBean#getPropertiesForLocation(java.lang.String,
+     * @see ConfigurationAdminMBean#getPropertiesForLocation(java.lang.String,
      *      java.lang.String)
      */
     @SuppressWarnings("unchecked")
@@ -360,7 +357,7 @@ public class ConfigurationAdmin implements ConfigurationAdminMBean {
     }
 
     /**
-     * @see ddf.ui.admin.api.ConfigurationAdminMBean#setBundleLocation(java.lang.String,
+     * @see ConfigurationAdminMBean#setBundleLocation(java.lang.String,
      *      java.lang.String)
      */
     public void setBundleLocation(String pid, String location) throws IOException {
@@ -372,14 +369,14 @@ public class ConfigurationAdmin implements ConfigurationAdminMBean {
     }
 
     /**
-     * @see ddf.ui.admin.api.ConfigurationAdminMBean#update(java.lang.String, java.util.Map)
+     * @see ConfigurationAdminMBean#update(java.lang.String, java.util.Map)
      */
     public void update(String pid, Map<String, Object> configurationTable) throws IOException {
         updateForLocation(pid, null, configurationTable);
     }
 
     /**
-     * @see ddf.ui.admin.api.ConfigurationAdminMBean#updateForLocation(java.lang.String,
+     * @see ConfigurationAdminMBean#updateForLocation(java.lang.String,
      *      java.lang.String, java.util.Map)
      */
     @SuppressWarnings("unchecked")

@@ -20,7 +20,7 @@
     <!--
       Defines the Configuration Plugin
     -->
-    <bean id="configPlugin" class="ddf.ui.admin.configuration.plugin.ConfigurationPluginImpl"
+    <bean id="configPlugin" class="org.codice.ddf.ui.admin.configuration.plugin.ConfigurationPluginImpl"
           init-method="init" destroy-method="destroy">
     </bean>
 

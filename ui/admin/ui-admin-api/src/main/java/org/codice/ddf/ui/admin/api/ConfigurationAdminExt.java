@@ -1,18 +1,15 @@
 /**
  * Copyright (c) Codice Foundation
- * 
- * This is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser
- * General Public License as published by the Free Software Foundation, either version 3 of the
- * License, or any later version.
- * 
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details. A copy of the GNU Lesser General Public License
- * is distributed along with this program and can be found at
+ *
+ * This is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation, either
+ * version 3 of the License, or any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details. A copy of the GNU Lesser General Public License is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
- * 
+ *
  **/
-package ddf.ui.admin.api;
+package org.codice.ddf.ui.admin.api;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -44,7 +41,7 @@ import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.LoggerFactory;
 import org.slf4j.ext.XLogger;
 
-import ddf.ui.admin.api.plugin.ConfigurationAdminPlugin;
+import org.codice.ddf.ui.admin.api.plugin.ConfigurationAdminPlugin;
 
 class ConfigurationAdminExt {
     static final String META_TYPE_NAME = "org.osgi.service.metatype.MetaTypeService";
@@ -86,9 +83,9 @@ class ConfigurationAdminExt {
                     return configs[0];
                 }
             } catch (InvalidSyntaxException ise) {
-                // should print message
+                logger.error("Invalid LDAP filter", ise);
             } catch (IOException ioe) {
-                // should print message
+                logger.error("Unable to retrieve list of configurations.", ioe);
             }
         }
 
@@ -251,7 +248,7 @@ class ConfigurationAdminExt {
     String getName(Bundle bundle) {
         Locale locale = Locale.getDefault();
         final String loc = locale == null ? null : locale.toString();
-        String name = (String) bundle.getHeaders(loc).get(Constants.BUNDLE_NAME);
+        String name = bundle.getHeaders(loc).get(Constants.BUNDLE_NAME);
         if (name == null || name.length() == 0) {
             name = bundle.getSymbolicName();
             if (name == null) {
@@ -549,8 +546,8 @@ class ConfigurationAdminExt {
         if (filterSpec != null) {
             try {
                 filter = getBundleContext().createFilter(filterSpec);
-            } catch (InvalidSyntaxException not_expected) {
-                /* filter is correct */
+            } catch (InvalidSyntaxException ignore) {
+                //don't care
             }
         }
 
