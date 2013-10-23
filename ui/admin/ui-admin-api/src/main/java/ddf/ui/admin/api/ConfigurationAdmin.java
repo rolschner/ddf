@@ -1,13 +1,16 @@
 /**
  * Copyright (c) Codice Foundation
- *
- * This is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation, either
- * version 3 of the License, or any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU Lesser General Public License for more details. A copy of the GNU Lesser General Public License is distributed along with this program and can be found at
+ * 
+ * This is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser
+ * General Public License as published by the Free Software Foundation, either version 3 of the
+ * License, or any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details. A copy of the GNU Lesser General Public License
+ * is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
- *
+ * 
  **/
 package ddf.ui.admin.api;
 
@@ -36,29 +39,35 @@ import java.util.Map;
 /**
  * @author Scott Tustison
  */
-public class ConfigurationAdmin implements ConfigurationAdminMBean
-{
+public class ConfigurationAdmin implements ConfigurationAdminMBean {
     private static final String DISABLED = "_disabled";
 
     private final XLogger logger = new XLogger(LoggerFactory.getLogger(ConfigurationAdmin.class));
 
     private static final String SERVICE_PID = "service.pid";
+
     private static final String SERVICE_FACTORYPID = "service.factorypid";
 
     private final org.osgi.service.cm.ConfigurationAdmin configurationAdmin;
+
     private final ConfigurationAdminExt configurationAdminExt;
+
     private ObjectName objectName;
+
     private MBeanServer mBeanServer;
+
     private List<String> filterList;
+
     private List<ConfigurationAdminPlugin> configurationAdminPluginList;
 
     /**
      * Constructs a ConfigurationAdmin implementation
-     *
-     * @param configurationAdmin instance of org.osgi.service.cm.ConfigurationAdmin service
+     * 
+     * @param configurationAdmin
+     *            instance of org.osgi.service.cm.ConfigurationAdmin service
      */
-    public ConfigurationAdmin(BundleContext bundleContext, org.osgi.service.cm.ConfigurationAdmin configurationAdmin)
-    {
+    public ConfigurationAdmin(BundleContext bundleContext,
+            org.osgi.service.cm.ConfigurationAdmin configurationAdmin) {
         this.configurationAdmin = configurationAdmin;
         configurationAdminExt = new ConfigurationAdminExt(bundleContext, configurationAdmin);
     }
@@ -66,32 +75,23 @@ public class ConfigurationAdmin implements ConfigurationAdminMBean
     /**
      * Initialize this MBean and register it with the MBean server
      */
-    public void init()
-    {
-        try
-        {
-            if (objectName == null)
-            {
+    public void init() {
+        try {
+            if (objectName == null) {
                 objectName = new ObjectName(ConfigurationAdminMBean.OBJECTNAME);
             }
-            if (mBeanServer == null)
-            {
+            if (mBeanServer == null) {
                 mBeanServer = ManagementFactory.getPlatformMBeanServer();
             }
-            try
-            {
+            try {
                 mBeanServer.registerMBean(this, objectName);
-            }
-            catch (InstanceAlreadyExistsException iaee)
-            {
+            } catch (InstanceAlreadyExistsException iaee) {
                 // Try to remove and re-register
                 logger.info("Re-registering SchemaLookup MBean");
                 mBeanServer.unregisterMBean(objectName);
                 mBeanServer.registerMBean(this, objectName);
             }
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             logger.warn("Exception during initialization: ", e);
             throw new RuntimeException(e);
         }
@@ -100,29 +100,23 @@ public class ConfigurationAdmin implements ConfigurationAdminMBean
     /**
      * Unregister this MBean with the MBean server
      */
-    public void destroy()
-    {
-        try
-        {
-            if (objectName != null && mBeanServer != null)
-            {
+    public void destroy() {
+        try {
+            if (objectName != null && mBeanServer != null) {
                 mBeanServer.unregisterMBean(objectName);
             }
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             logger.warn("Exception unregistering mbean: ", e);
             throw new RuntimeException(e);
         }
     }
 
-    public List<ConfigurationAdminPlugin> getConfigurationAdminPluginList()
-    {
+    public List<ConfigurationAdminPlugin> getConfigurationAdminPluginList() {
         return configurationAdminPluginList;
     }
 
-    public void setConfigurationAdminPluginList(List<ConfigurationAdminPlugin> configurationAdminPluginList)
-    {
+    public void setConfigurationAdminPluginList(
+            List<ConfigurationAdminPlugin> configurationAdminPluginList) {
         this.configurationAdminPluginList = configurationAdminPluginList;
         configurationAdminExt.setConfigurationAdminPluginList(configurationAdminPluginList);
     }
@@ -130,8 +124,7 @@ public class ConfigurationAdmin implements ConfigurationAdminMBean
     /**
      * @see ConfigurationAdminMBean#listDefaultFilteredFactoryConfigurations()
      */
-    public List<Map<String, Object>> listDefaultFilteredFactoryConfigurations()
-    {
+    public List<Map<String, Object>> listDefaultFilteredFactoryConfigurations() {
         List<Map<String, Object>> factoryConfigurations = listFactoryConfigurations(getDefaultFactoryLdapFilter());
 
         return factoryConfigurations;
@@ -140,29 +133,23 @@ public class ConfigurationAdmin implements ConfigurationAdminMBean
     /**
      * @see ConfigurationAdminMBean#listConfigurations(String)
      */
-    public List<Map<String, Object>> listDefaultFilteredConfigurations()
-    {
+    public List<Map<String, Object>> listDefaultFilteredConfigurations() {
         return listConfigurations(getDefaultLdapFilter());
     }
 
     /**
      * @see ConfigurationAdminMBean#listConfigurations(String)
      */
-    public List<Map<String, Object>> listConfigurations(String pidFilter)
-    {
+    public List<Map<String, Object>> listConfigurations(String pidFilter) {
         List<Map<String, Object>> json = new ArrayList<Map<String, Object>>();
 
         configurationAdminExt.listConfigurations(json, pidFilter);
-        for(Map<String, Object> configuration : json)
-        {
-            try
-            {
+        for (Map<String, Object> configuration : json) {
+            try {
                 Map<String, Object> properties = getProperties((String) configuration.get("id"));
                 configuration.put("properties", properties);
-            }
-            catch (IOException e)
-            {
-                logger.error("Unable to get properties for: "+configuration.get("id"), e);
+            } catch (IOException e) {
+                logger.error("Unable to get properties for: " + configuration.get("id"), e);
             }
         }
 
@@ -172,30 +159,26 @@ public class ConfigurationAdmin implements ConfigurationAdminMBean
     /**
      * @see ConfigurationAdminMBean#listFactoryConfigurations(String)
      */
-    public List<Map<String, Object>> listFactoryConfigurations(String pidFilter)
-    {
+    public List<Map<String, Object>> listFactoryConfigurations(String pidFilter) {
         List<Map<String, Object>> json = new ArrayList<Map<String, Object>>();
 
         configurationAdminExt.listFactoryConfigurations(json, pidFilter);
-        for(Map<String, Object> factoryConfiguration : json)
-        {
-            List<Map<String, Object>> configurations = listConfigurations("(" + SERVICE_FACTORYPID + "=" + factoryConfiguration.get("id") + ")");
+        for (Map<String, Object> factoryConfiguration : json) {
+            List<Map<String, Object>> configurations = listConfigurations("(" + SERVICE_FACTORYPID
+                    + "=" + factoryConfiguration.get("id") + ")");
             factoryConfiguration.put("configurations", configurations);
         }
 
         return json;
     }
 
-    private String getDefaultFactoryLdapFilter()
-    {
-        if(CollectionUtils.isNotEmpty(filterList))
-        {
+    private String getDefaultFactoryLdapFilter() {
+        if (CollectionUtils.isNotEmpty(filterList)) {
             StringBuilder ldapFilter = new StringBuilder();
             ldapFilter.append("(");
             ldapFilter.append("|");
 
-            for(String fpid : filterList)
-            {
+            for (String fpid : filterList) {
                 ldapFilter.append("(");
                 ldapFilter.append(SERVICE_FACTORYPID);
                 ldapFilter.append("=");
@@ -207,19 +190,16 @@ public class ConfigurationAdmin implements ConfigurationAdminMBean
 
             return ldapFilter.toString();
         }
-        return "("+SERVICE_FACTORYPID+"="+"*)";
+        return "(" + SERVICE_FACTORYPID + "=" + "*)";
     }
 
-    private String getDefaultLdapFilter()
-    {
-        if(CollectionUtils.isNotEmpty(filterList))
-        {
+    private String getDefaultLdapFilter() {
+        if (CollectionUtils.isNotEmpty(filterList)) {
             StringBuilder ldapFilter = new StringBuilder();
             ldapFilter.append("(");
             ldapFilter.append("|");
 
-            for(String fpid : filterList)
-            {
+            for (String fpid : filterList) {
                 ldapFilter.append("(");
                 ldapFilter.append(SERVICE_PID);
                 ldapFilter.append("=");
@@ -232,21 +212,22 @@ public class ConfigurationAdmin implements ConfigurationAdminMBean
 
             return ldapFilter.toString();
         }
-        return "("+SERVICE_PID+"="+"*)";
+        return "(" + SERVICE_PID + "=" + "*)";
     }
 
     /**
      * @see ddf.ui.admin.api.ConfigurationAdminMBean#createFactoryConfiguration(java.lang.String)
      */
-    public String createFactoryConfiguration(String factoryPid) throws IOException
-    {
+    public String createFactoryConfiguration(String factoryPid) throws IOException {
         return createFactoryConfigurationForLocation(factoryPid, null);
     }
 
     /**
-     * @see ddf.ui.admin.api.ConfigurationAdminMBean#createFactoryConfigurationForLocation(java.lang.String, java.lang.String)
+     * @see ddf.ui.admin.api.ConfigurationAdminMBean#createFactoryConfigurationForLocation(java.lang.String,
+     *      java.lang.String)
      */
-    public String createFactoryConfigurationForLocation(String factoryPid, String location) throws IOException {
+    public String createFactoryConfigurationForLocation(String factoryPid, String location)
+        throws IOException {
         if (factoryPid == null || factoryPid.length() < 1) {
             throw new IOException("Argument factoryPid cannot be null or empty");
         }
@@ -263,7 +244,8 @@ public class ConfigurationAdmin implements ConfigurationAdminMBean
     }
 
     /**
-     * @see ddf.ui.admin.api.ConfigurationAdminMBean#deleteForLocation(java.lang.String, java.lang.String)
+     * @see ddf.ui.admin.api.ConfigurationAdminMBean#deleteForLocation(java.lang.String,
+     *      java.lang.String)
      */
     public void deleteForLocation(String pid, String location) throws IOException {
         if (pid == null || pid.length() < 1) {
@@ -301,7 +283,8 @@ public class ConfigurationAdmin implements ConfigurationAdminMBean
             throw new IOException("Argument pid cannot be null or empty");
         }
         Configuration config = configurationAdmin.getConfiguration(pid, null);
-        String bundleLocation = (config.getBundleLocation() == null) ? "Configuration is not yet bound to a bundle location" : config.getBundleLocation();
+        String bundleLocation = (config.getBundleLocation() == null) ? "Configuration is not yet bound to a bundle location"
+                : config.getBundleLocation();
         return bundleLocation;
     }
 
@@ -321,7 +304,7 @@ public class ConfigurationAdmin implements ConfigurationAdminMBean
         }
         if (configurations != null) {
             for (Configuration config : configurations) {
-                result.add(new String[] { config.getPid(), config.getBundleLocation() });
+                result.add(new String[] {config.getPid(), config.getBundleLocation()});
             }
         }
         return result.toArray(new String[result.size()][]);
@@ -335,7 +318,8 @@ public class ConfigurationAdmin implements ConfigurationAdminMBean
     }
 
     /**
-     * @see ddf.ui.admin.api.ConfigurationAdminMBean#getFactoryPidForLocation(java.lang.String, java.lang.String)
+     * @see ddf.ui.admin.api.ConfigurationAdminMBean#getFactoryPidForLocation(java.lang.String,
+     *      java.lang.String)
      */
     public String getFactoryPidForLocation(String pid, String location) throws IOException {
         if (pid == null || pid.length() < 1) {
@@ -353,14 +337,16 @@ public class ConfigurationAdmin implements ConfigurationAdminMBean
     }
 
     /**
-     * @see ddf.ui.admin.api.ConfigurationAdminMBean#getPropertiesForLocation(java.lang.String, java.lang.String)
+     * @see ddf.ui.admin.api.ConfigurationAdminMBean#getPropertiesForLocation(java.lang.String,
+     *      java.lang.String)
      */
     @SuppressWarnings("unchecked")
-    public Map<String, Object> getPropertiesForLocation(String pid, String location) throws IOException {
+    public Map<String, Object> getPropertiesForLocation(String pid, String location)
+        throws IOException {
         if (pid == null || pid.length() < 1) {
             throw new IOException("Argument pid cannot be null or empty");
         }
-        Map<String,Object> propertiesTable = new HashMap<String, Object>();
+        Map<String, Object> propertiesTable = new HashMap<String, Object>();
         Configuration config = configurationAdmin.getConfiguration(pid, location);
         Dictionary<String, Object> properties = config.getProperties();
         if (properties != null) {
@@ -374,7 +360,8 @@ public class ConfigurationAdmin implements ConfigurationAdminMBean
     }
 
     /**
-     * @see ddf.ui.admin.api.ConfigurationAdminMBean#setBundleLocation(java.lang.String, java.lang.String)
+     * @see ddf.ui.admin.api.ConfigurationAdminMBean#setBundleLocation(java.lang.String,
+     *      java.lang.String)
      */
     public void setBundleLocation(String pid, String location) throws IOException {
         if (pid == null || pid.length() < 1) {
@@ -392,10 +379,12 @@ public class ConfigurationAdmin implements ConfigurationAdminMBean
     }
 
     /**
-     * @see ddf.ui.admin.api.ConfigurationAdminMBean#updateForLocation(java.lang.String, java.lang.String, java.util.Map)
+     * @see ddf.ui.admin.api.ConfigurationAdminMBean#updateForLocation(java.lang.String,
+     *      java.lang.String, java.util.Map)
      */
     @SuppressWarnings("unchecked")
-    public void updateForLocation(String pid, String location, Map<String, Object> configurationTable) throws IOException {
+    public void updateForLocation(String pid, String location,
+            Map<String, Object> configurationTable) throws IOException {
         if (pid == null || pid.length() < 1) {
             throw new IOException("Argument pid cannot be null or empty");
         }
@@ -403,76 +392,86 @@ public class ConfigurationAdmin implements ConfigurationAdminMBean
             throw new IOException("Argument configurationTable cannot be null");
         }
 
-        for(String key : configurationTable.keySet()) //sanity check to make sure no values are null
+        for (String key : configurationTable.keySet()) // sanity check to make sure no values are
+                                                       // null
         {
-            if(configurationTable.get(key) == null)
-            {
+            if (configurationTable.get(key) == null) {
                 configurationTable.put(key, "");
             }
         }
 
-        Dictionary<String, Object> configurationProperties = new Hashtable<String, Object>(configurationTable);
+        Dictionary<String, Object> configurationProperties = new Hashtable<String, Object>(
+                configurationTable);
         Configuration config = configurationAdmin.getConfiguration(pid, location);
         config.update(configurationProperties);
     }
 
-    public List<String> getFilterList()
-    {
+    public List<String> getFilterList() {
         return filterList;
     }
 
-    public void setFilterList(List<String> filterList)
-    {
+    public void setFilterList(List<String> filterList) {
         this.filterList = filterList;
     }
-    
-    public void disableConfiguration(String servicePid) throws IOException{
-        if(StringUtils.isEmpty(servicePid)){
-            throw new IOException("Service PID of Source to be disabled must be specified.  Service PID provided: " + servicePid);
+
+    public void disableConfiguration(String servicePid) throws IOException {
+        if (StringUtils.isEmpty(servicePid)) {
+            throw new IOException(
+                    "Service PID of Source to be disabled must be specified.  Service PID provided: "
+                            + servicePid);
         }
 
         Configuration originalConfig = configurationAdminExt.getConfiguration(servicePid);
 
-        if(originalConfig == null){
+        if (originalConfig == null) {
             throw new IOException("No Source exists with the service PID: " + servicePid);
         }
 
         Dictionary properties = originalConfig.getProperties();
-        String originalFactoryPid = (String) properties.get(org.osgi.service.cm.ConfigurationAdmin.SERVICE_FACTORYPID);
-        if(StringUtils.endsWith(originalFactoryPid, DISABLED)){
+        String originalFactoryPid = (String) properties
+                .get(org.osgi.service.cm.ConfigurationAdmin.SERVICE_FACTORYPID);
+        if (StringUtils.endsWith(originalFactoryPid, DISABLED)) {
             throw new IOException("Source is already disabled.");
         }
 
-        //Copy configuration from the original configuration and change its factory PID to end with "disabled"
+        // Copy configuration from the original configuration and change its factory PID to end with
+        // "disabled"
         String disabledServiceFactoryPid = originalFactoryPid + DISABLED;
-        properties.put(org.osgi.service.cm.ConfigurationAdmin.SERVICE_FACTORYPID, disabledServiceFactoryPid);
-        Configuration disabledConfig = configurationAdmin.createFactoryConfiguration(disabledServiceFactoryPid, null);
+        properties.put(org.osgi.service.cm.ConfigurationAdmin.SERVICE_FACTORYPID,
+                disabledServiceFactoryPid);
+        Configuration disabledConfig = configurationAdmin.createFactoryConfiguration(
+                disabledServiceFactoryPid, null);
         disabledConfig.update(properties);
 
-        //remove original configuration
+        // remove original configuration
         originalConfig.delete();
     }
-    
-    public void enableConfiguration(String servicePid) throws IOException{
-        if(StringUtils.isEmpty(servicePid)){
-            throw new IOException("Service PID of Source to be disabled must be specified.  Service PID provided: " + servicePid);
+
+    public void enableConfiguration(String servicePid) throws IOException {
+        if (StringUtils.isEmpty(servicePid)) {
+            throw new IOException(
+                    "Service PID of Source to be disabled must be specified.  Service PID provided: "
+                            + servicePid);
         }
 
         Configuration disabledConfig = configurationAdminExt.getConfiguration(servicePid);
 
-        if(disabledConfig == null){
+        if (disabledConfig == null) {
             throw new IOException("No Source exists with the service PID: " + servicePid);
         }
 
         Dictionary properties = disabledConfig.getProperties();
-        String disabledFactoryPid = (String) properties.get(org.osgi.service.cm.ConfigurationAdmin.SERVICE_FACTORYPID);
-        if(!StringUtils.endsWith(disabledFactoryPid, DISABLED)){
+        String disabledFactoryPid = (String) properties
+                .get(org.osgi.service.cm.ConfigurationAdmin.SERVICE_FACTORYPID);
+        if (!StringUtils.endsWith(disabledFactoryPid, DISABLED)) {
             throw new IOException("Source is already enabled.");
         }
 
         String enabledFactoryPid = StringUtils.removeEnd(disabledFactoryPid, DISABLED);
-        properties.put(org.osgi.service.cm.ConfigurationAdmin.SERVICE_FACTORYPID, enabledFactoryPid);
-        Configuration enabledConfiguration = configurationAdmin.createFactoryConfiguration(enabledFactoryPid, null);
+        properties
+                .put(org.osgi.service.cm.ConfigurationAdmin.SERVICE_FACTORYPID, enabledFactoryPid);
+        Configuration enabledConfiguration = configurationAdmin.createFactoryConfiguration(
+                enabledFactoryPid, null);
         enabledConfiguration.update(properties);
 
         disabledConfig.delete();
