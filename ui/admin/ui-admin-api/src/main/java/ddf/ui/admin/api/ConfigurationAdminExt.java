@@ -1,18 +1,31 @@
 /**
  * Copyright (c) Codice Foundation
- *
- * This is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation, either
- * version 3 of the License, or any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU Lesser General Public License for more details. A copy of the GNU Lesser General Public License is distributed along with this program and can be found at
+ * 
+ * This is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser
+ * General Public License as published by the Free Software Foundation, either version 3 of the
+ * License, or any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details. A copy of the GNU Lesser General Public License
+ * is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
- *
+ * 
  **/
 package ddf.ui.admin.api;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Dictionary;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Map.Entry;
 
-import ddf.ui.admin.api.plugin.ConfigurationAdminPlugin;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
@@ -31,25 +44,15 @@ import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.LoggerFactory;
 import org.slf4j.ext.XLogger;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Dictionary;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Map.Entry;
+import ddf.ui.admin.api.plugin.ConfigurationAdminPlugin;
 
-
-class ConfigurationAdminExt
-{
+class ConfigurationAdminExt {
     static final String META_TYPE_NAME = "org.osgi.service.metatype.MetaTypeService";
+
     private final XLogger logger = new XLogger(LoggerFactory.getLogger(ConfigurationAdminExt.class));
 
     private final BundleContext bundleContext;
+
     private final ConfigurationAdmin service;
 
     private final Map<String, ServiceTracker> services = new HashMap<String, ServiceTracker>();
@@ -59,42 +62,32 @@ class ConfigurationAdminExt
     /**
      * @param bundleContext
      * @param service
-     * @throws ClassCastException if {@code service} is not a MetaTypeService instances
+     * @throws ClassCastException
+     *             if {@code service} is not a MetaTypeService instances
      */
-    ConfigurationAdminExt(final BundleContext bundleContext, final Object service)
-    {
+    ConfigurationAdminExt(final BundleContext bundleContext, final Object service) {
         this.bundleContext = bundleContext;
         this.service = (ConfigurationAdmin) service;
     }
 
-
-    BundleContext getBundleContext()
-    {
+    BundleContext getBundleContext() {
         return bundleContext;
     }
 
-    final Configuration getConfiguration(String pid)
-    {
-        if (pid != null)
-        {
-            try
-            {
+    final Configuration getConfiguration(String pid) {
+        if (pid != null) {
+            try {
                 // we use listConfigurations to not create configuration
                 // objects persistently without the user providing actual
                 // configuration
                 String filter = '(' + Constants.SERVICE_PID + '=' + pid + ')';
                 Configuration[] configs = this.service.listConfigurations(filter);
-                if (configs != null && configs.length > 0)
-                {
+                if (configs != null && configs.length > 0) {
                     return configs[0];
                 }
-            }
-            catch (InvalidSyntaxException ise)
-            {
+            } catch (InvalidSyntaxException ise) {
                 // should print message
-            }
-            catch (IOException ioe)
-            {
+            } catch (IOException ioe) {
                 // should print message
             }
         }
@@ -103,8 +96,7 @@ class ConfigurationAdminExt
         return null;
     }
 
-    private final Bundle getBoundBundle(Configuration config)
-    {
+    private final Bundle getBoundBundle(Configuration config) {
         if (null == config)
             return null;
         final String location = config.getBundleLocation();
@@ -112,8 +104,7 @@ class ConfigurationAdminExt
             return null;
 
         final Bundle bundles[] = getBundleContext().getBundles();
-        for (int i = 0; bundles != null && i < bundles.length; i++)
-        {
+        for (int i = 0; bundles != null && i < bundles.length; i++) {
             if (bundles[i].getLocation().equals(location))
                 return bundles[i];
 
@@ -121,143 +112,122 @@ class ConfigurationAdminExt
         return null;
     }
 
-
-    final void listConfigurations(List<Map<String, Object>> json, String pidFilter)
-    {
-        try
-        {
+    final void listConfigurations(List<Map<String, Object>> configurationList, String pidFilter) {
+        try {
             // Get ManagedService instances
-            List<Map<String, Object>> serviceList = getServices(ManagedService.class.getName(), pidFilter, true);
+            List<Map<String, Object>> serviceList = getServices(ManagedService.class.getName(),
+                    pidFilter, true);
 
             // Get Metatypes
-            List<Map<String, Object>> metatypeList = addMetaTypeNamesToMap(getPidObjectClasses(), pidFilter, Constants.SERVICE_PID);
+            List<Map<String, Object>> metatypeList = addMetaTypeNamesToMap(getPidObjectClasses(),
+                    pidFilter, Constants.SERVICE_PID);
 
-            for(Map<String, Object> metatype : metatypeList)
-            {
-                if(metatype.get("id") != null)
-                {
+            for (Map<String, Object> metatype : metatypeList) {
+                if (metatype.get("id") != null) {
                     boolean exists = false;
-                    for(Map<String, Object> service : serviceList)
-                    {
-                        if(service.get("id") != null && metatype.get("id").equals(service.get("id")))
-                        {
+                    for (Map<String, Object> service : serviceList) {
+                        if (service.get("id") != null
+                                && metatype.get("id").equals(service.get("id"))) {
                             exists = true;
                             service.putAll(metatype);
                         }
                     }
-                    if(!exists)
-                    {
-                        json.add(metatype);
+                    if (!exists) {
+                        configurationList.add(metatype);
                     }
                 }
             }
-            json.addAll(serviceList);
+            configurationList.addAll(serviceList);
 
             // Get configurations
             Configuration[] cfgs = service.listConfigurations(pidFilter);
-            for (int i = 0; cfgs != null && i < cfgs.length; i++)
-            {
+            for (int i = 0; cfgs != null && i < cfgs.length; i++) {
 
                 // ignore configuration object if an entry already exists in the map
                 // or if it is invalid
                 final String pid = cfgs[i].getPid();
-                if(!isAllowedPid(pid))
-                {
+                if (!isAllowedPid(pid)) {
                     continue;
-                }
-                else
-                {
+                } else {
                     boolean skip = false;
-                    for(Map<String, Object> data : json)
-                    {
-                        if(data.get("id").equals(pid))
-                        {
+                    for (Map<String, Object> data : configurationList) {
+                        if (data.get("id").equals(pid)) {
                             skip = true;
                         }
                     }
-                    if(skip)
-                    {
+                    if (skip) {
                         continue;
                     }
                 }
 
                 // insert an entry for the PID
-                try
-                {
+                try {
                     ObjectClassDefinition ocd = getObjectClassDefinition(cfgs[i]);
-                    if (ocd != null)
-                    {
+                    if (ocd != null) {
                         Map<String, Object> data = new HashMap<String, Object>();
                         data.put("id", pid);
                         data.put("name", ocd.getName());
-                        json.add(data);
+                        configurationList.add(data);
                         continue;
                     }
-                }
-                catch (IllegalArgumentException t)
-                {
-                    // Catch exception thrown by getObjectClassDefinition so other configurations are displayed
+                } catch (IllegalArgumentException t) {
+                    // Catch exception thrown by getObjectClassDefinition so other configurations
+                    // are displayed
                 }
 
                 // no object class definition, use plain PID
                 Map<String, Object> data = new HashMap<String, Object>();
                 data.put("id", pid);
                 data.put("name", pid);
-                json.add(data);
+                configurationList.add(data);
             }
 
             // add configuration data
-            for(Map<String, Object> data : json)
-            {
+            for (Map<String, Object> data : configurationList) {
                 Object id = data.get("id");
                 final Configuration config = this.getConfiguration((String) id);
-                if (null != config)
-                {
+                if (null != config) {
                     final String fpid = config.getFactoryPid();
-                    if (null != fpid)
-                    {
+                    if (null != fpid) {
                         data.put("fpid", fpid);
                     }
 
                     final Bundle bundle = getBoundBundle(config);
-                    if (null != bundle)
-                    {
+                    if (null != bundle) {
                         data.put("bundle", bundle.getBundleId());
                         data.put("bundle_name", getName(bundle));
                     }
 
-                    Map<String, Object> pluginDataMap = getConfigurationPluginData(id.toString(), Collections.unmodifiableMap(data));
-                    if(pluginDataMap != null && !pluginDataMap.isEmpty())
-                    {
+                    Map<String, Object> pluginDataMap = getConfigurationPluginData(id.toString(),
+                            Collections.unmodifiableMap(data));
+                    if (pluginDataMap != null && !pluginDataMap.isEmpty()) {
                         data.putAll(pluginDataMap);
                     }
-                }
-                else
-                {
-                    //this could be an unconfigured service if this is null so we can ignore the configuration steps
-                    //but we still need to check our plugins to see if they know about this service
-                    Map<String, Object> pluginDataMap = getConfigurationPluginData(id.toString(), Collections.unmodifiableMap(data));
-                    if(pluginDataMap != null && !pluginDataMap.isEmpty())
-                    {
+                } else {
+                    // this could be an unconfigured service if this is null so we can ignore the
+                    // configuration steps
+                    // but we still need to check our plugins to see if they know about this service
+                    Map<String, Object> pluginDataMap = getConfigurationPluginData(id.toString(),
+                            Collections.unmodifiableMap(data));
+                    if (pluginDataMap != null && !pluginDataMap.isEmpty()) {
                         data.putAll(pluginDataMap);
                     }
                 }
             }
-        }
-        catch (Exception e)
-        {
-            logger.error("listConfigurations: Unexpected problem encountered", e);
+        } catch (IOException e) {
+            logger.error("Unable to obtain list of Configuration objects from ConfigurationAdmin.", e);
+        } catch (InvalidSyntaxException e) {
+            logger.error("Provided LDAP filter is incorrect: "+pidFilter, e);
         }
     }
 
-    private Map<String, Object> getConfigurationPluginData(String servicePid, Map<String, Object> dataMap)
-    {
+    private Map<String, Object> getConfigurationPluginData(String servicePid,
+            Map<String, Object> dataMap) {
         Map<String, Object> allPluginMap = new HashMap<String, Object>();
-        if(configurationAdminPluginList != null)
-        {
-            for(ConfigurationAdminPlugin plugin : configurationAdminPluginList)
-            {
-                Map<String, Object> pluginDataMap = plugin.getConfigurationData(servicePid, dataMap, bundleContext);
+        if (configurationAdminPluginList != null) {
+            for (ConfigurationAdminPlugin plugin : configurationAdminPluginList) {
+                Map<String, Object> pluginDataMap = plugin.getConfigurationData(servicePid,
+                        dataMap, bundleContext);
                 allPluginMap.putAll(pluginDataMap);
             }
         }
@@ -267,29 +237,26 @@ class ConfigurationAdminExt
     /**
      * Return a display name for the given <code>bundle</code>:
      * <ol>
-     * <li>If the bundle has a non-empty <code>Bundle-Name</code> manifest
-     * header that value is returned.</li>
+     * <li>If the bundle has a non-empty <code>Bundle-Name</code> manifest header that value is
+     * returned.</li>
      * <li>Otherwise the symbolic name is returned if set</li>
      * <li>Otherwise the bundle's location is returned if defined</li>
      * <li>Finally, as a last resort, the bundles id is returned</li>
      * </ol>
-     *
-     * @param bundle the bundle which name to retrieve
+     * 
+     * @param bundle
+     *            the bundle which name to retrieve
      * @return the bundle name - see the description of the method for more details.
      */
-    String getName(Bundle bundle)
-    {
+    String getName(Bundle bundle) {
         Locale locale = Locale.getDefault();
         final String loc = locale == null ? null : locale.toString();
         String name = (String) bundle.getHeaders(loc).get(Constants.BUNDLE_NAME);
-        if (name == null || name.length() == 0)
-        {
+        if (name == null || name.length() == 0) {
             name = bundle.getSymbolicName();
-            if (name == null)
-            {
+            if (name == null) {
                 name = bundle.getLocation();
-                if (name == null)
-                {
+                if (name == null) {
                     name = String.valueOf(bundle.getBundleId());
                 }
             }
@@ -297,118 +264,99 @@ class ConfigurationAdminExt
         return name;
     }
 
-    final boolean isAllowedPid(final String pid)
-    {
-        for (int i = 0; i < pid.length(); i++)
-        {
+    final boolean isAllowedPid(final String pid) {
+        for (int i = 0; i < pid.length(); i++) {
             final char c = pid.charAt(i);
-            if (c == '&' || c == '<' || c == '>' || c == '"' || c == '\'')
-            {
+            if (c == '&' || c == '<' || c == '>' || c == '"' || c == '\'') {
                 return false;
             }
         }
         return true;
     }
 
-    public void setConfigurationAdminPluginList(List<ConfigurationAdminPlugin> configurationAdminPluginList)
-    {
+    public void setConfigurationAdminPluginList(
+            List<ConfigurationAdminPlugin> configurationAdminPluginList) {
         this.configurationAdminPluginList = configurationAdminPluginList;
     }
 
     /**
-     * The <code>IdGetter</code> interface is an internal helper to abstract
-     * retrieving object class definitions from all bundles for either
-     * pids or factory pids.
-     *
+     * The <code>IdGetter</code> interface is an internal helper to abstract retrieving object class
+     * definitions from all bundles for either pids or factory pids.
+     * 
      * @see #PID_GETTER
      * @see #FACTORY_PID_GETTER
      */
-    private static interface IdGetter
-    {
+    private static interface IdGetter {
         String[] getIds(MetaTypeInformation metaTypeInformation);
     }
 
     /**
-     * The implementation of the {@link IdGetter} interface returning the PIDs
-     * listed in the meta type information.
-     *
+     * The implementation of the {@link IdGetter} interface returning the PIDs listed in the meta
+     * type information.
+     * 
      * @see #getPidObjectClasses()
      */
-    private static final IdGetter PID_GETTER = new IdGetter()
-    {
-        public String[] getIds(MetaTypeInformation metaTypeInformation)
-        {
+    private static final IdGetter PID_GETTER = new IdGetter() {
+        public String[] getIds(MetaTypeInformation metaTypeInformation) {
             return metaTypeInformation.getPids();
         }
     };
 
     /**
-     * The implementation of the {@link IdGetter} interface returning the
-     * factory PIDs listed in the meta type information.
+     * The implementation of the {@link IdGetter} interface returning the factory PIDs listed in the
+     * meta type information.
      */
-    private static final IdGetter FACTORY_PID_GETTER = new IdGetter()
-    {
-        public String[] getIds(MetaTypeInformation metaTypeInformation)
-        {
+    private static final IdGetter FACTORY_PID_GETTER = new IdGetter() {
+        public String[] getIds(MetaTypeInformation metaTypeInformation) {
             return metaTypeInformation.getFactoryPids();
         }
     };
 
     /**
-     * Returns a map of PIDs and providing bundles of MetaType information. The
-     * map is indexed by PID and the value of each entry is the bundle providing
-     * the MetaType information for that PID.
-     *
+     * Returns a map of PIDs and providing bundles of MetaType information. The map is indexed by
+     * PID and the value of each entry is the bundle providing the MetaType information for that
+     * PID.
+     * 
      * @return see the method description
      */
-    Map getPidObjectClasses()
-    {
+    Map getPidObjectClasses() {
         return getObjectClassDefinitions(PID_GETTER);
     }
 
     /**
-     * Returns the <code>ObjectClassDefinition</code> objects for the IDs
-     * returned by the <code>idGetter</code>. Depending on the
-     * <code>idGetter</code> implementation this will be for factory PIDs or
-     * plain PIDs.
-     *
-     * @param idGetter The {@link IdGetter} used to get the list of factory PIDs
-     *                 or PIDs from <code>MetaTypeInformation</code> objects.
-     * @return Map of <code>ObjectClassDefinition</code> objects indexed by the
-     *         PID (or factory PID) to which they pertain
+     * Returns the <code>ObjectClassDefinition</code> objects for the IDs returned by the
+     * <code>idGetter</code>. Depending on the <code>idGetter</code> implementation this will be for
+     * factory PIDs or plain PIDs.
+     * 
+     * @param idGetter
+     *            The {@link IdGetter} used to get the list of factory PIDs or PIDs from
+     *            <code>MetaTypeInformation</code> objects.
+     * @return Map of <code>ObjectClassDefinition</code> objects indexed by the PID (or factory PID)
+     *         to which they pertain
      */
-    private Map getObjectClassDefinitions(final IdGetter idGetter)
-    {
+    private Map getObjectClassDefinitions(final IdGetter idGetter) {
         Locale locale = Locale.getDefault();
         final Map objectClassesDefinitions = new HashMap();
         final MetaTypeService mts = this.getMetaTypeService();
-        if (mts != null)
-        {
+        if (mts != null) {
             final Bundle[] bundles = this.getBundleContext().getBundles();
-            for (int i = 0; i < bundles.length; i++)
-            {
+            for (int i = 0; i < bundles.length; i++) {
                 final MetaTypeInformation mti = mts.getMetaTypeInformation(bundles[i]);
-                if (mti != null)
-                {
+                if (mti != null) {
                     final String[] idList = idGetter.getIds(mti);
-                    for (int j = 0; idList != null && j < idList.length; j++)
-                    {
-                        // After getting the list of PIDs, a configuration  might be
+                    for (int j = 0; idList != null && j < idList.length; j++) {
+                        // After getting the list of PIDs, a configuration might be
                         // removed. So the getObjectClassDefinition will throw
                         // an exception, and this will prevent ALL configuration from
                         // being displayed. By catching it, the configurations will be
                         // visible
                         ObjectClassDefinition ocd = null;
-                        try
-                        {
+                        try {
                             ocd = mti.getObjectClassDefinition(idList[j], locale.toString());
-                        }
-                        catch (IllegalArgumentException ignore)
-                        {
+                        } catch (IllegalArgumentException ignore) {
                             // ignore - just don't show this configuration
                         }
-                        if (ocd != null)
-                        {
+                        if (ocd != null) {
                             objectClassesDefinitions.put(idList[j], ocd);
                         }
                     }
@@ -418,18 +366,14 @@ class ConfigurationAdminExt
         return objectClassesDefinitions;
     }
 
-    ObjectClassDefinition getObjectClassDefinition(Configuration config)
-    {
+    ObjectClassDefinition getObjectClassDefinition(Configuration config) {
         // if the configuration is bound, try to get the object class
         // definition from the bundle installed from the given location
-        if (config.getBundleLocation() != null)
-        {
+        if (config.getBundleLocation() != null) {
             Bundle bundle = getBundle(this.getBundleContext(), config.getBundleLocation());
-            if (bundle != null)
-            {
+            if (bundle != null) {
                 String id = config.getFactoryPid();
-                if (null == id)
-                {
+                if (null == id) {
                     id = config.getPid();
                 }
                 return getObjectClassDefinition(bundle, id);
@@ -440,8 +384,7 @@ class ConfigurationAdminExt
         // bundle with the bound location is installed. We search
         // all bundles for a matching [factory] PID
         // if the configuration is a factory one, use the factory PID
-        if (config.getFactoryPid() != null)
-        {
+        if (config.getFactoryPid() != null) {
             return getObjectClassDefinition(config.getFactoryPid());
         }
 
@@ -449,24 +392,17 @@ class ConfigurationAdminExt
         return getObjectClassDefinition(config.getPid());
     }
 
-    ObjectClassDefinition getObjectClassDefinition(Bundle bundle, String pid)
-    {
+    ObjectClassDefinition getObjectClassDefinition(Bundle bundle, String pid) {
         Locale locale = Locale.getDefault();
-        if (bundle != null)
-        {
+        if (bundle != null) {
             MetaTypeService mts = this.getMetaTypeService();
-            if (mts != null)
-            {
+            if (mts != null) {
                 MetaTypeInformation mti = mts.getMetaTypeInformation(bundle);
-                if (mti != null)
-                {
+                if (mti != null) {
                     // see #getObjectClasses( final IdGetter idGetter, final String locale )
-                    try
-                    {
+                    try {
                         return mti.getObjectClassDefinition(pid, locale.toString());
-                    }
-                    catch (IllegalArgumentException e)
-                    {
+                    } catch (IllegalArgumentException e) {
                         // MetaTypeProvider.getObjectClassDefinition might throw illegal
                         // argument exception. So we must catch it here, otherwise the
                         // other configurations will not be shown
@@ -481,23 +417,21 @@ class ConfigurationAdminExt
         return null;
     }
 
-    MetaTypeService getMetaTypeService()
-    {
+    MetaTypeService getMetaTypeService() {
         return (MetaTypeService) getService(META_TYPE_NAME);
     }
 
     /**
-     * Gets the service with the specified class name. Will create a new
-     * {@link ServiceTracker} if the service is not already retrieved.
-     *
-     * @param serviceName the service name to obtain
+     * Gets the service with the specified class name. Will create a new {@link ServiceTracker} if
+     * the service is not already retrieved.
+     * 
+     * @param serviceName
+     *            the service name to obtain
      * @return the service or <code>null</code> if missing.
      */
-    final Object getService(String serviceName)
-    {
+    final Object getService(String serviceName) {
         ServiceTracker serviceTracker = services.get(serviceName);
-        if (serviceTracker == null)
-        {
+        if (serviceTracker == null) {
             serviceTracker = new ServiceTracker(getBundleContext(), serviceName, null);
             serviceTracker.open();
 
@@ -507,39 +441,29 @@ class ConfigurationAdminExt
         return serviceTracker.getService();
     }
 
-    ObjectClassDefinition getObjectClassDefinition(String pid)
-    {
+    ObjectClassDefinition getObjectClassDefinition(String pid) {
         Bundle[] bundles = this.getBundleContext().getBundles();
-        for (int i = 0; i < bundles.length; i++)
-        {
-            try
-            {
+        for (int i = 0; i < bundles.length; i++) {
+            try {
                 ObjectClassDefinition ocd = this.getObjectClassDefinition(bundles[i], pid);
-                if (ocd != null)
-                {
+                if (ocd != null) {
                     return ocd;
                 }
-            }
-            catch (IllegalArgumentException iae)
-            {
+            } catch (IllegalArgumentException iae) {
                 // don't care
             }
         }
         return null;
     }
 
-    static Bundle getBundle(final BundleContext bundleContext, final String bundleLocation)
-    {
-        if (bundleLocation == null)
-        {
+    static Bundle getBundle(final BundleContext bundleContext, final String bundleLocation) {
+        if (bundleLocation == null) {
             return null;
         }
 
         Bundle[] bundles = bundleContext.getBundles();
-        for (int i = 0; i < bundles.length; i++)
-        {
-            if (bundleLocation.equals(bundles[i].getLocation()))
-            {
+        for (int i = 0; i < bundles.length; i++) {
+            if (bundleLocation.equals(bundles[i].getLocation())) {
                 return bundles[i];
             }
         }
@@ -547,84 +471,67 @@ class ConfigurationAdminExt
         return null;
     }
 
+    final void listFactoryConfigurations(List<Map<String, Object>> configurationList, String pidFilter) {
+        try {
+            List<Map<String, Object>> serviceList = getServices(
+                    ManagedServiceFactory.class.getName(), pidFilter, true);
+            List<Map<String, Object>> metatypeList = addMetaTypeNamesToMap(
+                    getFactoryPidObjectClasses(), pidFilter, ConfigurationAdmin.SERVICE_FACTORYPID);
 
-    final void listFactoryConfigurations(List<Map<String, Object>> json, String pidFilter)
-    {
-        try
-        {
-            List<Map<String, Object>> serviceList = getServices(ManagedServiceFactory.class.getName(),
-                    pidFilter, true);
-            List<Map<String, Object>> metatypeList = addMetaTypeNamesToMap(getFactoryPidObjectClasses(), pidFilter,
-                    ConfigurationAdmin.SERVICE_FACTORYPID);
-
-
-
-            for(Map<String, Object> metatype : metatypeList)
-            {
-                if(metatype.get("id") != null)
-                {
+            for (Map<String, Object> metatype : metatypeList) {
+                if (metatype.get("id") != null) {
                     boolean exists = false;
-                    for(Map<String, Object> service : serviceList)
-                    {
-                        if(service.get("id") != null && metatype.get("id").equals(service.get("id")))
-                        {
+                    for (Map<String, Object> service : serviceList) {
+                        if (service.get("id") != null
+                                && metatype.get("id").equals(service.get("id"))) {
                             exists = true;
                             service.putAll(metatype);
                         }
                     }
-                    if(!exists)
-                    {
-                        json.add(metatype);
+                    if (!exists) {
+                        configurationList.add(metatype);
                     }
                 }
             }
 
-            json.addAll(serviceList);
-        }
-        catch (Exception e)
-        {
-            logger.error("listFactoryConfigurations: Unexpected problem encountered", e);
+            configurationList.addAll(serviceList);
+        } catch (InvalidSyntaxException e) {
+            logger.error("Provided LDAP filter is incorrect: "+pidFilter, e);
         }
     }
 
     /**
-     * Returns a map of factory PIDs and providing bundles of MetaType
-     * information. The map is indexed by factory PID and the value of each
-     * entry is the bundle providing the MetaType information for that factory
-     * PID.
-     *
+     * Returns a map of factory PIDs and providing bundles of MetaType information. The map is
+     * indexed by factory PID and the value of each entry is the bundle providing the MetaType
+     * information for that factory PID.
+     * 
      * @return see the method description
      */
-    Map getFactoryPidObjectClasses()
-    {
+    Map getFactoryPidObjectClasses() {
         return getObjectClassDefinitions(FACTORY_PID_GETTER);
     }
 
     List<Map<String, Object>> getServices(String serviceClass, String serviceFilter,
-                          boolean ocdRequired) throws InvalidSyntaxException
-    {
+            boolean ocdRequired) throws InvalidSyntaxException {
         List<Map<String, Object>> serviceList = new ArrayList<Map<String, Object>>();
 
         // find all ManagedServiceFactories to get the factoryPIDs
-        ServiceReference[] refs = this.getBundleContext().getAllServiceReferences(serviceClass, serviceFilter);
-        for (int i = 0; refs != null && i < refs.length; i++)
-        {
+        ServiceReference[] refs = this.getBundleContext().getAllServiceReferences(serviceClass,
+                serviceFilter);
+        for (int i = 0; refs != null && i < refs.length; i++) {
             Object pidObject = refs[i].getProperty(Constants.SERVICE_PID);
             // only include valid PIDs
-            if (pidObject instanceof String && isAllowedPid((String) pidObject))
-            {
+            if (pidObject instanceof String && isAllowedPid((String) pidObject)) {
                 String pid = (String) pidObject;
                 String name = pid;
                 boolean haveOcd = !ocdRequired;
                 final ObjectClassDefinition ocd = getObjectClassDefinition(refs[i].getBundle(), pid);
-                if (ocd != null)
-                {
+                if (ocd != null) {
                     name = ocd.getName();
                     haveOcd = true;
                 }
 
-                if (haveOcd)
-                {
+                if (haveOcd) {
                     Map<String, Object> service = new HashMap<String, Object>();
                     service.put("id", pid);
                     service.put("name", name);
@@ -636,46 +543,38 @@ class ConfigurationAdminExt
         return serviceList;
     }
 
-    private List<Map<String, Object>> addMetaTypeNamesToMap(final Map ocdCollection, final String filterSpec, final String type)
-    {
+    private List<Map<String, Object>> addMetaTypeNamesToMap(final Map ocdCollection,
+            final String filterSpec, final String type) {
         Filter filter = null;
-        if (filterSpec != null)
-        {
-            try
-            {
+        if (filterSpec != null) {
+            try {
                 filter = getBundleContext().createFilter(filterSpec);
-            }
-            catch (InvalidSyntaxException not_expected)
-            {
+            } catch (InvalidSyntaxException not_expected) {
                 /* filter is correct */
             }
         }
 
         List<Map<String, Object>> metatypeList = new ArrayList<Map<String, Object>>();
-        for (Iterator ei = ocdCollection.entrySet().iterator(); ei.hasNext(); )
-        {
+        for (Iterator ei = ocdCollection.entrySet().iterator(); ei.hasNext();) {
             Entry ociEntry = (Entry) ei.next();
             final String pid = (String) ociEntry.getKey();
             final ObjectClassDefinition ocd = (ObjectClassDefinition) ociEntry.getValue();
-            if (filter == null)
-            {
+            if (filter == null) {
                 Map<String, Object> metatype = new HashMap<String, Object>();
                 metatype.put("id", pid);
                 metatype.put("name", ocd.getName());
                 AttributeDefinition[] defs = ocd.getAttributeDefinitions(ObjectClassDefinition.ALL);
                 metatype.put("metatype", createMetatypeMap(defs));
                 metatypeList.add(metatype);
-            }
-            else
-            {
+            } else {
                 final Dictionary props = new Hashtable();
                 props.put(type, pid);
-                if (filter.match(props))
-                {
+                if (filter.match(props)) {
                     Map<String, Object> metatype = new HashMap<String, Object>();
                     metatype.put("id", pid);
                     metatype.put("name", ocd.getName());
-                    AttributeDefinition[] defs = ocd.getAttributeDefinitions(ObjectClassDefinition.ALL);
+                    AttributeDefinition[] defs = ocd
+                            .getAttributeDefinitions(ObjectClassDefinition.ALL);
                     metatype.put("metatype", createMetatypeMap(defs));
                     metatypeList.add(metatype);
                 }
@@ -684,16 +583,13 @@ class ConfigurationAdminExt
         return metatypeList;
     }
 
-    private List<Map<String, Object>> createMetatypeMap(AttributeDefinition[] definitions)
-    {
+    private List<Map<String, Object>> createMetatypeMap(AttributeDefinition[] definitions) {
         List<Map<String, Object>> metatypeList = new ArrayList<Map<String, Object>>();
 
-        if(definitions != null)
-        {
-            for(AttributeDefinition definition : definitions)
-            {
+        if (definitions != null) {
+            for (AttributeDefinition definition : definitions) {
                 Map<String, Object> attributeMap = new HashMap<String, Object>();
-                attributeMap.put("id",definition.getID());
+                attributeMap.put("id", definition.getID());
                 attributeMap.put("name", definition.getName());
                 attributeMap.put("cardinality", definition.getCardinality());
                 attributeMap.put("defaultValue", definition.getDefaultValue());

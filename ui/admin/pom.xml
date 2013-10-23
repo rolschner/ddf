@@ -36,5 +36,14 @@
         <module>ui-admin-app</module>
     </modules>
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>ddf.ui.admin</groupId>
+                <artifactId>ui-admin-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
 </project>

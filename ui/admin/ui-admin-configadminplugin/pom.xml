@@ -34,7 +34,6 @@
         <dependency>
             <groupId>ddf.ui.admin</groupId>
             <artifactId>ui-admin-api</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.osgi</groupId>
