@@ -19,7 +19,6 @@
 		<groupId>ddf</groupId>
         <artifactId>ddf-parent</artifactId>
         <version>1.0.0</version>
-<!--         <relativePath>../../ddf-parent/pom.xml</relativePath> -->
         <relativePath>../parent/pom.xml</relativePath>
 	</parent>	
 
@@ -30,7 +29,7 @@
 	<name>DDF Catalog</name>
 
 	<properties>
-	    <ddf.platform.app.version>2.3.0-SNAPSHOT</ddf.platform.app.version>
+	    <ddf.platform.app.version>2.3.0</ddf.platform.app.version>
 	</properties>
 
 	<dependencyManagement>
