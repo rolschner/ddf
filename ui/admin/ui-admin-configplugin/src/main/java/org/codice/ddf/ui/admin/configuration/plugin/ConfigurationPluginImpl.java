@@ -43,7 +43,11 @@ public class ConfigurationPluginImpl implements ConfigurationPlugin {
      */
     public void modifyConfiguration(ServiceReference<?> reference,
             Dictionary<String, Object> properties) {
-        properties.put("configurationPid", properties.get("service.pid"));
+        //if for some reason service.pid was null, this would throw a null pointer and break everything
+        if(properties != null && properties.get("service.pid") != null)
+        {
+            properties.put("configurationPid", properties.get("service.pid"));
+        }
     }
 
 }
