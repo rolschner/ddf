@@ -39,13 +39,13 @@
     <ddf.platform.app.version>2.3.0</ddf.platform.app.version>
     <!-- <ddf.esb.app.version>2.3.0-SNAPSHOT</ddf.esb.app.version> -->
     <!-- <ddf.security.services.app.version>2.3.0-SNAPSHOT</ddf.security.services.app.version> -->
-    <ddf.content.services.app.version>2.3.0-SNAPSHOT</ddf.content.services.app.version>
-    <ddf.content.catalogger.plugin.app.version>2.3.0-SNAPSHOT</ddf.content.catalogger.plugin.app.version>
+    <ddf.content.services.app.version>2.3.0</ddf.content.services.app.version>
+    <ddf.content.catalogger.plugin.app.version>2.3.0</ddf.content.catalogger.plugin.app.version>
     <!-- <ddf.transformers.app.version>2.3.0-SNAPSHOT</ddf.transformers.app.version> -->
-    <ddf.catalog.services.app.version>2.3.0-SNAPSHOT</ddf.catalog.services.app.version>
-    <ddf.solr.catalog.app.version>2.3.0-SNAPSHOT</ddf.solr.catalog.app.version>
-    <ddf.searchui.app.version>2.3.0-SNAPSHOT</ddf.searchui.app.version>
-    <ddf.spatial.app.version>2.3.0-SNAPSHOT</ddf.spatial.app.version>
+    <ddf.catalog.services.app.version>2.3.0</ddf.catalog.services.app.version>
+    <ddf.solr.catalog.app.version>2.3.0</ddf.solr.catalog.app.version>
+    <ddf.searchui.app.version>2.3.0</ddf.searchui.app.version>
+    <ddf.spatial.app.version>2.3.0</ddf.spatial.app.version>
   </properties>
 
 
