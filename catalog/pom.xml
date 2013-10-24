@@ -24,7 +24,7 @@
 
 	<groupId>ddf.catalog</groupId>
 	<artifactId>catalog</artifactId>
-	<version>2.3.0</version>
+	<version>2.3.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>DDF Catalog</name>
 
@@ -134,9 +134,4 @@
         <!-- <module>../metrics</module> -->
         <module>catalog-services-app</module>
 	</modules>
-
-
-  <scm>
-    <tag>catalog-2.3.0</tag>
-  </scm>
 </project>
