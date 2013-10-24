@@ -26,7 +26,7 @@
   
   <groupId>ddf.spatial</groupId>
   <artifactId>spatial</artifactId>
-  <version>2.3.0</version>
+  <version>2.3.1-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>DDF Spatial</name>
   
@@ -48,9 +48,4 @@
       <module>../catalog/kml</module>
       <module>spatial-app</module>
   </modules>
-  
-
-  <scm>
-    <tag>spatial-2.3.0</tag>
-  </scm>
 </project>
