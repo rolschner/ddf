@@ -19,7 +19,7 @@ import java.util.Map;
  * @author Scott Tustison
  */
 public interface ConfigurationAdminMBean {
-    static String OBJECTNAME = "org.codice.ddf.ui.admin.api.ConfigurationAdmin:service=ui,version=2.3.0";
+    final static String OBJECTNAME = "org.codice.ddf.ui.admin.api.ConfigurationAdmin:service=ui,version=2.3.0";
 
     /**
      * Lists all ConfigurationAdmin Configurations that have been created. Filter is an LDAP style
@@ -36,7 +36,7 @@ public interface ConfigurationAdminMBean {
      * 
      * @return the List of all filtered Configurations
      */
-    public List<Map<String, Object>> listDefaultFilteredConfigurations();
+    List<Map<String, Object>> listDefaultFilteredConfigurations();
 
     /**
      * Lists all ManagedServiceFactory instances with associated Configurations. Filter is an LDAP
