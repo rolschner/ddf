@@ -45,6 +45,7 @@
     <ddf.catalog.services.app.version>2.3.0-SNAPSHOT</ddf.catalog.services.app.version>
     <ddf.solr.catalog.app.version>2.3.0-SNAPSHOT</ddf.solr.catalog.app.version>
     <ddf.searchui.app.version>2.3.0-SNAPSHOT</ddf.searchui.app.version>
+      <ddf.adminui.app.version>2.3.0-SNAPSHOT</ddf.adminui.app.version>
     <ddf.spatial.app.version>2.3.0-SNAPSHOT</ddf.spatial.app.version>
   </properties>
 

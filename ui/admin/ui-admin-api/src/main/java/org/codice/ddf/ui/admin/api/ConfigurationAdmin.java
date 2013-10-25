@@ -1,28 +1,19 @@
 /**
  * Copyright (c) Codice Foundation
- *
- * This is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation, either
- * version 3 of the License, or any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU Lesser General Public License for more details. A copy of the GNU Lesser General Public License is distributed along with this program and can be found at
+ * 
+ * This is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser
+ * General Public License as published by the Free Software Foundation, either version 3 of the
+ * License, or any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details. A copy of the GNU Lesser General Public License
+ * is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
- *
+ * 
  **/
 package org.codice.ddf.ui.admin.api;
 
-import org.codice.ddf.ui.admin.api.plugin.ConfigurationAdminPlugin;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.InvalidSyntaxException;
-import org.osgi.service.cm.Configuration;
-import org.slf4j.LoggerFactory;
-import org.slf4j.ext.XLogger;
-
-import javax.management.InstanceAlreadyExistsException;
-import javax.management.MBeanServer;
-import javax.management.ObjectName;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
@@ -32,6 +23,19 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+
+import javax.management.InstanceAlreadyExistsException;
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
+import org.codice.ddf.ui.admin.api.plugin.ConfigurationAdminPlugin;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.service.cm.Configuration;
+import org.slf4j.LoggerFactory;
+import org.slf4j.ext.XLogger;
 
 /**
  * @author Scott Tustison
@@ -241,8 +245,7 @@ public class ConfigurationAdmin implements ConfigurationAdminMBean {
     }
 
     /**
-     * @see ConfigurationAdminMBean#deleteForLocation(java.lang.String,
-     *      java.lang.String)
+     * @see ConfigurationAdminMBean#deleteForLocation(java.lang.String, java.lang.String)
      */
     public void deleteForLocation(String pid, String location) throws IOException {
         if (pid == null || pid.length() < 1) {
@@ -315,8 +318,7 @@ public class ConfigurationAdmin implements ConfigurationAdminMBean {
     }
 
     /**
-     * @see ConfigurationAdminMBean#getFactoryPidForLocation(java.lang.String,
-     *      java.lang.String)
+     * @see ConfigurationAdminMBean#getFactoryPidForLocation(java.lang.String, java.lang.String)
      */
     public String getFactoryPidForLocation(String pid, String location) throws IOException {
         if (pid == null || pid.length() < 1) {
@@ -334,8 +336,7 @@ public class ConfigurationAdmin implements ConfigurationAdminMBean {
     }
 
     /**
-     * @see ConfigurationAdminMBean#getPropertiesForLocation(java.lang.String,
-     *      java.lang.String)
+     * @see ConfigurationAdminMBean#getPropertiesForLocation(java.lang.String, java.lang.String)
      */
     @SuppressWarnings("unchecked")
     public Map<String, Object> getPropertiesForLocation(String pid, String location)
@@ -357,8 +358,7 @@ public class ConfigurationAdmin implements ConfigurationAdminMBean {
     }
 
     /**
-     * @see ConfigurationAdminMBean#setBundleLocation(java.lang.String,
-     *      java.lang.String)
+     * @see ConfigurationAdminMBean#setBundleLocation(java.lang.String, java.lang.String)
      */
     public void setBundleLocation(String pid, String location) throws IOException {
         if (pid == null || pid.length() < 1) {
@@ -376,8 +376,8 @@ public class ConfigurationAdmin implements ConfigurationAdminMBean {
     }
 
     /**
-     * @see ConfigurationAdminMBean#updateForLocation(java.lang.String,
-     *      java.lang.String, java.util.Map)
+     * @see ConfigurationAdminMBean#updateForLocation(java.lang.String, java.lang.String,
+     *      java.util.Map)
      */
     @SuppressWarnings("unchecked")
     public void updateForLocation(String pid, String location,
@@ -389,9 +389,9 @@ public class ConfigurationAdmin implements ConfigurationAdminMBean {
             throw new IOException("Argument configurationTable cannot be null");
         }
 
-        for (String key : configurationTable.keySet()) // sanity check to make sure no values are
-                                                       // null
-        {
+        // sanity check to make sure no values are
+        // null
+        for (String key : configurationTable.keySet()) {
             if (configurationTable.get(key) == null) {
                 configurationTable.put(key, "");
             }

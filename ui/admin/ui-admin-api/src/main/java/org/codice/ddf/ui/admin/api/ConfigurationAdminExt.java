@@ -1,13 +1,16 @@
 /**
  * Copyright (c) Codice Foundation
- *
- * This is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation, either
- * version 3 of the License, or any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU Lesser General Public License for more details. A copy of the GNU Lesser General Public License is distributed along with this program and can be found at
+ * 
+ * This is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser
+ * General Public License as published by the Free Software Foundation, either version 3 of the
+ * License, or any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details. A copy of the GNU Lesser General Public License
+ * is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
- *
+ * 
  **/
 package org.codice.ddf.ui.admin.api;
 
@@ -23,6 +26,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.codice.ddf.ui.admin.api.plugin.ConfigurationAdminPlugin;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
@@ -41,8 +45,6 @@ import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.LoggerFactory;
 import org.slf4j.ext.XLogger;
 
-import org.codice.ddf.ui.admin.api.plugin.ConfigurationAdminPlugin;
-
 class ConfigurationAdminExt {
     static final String META_TYPE_NAME = "org.osgi.service.metatype.MetaTypeService";
 
@@ -50,7 +52,7 @@ class ConfigurationAdminExt {
 
     private final BundleContext bundleContext;
 
-    private final ConfigurationAdmin service;
+    private final ConfigurationAdmin configurationAdmin;
 
     private final Map<String, ServiceTracker> services = new HashMap<String, ServiceTracker>();
 
@@ -58,13 +60,13 @@ class ConfigurationAdminExt {
 
     /**
      * @param bundleContext
-     * @param service
+     * @param configurationAdmin
      * @throws ClassCastException
      *             if {@code service} is not a MetaTypeService instances
      */
-    ConfigurationAdminExt(final BundleContext bundleContext, final Object service) {
+    ConfigurationAdminExt(final BundleContext bundleContext, final Object configurationAdmin) {
         this.bundleContext = bundleContext;
-        this.service = (ConfigurationAdmin) service;
+        this.configurationAdmin = (ConfigurationAdmin) configurationAdmin;
     }
 
     BundleContext getBundleContext() {
@@ -78,7 +80,7 @@ class ConfigurationAdminExt {
                 // objects persistently without the user providing actual
                 // configuration
                 String filter = '(' + Constants.SERVICE_PID + '=' + pid + ')';
-                Configuration[] configs = this.service.listConfigurations(filter);
+                Configuration[] configs = this.configurationAdmin.listConfigurations(filter);
                 if (configs != null && configs.length > 0) {
                     return configs[0];
                 }
@@ -137,7 +139,7 @@ class ConfigurationAdminExt {
             configurationList.addAll(serviceList);
 
             // Get configurations
-            Configuration[] cfgs = service.listConfigurations(pidFilter);
+            Configuration[] cfgs = configurationAdmin.listConfigurations(pidFilter);
             for (int i = 0; cfgs != null && i < cfgs.length; i++) {
 
                 // ignore configuration object if an entry already exists in the map
@@ -212,9 +214,10 @@ class ConfigurationAdminExt {
                 }
             }
         } catch (IOException e) {
-            logger.error("Unable to obtain list of Configuration objects from ConfigurationAdmin.", e);
+            logger.error("Unable to obtain list of Configuration objects from ConfigurationAdmin.",
+                    e);
         } catch (InvalidSyntaxException e) {
-            logger.error("Provided LDAP filter is incorrect: "+pidFilter, e);
+            logger.error("Provided LDAP filter is incorrect: " + pidFilter, e);
         }
     }
 
@@ -468,7 +471,8 @@ class ConfigurationAdminExt {
         return null;
     }
 
-    final void listFactoryConfigurations(List<Map<String, Object>> configurationList, String pidFilter) {
+    final void listFactoryConfigurations(List<Map<String, Object>> configurationList,
+            String pidFilter) {
         try {
             List<Map<String, Object>> serviceList = getServices(
                     ManagedServiceFactory.class.getName(), pidFilter, true);
@@ -493,7 +497,7 @@ class ConfigurationAdminExt {
 
             configurationList.addAll(serviceList);
         } catch (InvalidSyntaxException e) {
-            logger.error("Provided LDAP filter is incorrect: "+pidFilter, e);
+            logger.error("Provided LDAP filter is incorrect: " + pidFilter, e);
         }
     }
 
@@ -547,7 +551,7 @@ class ConfigurationAdminExt {
             try {
                 filter = getBundleContext().createFilter(filterSpec);
             } catch (InvalidSyntaxException ignore) {
-                //don't care
+                // don't care
             }
         }
 

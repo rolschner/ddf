@@ -33,6 +33,7 @@
 	
     <modules>
         <module>search-ui</module>
+        <module>admin</module>
     </modules>
 
 
