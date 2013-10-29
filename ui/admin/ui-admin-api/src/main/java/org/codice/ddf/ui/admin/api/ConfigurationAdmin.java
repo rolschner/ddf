@@ -142,10 +142,10 @@ public class ConfigurationAdmin implements ConfigurationAdminMBean {
      * @see ConfigurationAdminMBean#listConfigurations(String)
      */
     public List<Map<String, Object>> listConfigurations(String pidFilter) {
-        List<Map<String, Object>> json = new ArrayList<Map<String, Object>>();
+        List<Map<String, Object>> configurationList = new ArrayList<Map<String, Object>>();
 
-        configurationAdminExt.listConfigurations(json, pidFilter);
-        for (Map<String, Object> configuration : json) {
+        configurationAdminExt.listConfigurations(configurationList, pidFilter);
+        for (Map<String, Object> configuration : configurationList) {
             try {
                 Map<String, Object> properties = getProperties((String) configuration.get("id"));
                 configuration.put("properties", properties);
@@ -154,23 +154,23 @@ public class ConfigurationAdmin implements ConfigurationAdminMBean {
             }
         }
 
-        return json;
+        return configurationList;
     }
 
     /**
      * @see ConfigurationAdminMBean#listFactoryConfigurations(String)
      */
     public List<Map<String, Object>> listFactoryConfigurations(String pidFilter) {
-        List<Map<String, Object>> json = new ArrayList<Map<String, Object>>();
+        List<Map<String, Object>> factoryConfigurationList = new ArrayList<Map<String, Object>>();
 
-        configurationAdminExt.listFactoryConfigurations(json, pidFilter);
-        for (Map<String, Object> factoryConfiguration : json) {
+        configurationAdminExt.listFactoryConfigurations(factoryConfigurationList, pidFilter);
+        for (Map<String, Object> factoryConfiguration : factoryConfigurationList) {
             List<Map<String, Object>> configurations = listConfigurations("(" + SERVICE_FACTORYPID
                     + "=" + factoryConfiguration.get("id") + ")");
             factoryConfiguration.put("configurations", configurations);
         }
 
-        return json;
+        return factoryConfigurationList;
     }
 
     private String getDefaultFactoryLdapFilter() {
@@ -229,7 +229,7 @@ public class ConfigurationAdmin implements ConfigurationAdminMBean {
      */
     public String createFactoryConfigurationForLocation(String factoryPid, String location)
         throws IOException {
-        if (factoryPid == null || factoryPid.length() < 1) {
+        if (StringUtils.isBlank(factoryPid)) {
             throw new IOException("Argument factoryPid cannot be null or empty");
         }
         Configuration config = configurationAdmin.createFactoryConfiguration(factoryPid);
@@ -279,7 +279,7 @@ public class ConfigurationAdmin implements ConfigurationAdminMBean {
      * @see ConfigurationAdminMBean#getBundleLocation(java.lang.String)
      */
     public String getBundleLocation(String pid) throws IOException {
-        if (pid == null || pid.length() < 1) {
+        if (StringUtils.isBlank(pid)) {
             throw new IOException("Argument pid cannot be null or empty");
         }
         Configuration config = configurationAdmin.getConfiguration(pid, null);
