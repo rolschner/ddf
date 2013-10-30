@@ -15,6 +15,42 @@
 
 package org.codice.ddf.endpoints.rest.kml;
 
+import java.io.Serializable;
+import java.io.StringWriter;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Queue;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.UriInfo;
+import javax.xml.bind.JAXBException;
+
+import org.apache.log4j.Logger;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
+import org.osgi.framework.ServiceRegistration;
+
 import ddf.catalog.Constants;
 import ddf.catalog.data.Metacard;
 import ddf.catalog.event.Subscription;
@@ -39,40 +75,6 @@ import de.micromata.opengis.kml.v_2_2_0.NetworkLinkControl;
 import de.micromata.opengis.kml.v_2_2_0.Placemark;
 import de.micromata.opengis.kml.v_2_2_0.Update;
 import de.micromata.opengis.kml.v_2_2_0.ViewRefreshMode;
-import org.apache.log4j.Logger;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.InvalidSyntaxException;
-import org.osgi.framework.ServiceReference;
-import org.osgi.framework.ServiceRegistration;
-
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
-import javax.ws.rs.core.UriInfo;
-import javax.xml.bind.JAXBException;
-import java.io.Serializable;
-import java.io.StringWriter;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Queue;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * Endpoint used to create a KML Network Link in order to receive updated query results from the
@@ -328,24 +330,26 @@ public class KmlEndpoint implements DdfConfigurationWatcher {
      * @param incomingBoundingBox
      * @return HTTP response containing NetworkLinkControl xml element.
      */
+    // TODO - throwing Exceptions
     @GET
     @Path("/update")
     public Response getKmlNetworkLinkUpdate(@Context
     UriInfo uriInfo, @QueryParam(SUBSCRIPTION_QUERY_PARAM)
     String subIdQueryParam, @QueryParam(BBOX_QUERY_PARAM)
     String incomingBoundingBox) {
-        try {
-            LOGGER.trace("ENTERING: getKmlNetworkLinkUpdate");
-            String kmlResult = generateNetworkLinkControl(subIdQueryParam, incomingBoundingBox,
-                    uriInfo);
-            LOGGER.debug("KML Update Response: " + kmlResult);
-
-            LOGGER.trace("EXITING: getKmlNetworkLinkUpdate");
-            return Response.ok(kmlResult, "application/vnd.google-earth.kml+xml").build();
-        } catch (Exception e) {
-            LOGGER.error("Error performing network link update", e);
-            throw new WebApplicationException(e);
-        }
+        return Response.ok().build();
+        // try {
+        // LOGGER.trace("ENTERING: getKmlNetworkLinkUpdate");
+        // String kmlResult = generateNetworkLinkControl(subIdQueryParam, incomingBoundingBox,
+        // uriInfo);
+        // LOGGER.debug("KML Update Response: " + kmlResult);
+        //
+        // LOGGER.trace("EXITING: getKmlNetworkLinkUpdate");
+        // return Response.ok(kmlResult, "application/vnd.google-earth.kml+xml").build();
+        // } catch (Exception e) {
+        // LOGGER.error("Error performing network link update", e);
+        // throw new WebApplicationException(e);
+        // }
     }
 
     /**
@@ -448,9 +452,9 @@ public class KmlEndpoint implements DdfConfigurationWatcher {
                     arguments.put(Constants.SUBSCRIPTION_KEY, subscriptionId);
 
                     // create "Document" and add "Placemark" to the document
-                    Document doc = kmlTransformer.transformEntry(null, currCreatedMetacard,
+                    Placemark placemark = kmlTransformer.transformEntry(null, currCreatedMetacard,
                             arguments);
-                    createFolder.addToFeature(doc);
+                    createFolder.addToFeature(placemark);
                 }
             }
 
@@ -499,16 +503,11 @@ public class KmlEndpoint implements DdfConfigurationWatcher {
                     Change change = KmlFactory.createChange();
                     updateList.add(change);
 
-                    Document doc = kmlTransformer.transformEntry(null, currChangedMetacard,
+                    Placemark placemark = kmlTransformer.transformEntry(null, currChangedMetacard,
                             arguments);
-                    List<Feature> features = doc.getFeature();
-                    if (features != null && !features.isEmpty()) {
-                        Placemark placemark = (Placemark) features.get(0);
-                        String id = placemark.getId();
-                        placemark.setTargetId(id);
-                        placemark.setId(null);
-                        change.addToAbstractObject(placemark);
-                    }
+                    placemark.setTargetId(placemark.getId());
+                    placemark.setId(null);
+                    change.addToAbstractObject(placemark);
                 }
             }
         } catch (CatalogTransformerException e) {
