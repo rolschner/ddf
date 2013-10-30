@@ -23,9 +23,9 @@ import ddf.catalog.data.Metacard;
 import ddf.catalog.transform.CatalogTransformerException;
 import ddf.catalog.transform.MetacardTransformer;
 import ddf.catalog.transform.QueryResponseTransformer;
-import de.micromata.opengis.kml.v_2_2_0.Document;
+import de.micromata.opengis.kml.v_2_2_0.Placemark;
 
 public interface KMLTransformer extends QueryResponseTransformer, MetacardTransformer {
-    public Document transformEntry(Subject user, Metacard entry, Map<String, Serializable> arguments)
-        throws CatalogTransformerException;
+    public Placemark transformEntry(Subject user, Metacard entry,
+            Map<String, Serializable> arguments) throws CatalogTransformerException;
 }

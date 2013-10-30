@@ -1,4 +1,3 @@
-
 <!--
 /**
  * Copyright (c) Codice Foundation
@@ -17,8 +16,6 @@
 	<bean id="kmlTransformerImpl"
 		class="ddf.service.kml.KMLTransformerImpl">
 		<argument ref="blueprintBundleContext"/>
-		<argument ref="blueprintBundle"/>
-		<argument value="kml-xslt/defaultKML.xsl" />		<!-- Path for default base KML transformer -->
 		<argument value="kml-styling/defaultStyling.kml" />	<!-- Path for default base Styling file -->
 	</bean>
 
@@ -27,19 +24,18 @@
 			<entry key="shortname" value="kml" />
 			<entry key="title" value="View as KML..." />
 			<entry key="description"
-				value="If this service finds a kml transformation service on the container for the record's content type, it will attempt to combine that service's XSLT with its own default XML to KML XSLT Transformer." />
+				value="Transforms a Metacard to KML for use with Google Earth and other visualization tools." />
 		</service-properties>
 	</service>
 	
 	<service ref="kmlTransformerImpl" interface="ddf.catalog.transform.QueryResponseTransformer">
 		<service-properties>
 			<entry key="shortname" value="kml" />
-			<entry key="title" value="View as KML..." />
+			<entry key="title" value="View Results as KML..." />
 			<entry key="description"
-				value="If this service finds a kml transformation service on the container for the record's content type, it will attempt to combine that service's XSLT with its own default XML to KML XSLT Transformer." />
+				value="Transforms a Metacard to KML for use with Google Earth and other visualization tools." />
 		</service-properties>
 	</service>
-	
 	
 	<service ref="kmlTransformerImpl" interface="ddf.service.kml.KMLTransformer" />
 

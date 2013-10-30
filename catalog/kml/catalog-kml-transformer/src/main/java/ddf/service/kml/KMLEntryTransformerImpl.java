@@ -38,6 +38,7 @@ import net.sf.saxon.Configuration;
 import net.sf.saxon.TransformerFactoryImpl;
 import net.sf.saxon.trans.DynamicLoader;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -86,7 +87,7 @@ public class KMLEntryTransformerImpl implements KMLEntryTransformer {
             logger.debug("The stylingURL: " + stylingUrl);
 
             try {
-                this.styling = KMLTransformerImpl.extractStringFrom(stylingUrl);
+                this.styling = IOUtils.toString(stylingUrl.openStream());
             } catch (IOException e) {
                 logger.warn("Could not retrieve styling file: " + stylingUrl, e);
                 this.styling = "";

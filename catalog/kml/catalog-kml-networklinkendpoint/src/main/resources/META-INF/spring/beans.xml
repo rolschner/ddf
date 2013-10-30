@@ -19,9 +19,9 @@
 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
 http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd
 http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi.xsd">
-
+<!--
 	<import resource="classpath:META-INF/cxf/cxf.xml" />
-	<!-- Obsolete as of CXF 2.6.1 upgrade - was getting FileNotFoundException at runtime
+	 Obsolete as of CXF 2.6.1 upgrade - was getting FileNotFoundException at runtime
 	<import resource="classpath:META-INF/cxf/cxf-extension-http.xml" />
 	<import resource="classpath:META-INF/cxf/osgi/cxf-extension-osgi.xml" />
 	-->

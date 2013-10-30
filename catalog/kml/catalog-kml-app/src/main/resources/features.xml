@@ -13,14 +13,14 @@
  -->
 <features name="${project.artifactId}-${project.version}">
 
-	<feature name="catalog-kml-metacardtransformer" version="${project.version}"
+	<feature name="catalog-kml-transformer" version="${project.version}"
 		description="KML Transformer transforms metacards and query results into KML.">
 		<bundle>mvn:ddf.catalog.kml/catalog-kml-transformer/${project.version}</bundle>
 	</feature>
 
 	<feature name="catalog-kml-networklinkendpoint" version="${project.version}"
 		description="KML Network Link Endpoint generates view-based KML Network Links for dynamic query results in KML viewer.">
-		<feature>catalog-kml-metacardtransformer</feature>
+		<feature>catalog-kml-transformer</feature>
 		<bundle>mvn:org.codice.thirdparty/jts/${jts.bundle.version}</bundle>
 		<bundle>mvn:ddf.catalog.kml/catalog-kml-networklinkendpoint/${project.version}</bundle>
 	</feature>

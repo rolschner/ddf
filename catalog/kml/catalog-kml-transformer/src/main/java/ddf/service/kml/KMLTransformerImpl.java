@@ -14,23 +14,24 @@
  **/
 package ddf.service.kml;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.Serializable;
-import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.UUID;
 
 import javax.security.auth.Subject;
@@ -40,25 +41,22 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.PropertyException;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.util.JAXBResult;
-import javax.xml.transform.Source;
-import javax.xml.transform.Templates;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamSource;
 
-import net.sf.saxon.Controller;
-import net.sf.saxon.event.Emitter;
-import net.sf.saxon.event.MessageEmitter;
-
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
+
+import com.vividsolutions.jts.geom.GeometryCollection;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
+import com.vividsolutions.jts.io.ParseException;
+import com.vividsolutions.jts.io.WKTReader;
 
 import ddf.catalog.Constants;
 import ddf.catalog.data.BinaryContent;
@@ -67,15 +65,12 @@ import ddf.catalog.data.Result;
 import ddf.catalog.operation.Query;
 import ddf.catalog.operation.QueryRequest;
 import ddf.catalog.operation.SourceResponse;
-import ddf.catalog.plugin.PluginExecutionException;
 import ddf.catalog.transform.CatalogTransformerException;
-import ddf.catalog.transform.MetacardTransformer;
 import ddf.service.kml.internal.TransformedContentImpl;
 import ddf.service.kml.subscription.KmlSubscription;
 import ddf.service.kml.subscription.KmlUpdateDeliveryMethod;
+import de.micromata.opengis.kml.v_2_2_0.Coordinate;
 import de.micromata.opengis.kml.v_2_2_0.Document;
-import de.micromata.opengis.kml.v_2_2_0.Feature;
-import de.micromata.opengis.kml.v_2_2_0.Folder;
 import de.micromata.opengis.kml.v_2_2_0.Geometry;
 import de.micromata.opengis.kml.v_2_2_0.Kml;
 import de.micromata.opengis.kml.v_2_2_0.KmlFactory;
@@ -84,14 +79,15 @@ import de.micromata.opengis.kml.v_2_2_0.NetworkLink;
 import de.micromata.opengis.kml.v_2_2_0.Placemark;
 import de.micromata.opengis.kml.v_2_2_0.RefreshMode;
 import de.micromata.opengis.kml.v_2_2_0.Style;
+import de.micromata.opengis.kml.v_2_2_0.StyleSelector;
 
 /**
- * The base service for handling KML requests to take a metadata record and output the metadata
- * record's KML representation. This service attempts to first locate a custom transformation for a
- * given metadata records based on the metadata record's content type. If no custom transformation
- * can be found, the default transformation of this class is provided to the requesting process.
+ * The base Transformer for handling KML requests to take a {@link Metacard} or
+ * {@link SourceResponse} and produce a KML representation. This service attempts to first locate a
+ * {@link KMLEntryTransformer} for a given {@link Metacard} based on the metadata-content-type. If
+ * no {@link KMLEntryTransformer} can be found, the default transformation is preformed.
  * 
- * @author Ashraf Barakat, Ian Barnett
+ * @author Ashraf Barakat, Ian Barnett, Keith C Wire
  * 
  */
 public class KMLTransformerImpl implements KMLTransformer {
@@ -100,13 +96,9 @@ public class KMLTransformerImpl implements KMLTransformer {
 
     private static final String DEFAULT_INTERVAL_STRING = "5.0";
 
-    private static final String KML_FOLDER_NAME_METACARD = "DDF Metacard";
-
-    private static final String KML_FOLDER_NAME_RESPONSE_QUEUE = "DDF Query Results";
+    private static final String KML_RESPONSE_QUEUE_PREFIX = "Query Results (";
 
     private static final String NETWORK_LINK_UPDATE_NAME = "Update";
-
-    private static final String DOCUMENT_ID_POSTFIX = "-doc";
 
     private static final String XSL_REST_URL_PROPERTY = "resturl";
 
@@ -133,9 +125,7 @@ public class KMLTransformerImpl implements KMLTransformer {
 
     protected BundleContext context;
 
-    private Templates templates;
-
-    private String defaultStyling;
+    private static List<StyleSelector> defaultStyle = new ArrayList<StyleSelector>();
 
     private Map<String, ServiceRegistration> subscriptionMap;
 
@@ -147,43 +137,11 @@ public class KMLTransformerImpl implements KMLTransformer {
 
     private static final Logger LOGGER = Logger.getLogger(KMLTransformerImpl.class);
 
-    private final TransformerFactory tf;
-
-    private static Emitter messageEmitter;
-
-    public KMLTransformerImpl() {
-        tf = TransformerFactory.newInstance(net.sf.saxon.TransformerFactoryImpl.class.getName(),
-                this.getClass().getClassLoader());
-    }
-
-    public KMLTransformerImpl(BundleContext context, Bundle bundle, String defaultTransformerName,
-            String defaultStylingName) throws TransformerConfigurationException {
-        this();
-
+    public KMLTransformerImpl(BundleContext bundleContext, String defaultStylingName) {
         this.subscriptionMap = new HashMap<String, ServiceRegistration>();
-        this.context = context;
+        this.context = bundleContext;
 
-        URL xsltUrl = bundle.getResource(defaultTransformerName);
-
-        URL stylingUrl = bundle.getResource(defaultStylingName);
-
-        try {
-            this.defaultStyling = extractStringFrom(stylingUrl);
-        } catch (IOException e) {
-            LOGGER.warn("Exception while extracting style from string", e);
-        }
-
-        LOGGER.debug("Resource located at " + xsltUrl);
-
-        Source xsltSource = new StreamSource(xsltUrl.toString());
-
-        try {
-            templates = tf.newTemplates(xsltSource);
-        } catch (TransformerConfigurationException tce) {
-            throw new TransformerConfigurationException(
-                    "Could not create new templates for KMLDefaultService: " + tce.getException(),
-                    tce);
-        }
+        URL stylingUrl = context.getBundle().getResource(defaultStylingName);
 
         try {
             this.jaxbContext = JAXBContext.newInstance(Kml.class);
@@ -197,6 +155,23 @@ public class KMLTransformerImpl implements KMLTransformer {
         }
 
         try {
+            if (unmarshaller != null) {
+                LOGGER.debug("Reading in KML Style");
+                JAXBElement<Kml> jaxbKmlStyle = this.unmarshaller.unmarshal(new StreamSource(
+                        stylingUrl.openStream()), Kml.class);
+                Kml kml = jaxbKmlStyle.getValue();
+                if (kml.getFeature() instanceof Document) {
+                    Document doc = (Document) kml.getFeature();
+                    defaultStyle = doc.getStyleSelector();
+                }
+            }
+        } catch (JAXBException e) {
+            LOGGER.warn("Exception while unmarshalling default style resource.", e);
+        } catch (IOException e) {
+            LOGGER.warn("Exception while opening default style resource.", e);
+        }
+
+        try {
             this.marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.FALSE);
             this.marshaller.setProperty(Marshaller.JAXB_ENCODING, UTF_8);
         } catch (PropertyException e) {
@@ -204,48 +179,28 @@ public class KMLTransformerImpl implements KMLTransformer {
         }
     }
 
-    public Transformer getTransformer() {
-        Transformer transformer;
-
-        try {
-            transformer = templates.newTransformer();
-        } catch (TransformerConfigurationException e) {
-            LOGGER.warn("Unable to create new transformer: " + e.getException(), e);
-            return null;
-        }
-
-        transformer.setOutputProperty(javax.xml.transform.OutputKeys.OMIT_XML_DECLARATION, "yes");
-
-        if (transformer instanceof Controller) {
-            if (messageEmitter == null) {
-                messageEmitter = new MessageEmitter();
-            }
-            ((Controller) transformer).setMessageEmitter(messageEmitter);
-        }
-
-        return transformer;
-    }
-
     /**
-     * This will return a KML document (i.e. there are no kml tags)
+     * This will return a KML Placemark (i.e. there are no kml tags)
      * {@code 
      * <KML>        ---> not included
-     * <Document>   ---> What is returned from this method
+     * <Placemark>   ---> What is returned from this method
      * ...          ---> What is returned from this method 
-     * </Document>  ---> What is returned from this method
+     * </Placemark>  ---> What is returned from this method
      * </KML>       ---> not included
      * }
      * 
      * @param user
      * @param entry
+     *            - the {@link Metacard} to be transformed
      * @param arguments
-     * @return Document jaxb containing kml document with content and style
+     *            - additional arguments to assist in the transformation
+     * @return Placemark - kml object containing transformed content
      * 
-     * @throws PluginExecutionException
+     * @throws CatalogTransformerException
      */
     @Override
-    public Document transformEntry(Subject user, Metacard entry, Map<String, Serializable> arguments)
-        throws CatalogTransformerException {
+    public Placemark transformEntry(Subject user, Metacard entry,
+            Map<String, Serializable> arguments) throws CatalogTransformerException {
         String urlToMetacard = null;
 
         if (arguments == null) {
@@ -271,50 +226,39 @@ public class KMLTransformerImpl implements KMLTransformer {
         String qual = "type";
         try {
 
-            LOGGER.info("Entry with id \""
+            LOGGER.debug("Entry with id \""
                     + entry.getId()
                     + "\" has come in to be transformed, search for KMLEntryTransformers that handle the given qualified content type: "
                     + qual + " : " + type);
+            if (this.unmarshaller != null) {
+                KMLEntryTransformer kmlET = lookupTransformersForQualifiedContentType(qual, type);
+                if (kmlET != null) {
 
-            KMLEntryTransformer kmlET = lookupTransformersForQualifiedContentType(qual, type);
+                    // add the rest url argument
+                    arguments.put(XSL_REST_URL_PROPERTY, urlToMetacard);
 
-            // add the rest url argument
-            arguments.put(XSL_REST_URL_PROPERTY, urlToMetacard);
+                    String content = kmlET.getKMLContent(entry, arguments);
+                    String style = kmlET.getKMLStyle();
 
-            String content = kmlET.getKMLContent(entry, arguments);
-            String style = kmlET.getKMLStyle();
+                    JAXBElement<Placemark> kmlContentJaxb = this.unmarshaller.unmarshal(
+                            new StreamSource(new ByteArrayInputStream(content.getBytes())),
+                            Placemark.class);
+                    JAXBElement<Style> kmlStyleJaxb = this.unmarshaller.unmarshal(new StreamSource(
+                            new ByteArrayInputStream(style.getBytes())), Style.class);
+                    Placemark placemark = kmlContentJaxb.getValue();
+                    placemark.getStyleSelector().add(kmlStyleJaxb.getValue());
 
-            if (this.unmarshaller == null) {
-                throw new PluginExecutionException(
-                        "Unmarshaller is null.  Cannot obtain kml content and kml style.");
+                    return placemark;
+                }
+            } else {
+                LOGGER.warn("Unmarshaller is null. Cannot obtain kml content and kml style from KMLEntryTransformer. Attempting default transformation...");
             }
 
-            JAXBElement<Placemark> kmlContentJaxb = this.unmarshaller.unmarshal(new StreamSource(
-                    new ByteArrayInputStream(content.getBytes())), Placemark.class);
-            JAXBElement<Style> kmlStyleJaxb = this.unmarshaller.unmarshal(new StreamSource(
-                    new ByteArrayInputStream(style.getBytes())), Style.class);
-
-            String docName = entry.getTitle();
-            return encloseDoc(kmlContentJaxb.getValue(), kmlStyleJaxb.getValue(), entry.getId()
-                    + DOCUMENT_ID_POSTFIX, docName);
-
-        } catch (Exception e) {
+        } catch (JAXBException e) {
             LOGGER.warn("Could not transform for given content type: " + e.getMessage());
-            try {
-                LOGGER.info("No other transformer can properly perform the transformation, defaulting to common kml transformation.");
-
-                return performDefaultTransformation(entry, urlToMetacard);
-            } catch (TransformerException te) {
-                LOGGER.info("Exception performing default transformation: " + te.getMessage(), te);
-                throw new CatalogTransformerException(e);
-            } catch (Exception e1) {
-                LOGGER.info(
-                        "Uncaught exception performing default transformation: " + e1.getMessage(),
-                        e1);
-                throw new CatalogTransformerException(e);
-            }
-
+            LOGGER.info("No other transformer can properly perform the transformation, defaulting to common kml transformation.");
         }
+        return performDefaultTransformation(entry, urlToMetacard);
     }
 
     protected void addNetworkLinkUpdate(Kml kmlResult, URL requestUrl, String subscriptionId,
@@ -348,68 +292,128 @@ public class KMLTransformerImpl implements KMLTransformer {
                 requestUrl.getPort(), netLinkUpdatePath, netLinkUpdateQuery, null);
         LOGGER.debug("network link update url: " + netLinkUpdateUri.toURL());
 
-        Folder folder = (Folder) kmlResult.getFeature();
-        NetworkLink networkLink = KmlFactory.createNetworkLink();
-        folder.addToFeature(networkLink);
+        if (kmlResult.getFeature() instanceof Document) {
+            Document doc = (Document) kmlResult.getFeature();
+            NetworkLink networkLink = KmlFactory.createNetworkLink();
+            doc.addToFeature(networkLink);
 
-        networkLink.setName(NETWORK_LINK_UPDATE_NAME);
-        // networkLink.setVisibility(true);
+            networkLink.setName(NETWORK_LINK_UPDATE_NAME);
+            // networkLink.setVisibility(true);
 
-        Link link = KmlFactory.createLink();
-        networkLink.setLink(link);
+            Link link = KmlFactory.createLink();
+            networkLink.setLink(link);
 
-        link.setRefreshMode(RefreshMode.ON_INTERVAL);
-        link.setRefreshInterval(refreshInterval);
-        link.setHref(netLinkUpdateUri.toURL().toString());
-        link.setViewBoundScale(1);
+            link.setRefreshMode(RefreshMode.ON_INTERVAL);
+            link.setRefreshInterval(refreshInterval);
+            link.setHref(netLinkUpdateUri.toURL().toString());
+            link.setViewBoundScale(1);
+        }
     }
 
-    private Document performDefaultTransformation(Metacard entry, String urlToMetacard)
-        throws TransformerException {
-        Transformer transformer = getTransformer();
+    /**
+     * The default Transformation from a {@link Metacard} to a KML {@link Placemark}. Protected to
+     * easily allow other default transformations.
+     * 
+     * @param entry
+     *            - the {@link Metacard} to transform.
+     * @param urlToMetacard
+     * @return
+     * @throws TransformerException
+     */
+    protected Placemark performDefaultTransformation(Metacard entry, String urlToMetacard)
+        throws CatalogTransformerException {
+        Placemark kmlPlacemark = KmlFactory.createPlacemark();
+        kmlPlacemark.setId("Placemark-" + entry.getId());
+        kmlPlacemark.setName(entry.getTitle());
 
-        String entryDocument = entry.getMetadata();
-        StringReader entryDocumentReader = new StringReader(entryDocument);
+        // TODO - Need to understand how this effects the NetworkLink Behavior.
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+        String effectiveTime = null;
+        if (entry.getEffectiveDate() == null) {
+            effectiveTime = dateFormat.format(new Date());
+        } else {
+            effectiveTime = dateFormat.format(entry.getEffectiveDate());
+        }
+        kmlPlacemark.setTimePrimitive(KmlFactory.createTimeStamp().withWhen(effectiveTime));
 
-        LOGGER.debug("setting id to " + entry.getId());
-        transformer.setParameter("id", entry.getId());
-        transformer.setParameter("title", entry.getTitle());
-        transformer.setParameter("location", entry.getLocation());
-        transformer.setParameter("site", entry.getSourceId());
-        transformer.setParameter("services", getServiceRefs(entry.getId()));
-        LOGGER.debug("setting " + XSL_REST_URL_PROPERTY + " to " + urlToMetacard);
-        transformer.setParameter(XSL_REST_URL_PROPERTY, urlToMetacard);
+        kmlPlacemark.setGeometry(getKmlGeoFromWkt(entry.getLocation()));
 
-        Placemark kmlPlacemark = null;
-        Style style = new Style();
-        try {
-            JAXBResult jaxbKmlContentResult = new JAXBResult(this.jaxbContext);
-            LOGGER.debug("Transforming Metacard to KML.");
-            transformer.transform(new StreamSource(entryDocumentReader), jaxbKmlContentResult);
-            LOGGER.debug("getting placemark");
+        // TODO - Description should be an HTML document.
+        kmlPlacemark.setDescription(entry.getTitle());
 
-            // Geometry geometry = (Geometry) jaxbKmlContentResult.getResult();
-            // kmlPlacemark = new Placemark();
-            // kmlPlacemark.setGeometry(geometry);
-            // kmlPlacemark.setName(entry.getTitle());
-            // kmlPlacemark.setId(entry.getId());
-            kmlPlacemark = (Placemark) jaxbKmlContentResult.getResult();
+        // TODO - StyleUrl needs to be updated
+        // kmlPlacemark.setStyleUrl("#default");
 
-            if (unmarshaller != null) {
-                LOGGER.debug("Reading in KML Style");
-                JAXBElement<Style> jaxbKmlStyle = this.unmarshaller.unmarshal(new StreamSource(
-                        new ByteArrayInputStream(this.defaultStyling.getBytes())), Style.class);
-                style = jaxbKmlStyle.getValue();
-            }
-        } catch (Exception e) {
-            throw new TransformerException(
-                    "Exception performing default KML transform for document:\n" + entryDocument
-                            + "\n", e);
+        return kmlPlacemark;
+    }
+
+    private Geometry getKmlGeoFromWkt(final String wkt) throws CatalogTransformerException {
+        if (StringUtils.isBlank(wkt)) {
+            throw new CatalogTransformerException(
+                    "WKT was null or empty. Unable to preform KML Transform on Metacard.");
         }
 
-        String docName = entry.getTitle();
+        com.vividsolutions.jts.geom.Geometry geo = readGeoFromWkt(wkt);
+        Geometry kmlGeo = createKmlGeo(geo);
+        if (!Point.class.getSimpleName().equals(geo.getGeometryType())) {
+            kmlGeo = addPointToKmlGeo(kmlGeo, geo.getCoordinate());
+        }
+        return kmlGeo;
+    }
+    
+    private Geometry createKmlGeo(com.vividsolutions.jts.geom.Geometry geo)
+        throws CatalogTransformerException {
+        Geometry kmlGeo = null;
+        if (Point.class.getSimpleName().equals(geo.getGeometryType())) {
+            Point jtsPoint = (Point) geo;
+            kmlGeo = KmlFactory.createPoint().addToCoordinates(jtsPoint.getX(), jtsPoint.getY());
 
-        return encloseDoc(kmlPlacemark, style, entry.getId() + DOCUMENT_ID_POSTFIX, docName);
+        } else if (LineString.class.getSimpleName().equals(geo.getGeometryType())) {
+            LineString jtsLS = (LineString) geo;
+            de.micromata.opengis.kml.v_2_2_0.LineString kmlLS = KmlFactory.createLineString();
+            List<Coordinate> kmlCoords = kmlLS.createAndSetCoordinates();
+            for (com.vividsolutions.jts.geom.Coordinate coord : jtsLS.getCoordinates()) {
+                kmlCoords.add(new Coordinate(coord.x, coord.y));
+            }
+            kmlGeo = kmlLS;
+        } else if (Polygon.class.getSimpleName().equals(geo.getGeometryType())) {
+            Polygon jtsPoly = (Polygon) geo;
+            de.micromata.opengis.kml.v_2_2_0.Polygon kmlPoly = KmlFactory.createPolygon();
+            List<Coordinate> kmlCoords = kmlPoly.createAndSetOuterBoundaryIs()
+                    .createAndSetLinearRing().createAndSetCoordinates();
+            for (com.vividsolutions.jts.geom.Coordinate coord : jtsPoly.getCoordinates()) {
+                kmlCoords.add(new Coordinate(coord.x, coord.y));
+            }
+            kmlGeo = kmlPoly;
+        } else if (geo instanceof GeometryCollection) {
+            List<Geometry> geos = new ArrayList<Geometry>();
+            for (int xx = 0; xx < geo.getNumGeometries(); xx++) {
+                geos.add(createKmlGeo(geo.getGeometryN(xx)));
+            }
+            kmlGeo = KmlFactory.createMultiGeometry().withGeometry(geos);
+        } else {
+            throw new CatalogTransformerException("Unknown / Unsupported Geometry Type '"
+                    + geo.getGeometryType() + "'. Unale to preform KML Transform.");
+        }
+        return kmlGeo;
+    }
+
+    private com.vividsolutions.jts.geom.Geometry readGeoFromWkt(final String wkt)
+        throws CatalogTransformerException {
+        WKTReader reader = new WKTReader();
+        try {
+            return reader.read(wkt);
+        } catch (ParseException e) {
+            throw new CatalogTransformerException("Unable to parse WKT to Geometry.", e);
+
+        }
+    }
+
+    private Geometry addPointToKmlGeo(Geometry kmlGeo, com.vividsolutions.jts.geom.Coordinate vertex){
+        de.micromata.opengis.kml.v_2_2_0.Point kmlPoint = KmlFactory.createPoint()
+                .addToCoordinates(vertex.x, vertex.y);
+        return KmlFactory.createMultiGeometry().addToGeometry(kmlPoint).addToGeometry(kmlGeo);
     }
 
     private KMLEntryTransformer lookupTransformersForQualifiedContentType(String qualifier,
@@ -422,251 +426,27 @@ public class KMLTransformerImpl implements KMLTransformer {
                             + EQUALS_SIGN + contentType + CLOSE_PARENTHESIS + CLOSE_PARENTHESIS);
 
             if (refs == null || refs.length == 0) {
-                throw new CatalogTransformerException("No KML transformer found for " + qualifier
-                        + " : " + contentType);
+                return null;
             } else {
                 return (KMLEntryTransformer) context.getService(refs[0]);
             }
         } catch (InvalidSyntaxException e) {
             throw new IllegalArgumentException("Invalid transformer shortName");
-
         }
-    }
-
-    // private String getRestServiceUrl( BundleContext context )
-    // {
-    // StringBuilder url = new StringBuilder("");
-    //
-    // /*
-    // * ServiceReference serviceRef =
-    // * context.getServiceReference(ConfigurationAdmin.class.getName());
-    // *
-    // * if (null != serviceRef) { ConfigurationAdmin osgiConfigAdmin =
-    // * (ConfigurationAdmin) context.getService(serviceRef);
-    // *
-    // * if (null != osgiConfigAdmin) { try { // Method does not return null
-    // * Configuration config =
-    // * osgiConfigAdmin.getConfiguration("org.ops4j.pax.web");
-    // *
-    // * @SuppressWarnings("unchecked") Dictionary<String, String> props =
-    // * (Dictionary<String, String>) config.getProperties();
-    // *
-    // * if (null != props) { url.append(parseUrl((String)
-    // * serviceRef.getProperty("org.osgi.service.http.secure.enabled"),
-    // * (String)
-    // * serviceRef.getProperty("org.ops4j.pax.web.listening.addresses"),
-    // * (String) serviceRef.getProperty("org.osgi.service.http.port"))); } }
-    // * catch (Exception e) { logger.debug("", e); } } }
-    // */
-    //
-    // // TODO: use the config admin to get the /services url
-    // // TODO: figure out how to get the /rest url
-    //
-    // // for now, hardcode it!
-    // url.append(SERVICES_REST);
-    //
-    // /*
-    // * ServiceReference[] serviceRef = null; try { serviceRef =
-    // * context.getServiceReferences
-    // * (null,"(org.springframework.context.service.name=endpoint-rest)"); }
-    // * catch (InvalidSyntaxException e) { // TODO Auto-generated catch block
-    // } System.out.println("looking for serviceref");
-    // *
-    // * if (null != serviceRef) { System.out.println("found " +
-    // * serviceRef.length + " serviceref(s)"); for (String key :
-    // * serviceRef[0].getPropertyKeys()) { System.out.println(key);
-    // * System.out.println(" : " + serviceRef[0].getProperty(key)); } }
-    // */
-    // return url.toString();
-    // }
-
-    // private String parseUrl( String cmHttpsEnabled, String cmHost, String
-    // cmPort )
-    // {
-    //
-    // String defaultScheme = "http";
-    // String defaultHost = null;
-    // String defaultPort = "8181";
-    //
-    // logger.debug("Received the following arguments:\n" + "Https Enabled: " +
-    // cmHttpsEnabled + "\n" + "Host IP: "
-    // + cmHost + "\n" + "Host Port: " + cmPort);
-    //
-    // if (Boolean.parseBoolean(cmHttpsEnabled))
-    // {
-    // defaultScheme = "https";
-    // defaultPort = "8443";
-    // }
-    //
-    // if (isValidArgument(cmHost) &&
-    // !cmHost.matches(UNSUBSTITUTED_PROPERTY_REGEX))
-    // {
-    //
-    // if (cmHost.contains(","))
-    // {
-    // defaultHost = cmHost.substring(0, cmHost.indexOf(",")).trim();
-    // }
-    // else
-    // {
-    // defaultHost = cmHost;
-    // }
-    //
-    // }
-    // else
-    // {
-    // defaultHost = getServerAddress();
-    // }
-    //
-    // if (isValidArgument(cmPort) &&
-    // !cmPort.matches(UNSUBSTITUTED_PROPERTY_REGEX))
-    // {
-    // defaultPort = cmPort;
-    // }
-    //
-    // return (defaultScheme + "://" + defaultHost + ":" + defaultPort);
-    //
-    // }
-
-    // private String getServerAddress()
-    // {
-    // InetAddress address = null;
-    // Enumeration<NetworkInterface> netInterfaces;
-    // String defaultHost = null;
-    // try
-    // {
-    // netInterfaces = NetworkInterface.getNetworkInterfaces();
-    //
-    // while (null == defaultHost && netInterfaces.hasMoreElements())
-    // {
-    // NetworkInterface ni = netInterfaces.nextElement();
-    // Enumeration<InetAddress> addresses = ni.getInetAddresses();
-    //
-    // while (null == defaultHost && addresses.hasMoreElements())
-    // {
-    // address = addresses.nextElement();
-    // if (!address.isLoopbackAddress() &&
-    // !address.getHostAddress().contains(":"))
-    // {
-    // defaultHost = address.getHostAddress();
-    // }
-    // }
-    // }
-    // }
-    // catch (SocketException se)
-    // {
-    // logger.info("Socket Exception attempting to obtain IP address of localhost",
-    // se);
-    // }
-    //
-    // if (null == defaultHost)
-    // {
-    // logger.info("Unable to obtain localhost IP address, using \"localhost\"");
-    // defaultHost = DEFAULT_HOST_NAME;
-    // }
-    //
-    // return defaultHost;
-    // }
-    //
-    // private boolean isValidArgument( String argument )
-    // {
-    // return (null != argument && !argument.isEmpty());
-    // }
-
-    private List<String> getServiceRefs(String id) {
-        ServiceReference[] refs = null;
-        try {
-            refs = context.getServiceReferences(MetacardTransformer.class.getName(), null);
-        } catch (InvalidSyntaxException e) {
-            // can't happen because filter is null
-        }
-        List<String> serviceList = new ArrayList<String>();
-        if (refs != null) {
-            for (ServiceReference ref : refs) {
-                if (ref != null) {
-                    String title = null;
-                    String shortName = (String) ref.getProperty(Constants.SERVICE_SHORTNAME);
-
-                    if ((title = (String) ref.getProperty(Constants.SERVICE_TITLE)) == null) {
-                        title = "View as " + shortName.toUpperCase();
-                    }
-
-                    String url = "/services/catalog/" + id + "?transform=" + shortName;
-
-                    // define the services
-                    serviceList.add(title);
-                    serviceList.add(url);
-                }
-            }
-        }
-        return serviceList;
-
-    }
-
-    /**
-     * Given a URL, it will seek the contents of the URL and pass those contents back as a String.
-     * Expects to be passed a URL to a file.
-     * 
-     * If URL is null, empty string is passed back.
-     * 
-     * 
-     * @param url
-     *            URL of where the file is.
-     * @return A String representation of the file's contents
-     * @throws IOException
-     *             If file cannot be opened or corrupted.
-     */
-    public static String extractStringFrom(URL url) throws IOException {
-        InputStream is = null;
-        InputStreamReader isReader = null;
-        BufferedReader reader = null;
-
-        if (url != null) {
-            StringBuilder builder = new StringBuilder();
-            try {
-                is = url.openStream();
-                isReader = new InputStreamReader(is);
-                reader = new BufferedReader(isReader);
-
-                String nextLine = "";
-
-                while ((nextLine = reader.readLine()) != null) {
-
-                    builder.append(nextLine);
-                }
-            } finally {
-                if (reader != null) {
-                    reader.close();
-                }
-                if (isReader != null) {
-                    isReader.close();
-                }
-                if (is != null) {
-                    is.close();
-                }
-            }
-
-            return builder.toString();
-        } else {
-            return "";
-        }
-
-    }
-
-    public String getDefaultStyling() {
-        return defaultStyling;
-    }
-
-    public void setDefaultStyling(String defaultStyling) {
-        this.defaultStyling = defaultStyling;
     }
 
     @Override
     public BinaryContent transform(Metacard metacard, Map<String, Serializable> arguments)
         throws CatalogTransformerException {
         try {
-            Document transformedKmlDocument = transformEntry(null, metacard, arguments);
-            Kml transformedKml = encloseKml(transformedKmlDocument, null, KML_FOLDER_NAME_METACARD);
-            String transformedKmlString = marshalKml(transformedKml);
+            Placemark placemark = transformEntry(null, metacard, arguments);
+            if (placemark.getStyleSelector().isEmpty()
+                    && StringUtils.isBlank(placemark.getStyleUrl())) {
+                placemark.getStyleSelector().addAll(defaultStyle);
+            }
+            Kml kml = KmlFactory.createKml().withFeature(placemark);
+
+            String transformedKmlString = marshalKml(kml);
 
             // logger.debug("transformed kml metacard: " + transformedKmlString);
             InputStream kmlInputStream = new ByteArrayInputStream(transformedKmlString.getBytes());
@@ -686,40 +466,48 @@ public class KMLTransformerImpl implements KMLTransformer {
             LOGGER.debug("Null arguments, unable to complete transform");
             throw new CatalogTransformerException("Unable to complete transform without arguments");
         }
+        // Get the Subscription ID
         Object id = arguments.get(Constants.SUBSCRIPTION_KEY);
         String subscriptionId = null;
         if (id != null) {
             subscriptionId = (String) id;
         }
+        String docId = subscriptionId;
+        if (docId == null) {
+            LOGGER.debug("Document id was null, generating new Document id.");
+            docId = UUID.randomUUID().toString();
+        }
         LOGGER.debug("subscription id: " + subscriptionId);
+
         String restUriAbsolutePath = (String) arguments.get("url");
         LOGGER.debug("rest string url arg: " + restUriAbsolutePath);
 
-        double intervalDouble = parseInterval(arguments);
-
-        Kml kmlResult = encloseKml(null, null, KML_FOLDER_NAME_RESPONSE_QUEUE);
-        Folder folder = (Folder) kmlResult.getFeature();
-        List<Feature> folderFeatures = folder.getFeature();
-
-        String folderId = subscriptionId;
-        if (subscriptionId == null) {
-            LOGGER.debug("subscription id was null, generating folder id.");
-            folderId = UUID.randomUUID().toString();
+        // Transform Metacards to KML
+        Document kmlDoc = KmlFactory.createDocument();
+        boolean needDefaultStyle = false;
+        for (Result result : upstreamResponse.getResults()) {
+            Placemark placemark = transformEntry(null, result.getMetacard(), arguments);
+            if (placemark.getStyleSelector().isEmpty()
+                    && StringUtils.isEmpty(placemark.getStyleUrl())) {
+                placemark.setStyleUrl("#default");
+                needDefaultStyle = true;
+            }
+            kmlDoc.getFeature().add(placemark);
         }
-        folder.setId(folderId);
-
-        List<Result> results = upstreamResponse.getResults();
-        for (Result result : results) {
-            Document transformedKmlDocument = transformEntry(null, result.getMetacard(), arguments);
-            folderFeatures.add(transformedKmlDocument);
+        
+        if (needDefaultStyle) {
+            kmlDoc.getStyleSelector().addAll(defaultStyle);
         }
+
+        Kml kmlResult = encloseKml(kmlDoc, "Subscription-" + docId,
+                KML_RESPONSE_QUEUE_PREFIX + kmlDoc.getFeature().size() + CLOSE_PARENTHESIS);
 
         if (subscriptionId != null && !subscriptionId.isEmpty()) {
             try {
                 // add network link update to results
                 URL url = new URL(restUriAbsolutePath);
                 // arguments.get(key)
-
+                double intervalDouble = parseInterval(arguments);
                 addNetworkLinkUpdate(kmlResult, url, subscriptionId, intervalDouble);
 
                 ServiceRegistration svcReg = this.subscriptionMap.get(subscriptionId);
@@ -758,8 +546,7 @@ public class KMLTransformerImpl implements KMLTransformer {
             }
         }
 
-        String transformedKml;
-        transformedKml = marshalKml(kmlResult);
+        String transformedKml = marshalKml(kmlResult);
 
         // logger.debug("transformed kml: " + transformedKml);
 
@@ -803,9 +590,8 @@ public class KMLTransformerImpl implements KMLTransformer {
      *            which should be the metacard id
      * @return KML DocumentType element with style and content
      */
-    public static Document encloseDoc(Placemark content, Style style, String documentId,
+    public static Document encloseDoc(Placemark placemark, Style style, String documentId,
             String docName) throws IllegalArgumentException {
-        // TODO: pass in doc name too
         Document document = KmlFactory.createDocument();
         document.setId(documentId);
         document.setOpen(true);
@@ -814,8 +600,8 @@ public class KMLTransformerImpl implements KMLTransformer {
         if (style != null) {
             document.getStyleSelector().add(style);
         }
-        if (content != null) {
-            document.getFeature().add(content);
+        if (placemark != null) {
+            document.getFeature().add(placemark);
         }
 
         return document;
@@ -829,18 +615,14 @@ public class KMLTransformerImpl implements KMLTransformer {
      *            which should be the subscription id if it exists
      * @return completed KML
      */
-    public static Kml encloseKml(Document doc, String folderId, String folderName) {
+    public static Kml encloseKml(Document doc, String docId, String docName) {
         Kml kml = KmlFactory.createKml();
-        Folder folder = KmlFactory.createFolder();
-        kml.setFeature(folder);
-
-        folder.setId(folderId); // Id should be subscription id
-        folder.setName(KML_FOLDER_NAME_RESPONSE_QUEUE);
-        folder.setOpen(true);
         if (doc != null) {
-            folder.getFeature().add(doc);
+            kml.setFeature(doc);
+            doc.setId(docId); // Id should be subscription id
+            doc.setName(docName);
+            doc.setOpen(true);
         }
-
         return kml;
     }
 
