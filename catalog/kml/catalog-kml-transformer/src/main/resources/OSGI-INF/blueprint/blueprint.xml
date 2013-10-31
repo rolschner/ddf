@@ -11,12 +11,25 @@
  *
  **/
 -->
-<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0" xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.osgi.org/xmlns/blueprint/v1.0.0
+                http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd
+        http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0
+        http://aries.apache.org/schemas/blueprint-cm/blueprint-cm-1.1.0.xsd">
 
-	<bean id="kmlTransformerImpl"
-		class="ddf.service.kml.KMLTransformerImpl">
-		<argument ref="blueprintBundleContext"/>
+
+	<bean id="kmlStyleMapper" class="ddf.service.kml.KmlStyleMapper">
+		<argument ref="blueprintBundleContext" />
+		<cm:managed-properties persistent-id="org.codice.ddf.spatial.kml.style.properties"
+			update-strategy="component-managed" update-method="updateMap" />
+	</bean>
+
+
+	<bean id="kmlTransformerImpl" class="ddf.service.kml.KMLTransformerImpl">
+		<argument ref="blueprintBundleContext" />
 		<argument value="kml-styling/defaultStyling.kml" />	<!-- Path for default base Styling file -->
+		<argument ref="kmlStyleMapper" />
 	</bean>
 
 	<service ref="kmlTransformerImpl" interface="ddf.catalog.transform.MetacardTransformer">
@@ -27,7 +40,7 @@
 				value="Transforms a Metacard to KML for use with Google Earth and other visualization tools." />
 		</service-properties>
 	</service>
-	
+
 	<service ref="kmlTransformerImpl" interface="ddf.catalog.transform.QueryResponseTransformer">
 		<service-properties>
 			<entry key="shortname" value="kml" />
@@ -36,7 +49,7 @@
 				value="Transforms a Metacard to KML for use with Google Earth and other visualization tools." />
 		</service-properties>
 	</service>
-	
+
 	<service ref="kmlTransformerImpl" interface="ddf.service.kml.KMLTransformer" />
 
 </blueprint>

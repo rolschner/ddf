@@ -137,9 +137,13 @@ public class KMLTransformerImpl implements KMLTransformer {
 
     private static final Logger LOGGER = Logger.getLogger(KMLTransformerImpl.class);
 
-    public KMLTransformerImpl(BundleContext bundleContext, String defaultStylingName) {
+    private KmlStyleMapper styleMapper;
+
+    public KMLTransformerImpl(BundleContext bundleContext, String defaultStylingName,
+            KmlStyleMapper mapper) {
         this.subscriptionMap = new HashMap<String, ServiceRegistration>();
         this.context = bundleContext;
+        this.styleMapper = mapper;
 
         URL stylingUrl = context.getBundle().getResource(defaultStylingName);
 
@@ -342,8 +346,10 @@ public class KMLTransformerImpl implements KMLTransformer {
         // TODO - Description should be an HTML document.
         kmlPlacemark.setDescription(entry.getTitle());
 
-        // TODO - StyleUrl needs to be updated
-        // kmlPlacemark.setStyleUrl("#default");
+        String styleUrl = styleMapper.getStyleForMetacard(entry);
+        if (StringUtils.isNotBlank(styleUrl)) {
+            kmlPlacemark.setStyleUrl(styleUrl);
+        }
 
         return kmlPlacemark;
     }

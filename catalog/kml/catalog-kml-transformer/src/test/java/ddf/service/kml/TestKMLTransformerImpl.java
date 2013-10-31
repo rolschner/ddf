@@ -81,7 +81,8 @@ public class TestKMLTransformerImpl {
                 TestKMLTransformerImpl.class.getResource(defaultStyleLocation));
 
         dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
-        kmlTransformer = new KMLTransformerImpl(mockContext, defaultStyleLocation);
+        kmlTransformer = new KMLTransformerImpl(mockContext, defaultStyleLocation,
+                new KmlStyleMapper(mockContext));
     }
 
     @Test(expected = CatalogTransformerException.class)
