@@ -1,0 +1,1565 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document>
+    <Style id="whitenormal">
+    <!--  
+      <IconStyle>
+        <Icon>
+          <href>http://home2.gvs.dev/ResourceServer/ResourceServer/KMLIcons/pal3/icon35.png</href>
+        </Icon>
+        <scale>0.7</scale>
+      </IconStyle>
+      -->
+      <LabelStyle>
+        <scale>0.0</scale>
+      </LabelStyle>
+      <LineStyle>
+        <color>ffffffff</color>
+      </LineStyle>
+      <PolyStyle>
+        <color>33ffffff</color>
+        <fill>1</fill>
+      </PolyStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3><b>$[name]</b></h3><table><tr><td width="400">$[description]</td></tr></table>]]></text>
+      </BalloonStyle>
+    </Style>
+    <Style id="whitehighlight">
+    <!--
+      <IconStyle>
+        <Icon>
+          <href>http://home2.gvs.dev/ResourceServer/ResourceServer/KMLIcons/pal3/icon35.png</href>
+        </Icon>
+        <scale>1.0</scale>
+      </IconStyle>
+      -->
+      <LabelStyle>
+        <scale>1.0</scale>
+      </LabelStyle>
+      <LineStyle>
+        <color>ffffffff</color>
+      </LineStyle>
+      <PolyStyle>
+        <color>99ffffff</color>
+        <fill>1</fill>
+      </PolyStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3><b>$[name]</b></h3><table><tr><td width="400">$[description]</td></tr></table>]]></text>
+      </BalloonStyle>
+    </Style>
+    <Style id="bluenormal">
+      <IconStyle>
+        <Icon>
+          <href>/icons?iconId=bomber-2.png</href>
+        </Icon>
+        <scale>0.7</scale>
+      </IconStyle>
+      <LabelStyle>
+        <scale>0.0</scale>
+      </LabelStyle>
+      <LineStyle>
+        <color>ffff0000</color>
+      </LineStyle>
+      <PolyStyle>
+        <color>33ff0000</color>
+        <fill>1</fill>
+      </PolyStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3><b>$[name]</b></h3><table><tr><td width="400">$[description]</td></tr></table>]]></text>
+      </BalloonStyle>
+    </Style>
+
+    <Style id="bluehighlight">
+      <IconStyle>
+        <Icon>
+          <href>/icons?iconId=bomber-2.png</href>
+        </Icon>
+        <scale>1.0</scale>
+      </IconStyle>
+      <LabelStyle>
+        <scale>1.0</scale>
+      </LabelStyle>
+      <LineStyle>
+        <color>ffff0000</color>
+      </LineStyle>
+      <PolyStyle>
+        <color>99ff0000</color>
+        <fill>1</fill>
+      </PolyStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3><b>$[name]</b></h3><table><tr><td width="400">$[description]</td></tr></table>]]></text>
+      </BalloonStyle>
+    </Style>
+
+<Style id="chartreusenormal">
+<!--
+      <IconStyle>
+        <Icon>
+          <href>http://home2.gvs.dev/ResourceServer/ResourceServer/KMLIcons/pal3/icon35.png</href>
+        </Icon>
+        <scale>0.7</scale>
+      </IconStyle>
+      -->
+      <LabelStyle>
+        <scale>0.0</scale>
+      </LabelStyle>
+      <LineStyle>
+        <color>ff00FF7F</color>
+      </LineStyle>
+      <PolyStyle>
+        <color>3300FF7F</color>
+        <fill>1</fill>
+      </PolyStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3><b>$[name]</b></h3><table><tr><td width="400">$[description]</td></tr></table>]]></text>
+      </BalloonStyle>
+    </Style>
+
+    <Style id="chartreusehighlight">
+    <!--
+      <IconStyle>
+        <Icon>
+          <href>http://home2.gvs.dev/ResourceServer/ResourceServer/KMLIcons/pal3/icon35.png</href>
+        </Icon>
+        <scale>1.0</scale>
+      </IconStyle>
+      -->
+      <LabelStyle>
+        <scale>1.0</scale>
+      </LabelStyle>
+      <LineStyle>
+        <color>ff00FF7F</color>
+      </LineStyle>
+      <PolyStyle>
+        <color>9900FF7F</color>
+        <fill>1</fill>
+      </PolyStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3><b>$[name]</b></h3><table><tr><td width="400">$[description]</td></tr></table>]]></text>
+      </BalloonStyle>
+    </Style>
+
+<Style id="chestnutrosenormal">
+<!--
+      <IconStyle>
+        <Icon>
+          <href>http://home2.gvs.dev/ResourceServer/ResourceServer/KMLIcons/pal3/icon35.png</href>
+        </Icon>
+        <scale>0.7</scale>
+      </IconStyle>
+      -->
+      <LabelStyle>
+        <scale>0.0</scale>
+      </LabelStyle>
+      <LineStyle>
+        <color>ff5C5CCD</color>
+      </LineStyle>
+      <PolyStyle>
+        <color>335C5CCD</color>
+        <fill>1</fill>
+      </PolyStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3><b>$[name]</b></h3><table><tr><td width="400">$[description]</td></tr></table>]]></text>
+      </BalloonStyle>
+    </Style>
+
+    <Style id="chestnutrosehighlight">
+    <!--
+      <IconStyle>
+        <Icon>
+          <href>http://home2.gvs.dev/ResourceServer/ResourceServer/KMLIcons/pal3/icon35.png</href>
+        </Icon>
+        <scale>1.0</scale>
+      </IconStyle>
+      -->
+      <LabelStyle>
+        <scale>1.0</scale>
+      </LabelStyle>
+      <LineStyle>
+        <color>ff5C5CCD</color>
+      </LineStyle>
+      <PolyStyle>
+        <color>995C5CCD</color>
+        <fill>1</fill>
+      </PolyStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3><b>$[name]</b></h3><table><tr><td width="400">$[description]</td></tr></table>]]></text>
+      </BalloonStyle>
+    </Style>
+
+<Style id="cobaltnormal">
+<!--
+      <IconStyle>
+        <Icon>
+          <href>http://home2.gvs.dev/ResourceServer/ResourceServer/KMLIcons/pal3/icon35.png</href>
+        </Icon>
+        <scale>0.7</scale>
+      </IconStyle>
+      -->
+      <LabelStyle>
+        <scale>0.0</scale>
+      </LabelStyle>
+      <LineStyle>
+        <color>ffFF6923</color>
+      </LineStyle>
+      <PolyStyle>
+        <color>33FF6923</color>
+        <fill>1</fill>
+      </PolyStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3><b>$[name]</b></h3><table><tr><td width="400">$[description]</td></tr></table>]]></text>
+      </BalloonStyle>
+    </Style>
+
+    <Style id="cobalthighlight">
+    <!--
+      <IconStyle>
+        <Icon>
+          <href>http://home2.gvs.dev/ResourceServer/ResourceServer/KMLIcons/pal3/icon35.png</href>
+        </Icon>
+        <scale>1.0</scale>
+      </IconStyle>
+      -->
+      <LabelStyle>
+        <scale>1.0</scale>
+      </LabelStyle>
+      <LineStyle>
+        <color>ffFF6923</color>
+      </LineStyle>
+      <PolyStyle>
+        <color>99FF6923</color>
+        <fill>1</fill>
+      </PolyStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3><b>$[name]</b></h3><table><tr><td width="400">$[description]</td></tr></table>]]></text>
+      </BalloonStyle>
+    </Style>
+
+<Style id="coralnormal">
+<!--
+      <IconStyle>
+        <Icon>
+          <href>http://home2.gvs.dev/ResourceServer/ResourceServer/KMLIcons/pal3/icon35.png</href>
+        </Icon>
+        <scale>0.7</scale>
+      </IconStyle>
+      -->
+      <LabelStyle>
+        <scale>0.0</scale>
+      </LabelStyle>
+      <LineStyle>
+        <color>ff507FFF</color>
+      </LineStyle>
+      <PolyStyle>
+        <color>33507FFF</color>
+        <fill>1</fill>
+      </PolyStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3><b>$[name]</b></h3><table><tr><td width="400">$[description]</td></tr></table>]]></text>
+      </BalloonStyle>
+    </Style>
+
+    <Style id="coralhighlight">
+    <!--
+      <IconStyle>
+        <Icon>
+          <href>http://home2.gvs.dev/ResourceServer/ResourceServer/KMLIcons/pal3/icon35.png</href>
+        </Icon>
+        <scale>1.0</scale>
+      </IconStyle>
+      -->
+      <LabelStyle>
+        <scale>1.0</scale>
+      </LabelStyle>
+      <LineStyle>
+        <color>ff507FFF</color>
+      </LineStyle>
+      <PolyStyle>
+        <color>99507FFF</color>
+        <fill>1</fill>
+      </PolyStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3><b>$[name]</b></h3><table><tr><td width="400">$[description]</td></tr></table>]]></text>
+      </BalloonStyle>
+    </Style>
+
+<Style id="cyannormal">
+<!--
+      <IconStyle>
+        <Icon>
+          <href>http://home2.gvs.dev/ResourceServer/ResourceServer/KMLIcons/pal3/icon35.png</href>
+        </Icon>
+        <scale>0.7</scale>
+      </IconStyle>
+      -->
+      <LabelStyle>
+        <scale>0.0</scale>
+      </LabelStyle>
+      <LineStyle>
+        <color>ffffff00</color>
+      </LineStyle>
+      <PolyStyle>
+        <color>33ffff00</color>
+        <fill>1</fill>
+      </PolyStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3><b>$[name]</b></h3><table><tr><td width="400">$[description]</td></tr></table>]]></text>
+      </BalloonStyle>
+    </Style>
+
+    <Style id="cyanhighlight">
+    <!--
+      <IconStyle>
+        <Icon>
+          <href>http://home2.gvs.dev/ResourceServer/ResourceServer/KMLIcons/pal3/icon35.png</href>
+        </Icon>
+        <scale>1.0</scale>
+      </IconStyle>
+      -->
+      <LabelStyle>
+        <scale>1.0</scale>
+      </LabelStyle>
+      <LineStyle>
+        <color>ffffff00</color>
+      </LineStyle>
+      <PolyStyle>
+        <color>99ffff00</color>
+        <fill>1</fill>
+      </PolyStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3><b>$[name]</b></h3><table><tr><td width="400">$[description]</td></tr></table>]]></text>
+      </BalloonStyle>
+    </Style>
+
+    <Style id="gambogenormal">
+    <!--
+      <IconStyle>
+        <Icon>
+          <href>http://home2.gvs.dev/ResourceServer/ResourceServer/KMLIcons/pal3/icon35.png</href>
+        </Icon>
+        <scale>0.7</scale>
+      </IconStyle>
+      -->
+      <LabelStyle>
+        <scale>0.0</scale>
+      </LabelStyle>
+      <LineStyle>
+        <color>ff0f9be4</color>
+      </LineStyle>
+      <PolyStyle>
+        <color>330f9be4</color>
+        <fill>1</fill>
+      </PolyStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3><b>$[name]</b></h3><table><tr><td width="400">$[description]</td></tr></table>]]></text>
+      </BalloonStyle>
+    </Style>
+
+    <Style id="gambogehighlight">
+    <!--
+      <IconStyle>
+        <Icon>
+          <href>http://home2.gvs.dev/ResourceServer/ResourceServer/KMLIcons/pal3/icon35.png</href>
+        </Icon>
+        <scale>1.0</scale>
+      </IconStyle>
+      -->
+      <LabelStyle>
+        <scale>1.0</scale>
+      </LabelStyle>
+      <LineStyle>
+        <color>ff0f9be4</color>
+      </LineStyle>
+      <PolyStyle>
+        <color>990f9be4</color>
+        <fill>1</fill>
+      </PolyStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3><b>$[name]</b></h3><table><tr><td width="400">$[description]</td></tr></table>]]></text>
+      </BalloonStyle>
+    </Style>
+
+    <Style id="greennormal">
+    <!--
+      <IconStyle>
+        <Icon>
+          <href>http://home2.gvs.dev/ResourceServer/ResourceServer/KMLIcons/pal3/icon35.png</href>
+        </Icon>
+        <scale>0.7</scale>
+      </IconStyle>
+      -->
+      <LabelStyle>
+        <scale>0.0</scale>
+      </LabelStyle>
+      <LineStyle>
+        <color>ff00ff00</color>
+      </LineStyle>
+      <PolyStyle>
+        <color>3300ff00</color>
+        <fill>1</fill>
+      </PolyStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3><b>$[name]</b></h3><table><tr><td width="400">$[description]</td></tr></table>]]></text>
+      </BalloonStyle>
+    </Style>
+
+    <Style id="greenhighlight">
+    <!--
+      <IconStyle>
+        <Icon>
+          <href>http://home2.gvs.dev/ResourceServer/ResourceServer/KMLIcons/pal3/icon35.png</href>
+        </Icon>
+        <scale>1.0</scale>
+      </IconStyle>
+      -->
+      <LabelStyle>
+        <scale>1.0</scale>
+      </LabelStyle>
+      <LineStyle>
+        <color>ff00ff00</color>
+      </LineStyle>
+      <PolyStyle>
+        <color>9900ff00</color>
+        <fill>1</fill>
+      </PolyStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3><b>$[name]</b></h3><table><tr><td width="400">$[description]</td></tr></table>]]></text>
+      </BalloonStyle>
+    </Style>
+
+    <Style id="hotpinknormal">
+      <IconStyle>
+        <Icon>
+          <href>/icons?iconId=battleship-3.png</href>
+        </Icon>
+        <scale>0.7</scale>
+      </IconStyle>
+      <LabelStyle>
+        <scale>0.0</scale>
+      </LabelStyle>
+      <LineStyle>
+        <color>ffB469FF</color>
+      </LineStyle>
+      <PolyStyle>
+        <color>33B469FF</color>
+        <fill>1</fill>
+      </PolyStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3><b>$[name]</b></h3><table><tr><td width="400">$[description]</td></tr></table>]]></text>
+      </BalloonStyle>
+    </Style>
+
+    <Style id="hotpinkhighlight">
+      <IconStyle>
+        <Icon>
+          <href>/icons?iconId=battleship-3.png</href>
+        </Icon>
+        <scale>1.0</scale>
+      </IconStyle>
+      <LabelStyle>
+        <scale>1.0</scale>
+      </LabelStyle>
+      <LineStyle>
+        <color>ffB469FF</color>
+      </LineStyle>
+      <PolyStyle>
+        <color>99B469FF</color>
+        <fill>1</fill>
+      </PolyStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3><b>$[name]</b></h3><table><tr><td width="400">$[description]</td></tr></table>]]></text>
+      </BalloonStyle>
+    </Style>
+
+    <Style id="magentanormal">
+    <!--
+      <IconStyle>
+        <Icon>
+          <href>http://home2.gvs.dev/ResourceServer/ResourceServer/KMLIcons/pal3/icon35.png</href>
+        </Icon>
+        <scale>0.7</scale>
+      </IconStyle>
+      -->
+      <LabelStyle>
+        <scale>0.0</scale>
+      </LabelStyle>
+      <LineStyle>
+        <color>ffff00ff</color>
+      </LineStyle>
+      <PolyStyle>
+        <color>33ff00ff</color>
+        <fill>1</fill>
+      </PolyStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3><b>$[name]</b></h3><table><tr><td width="400">$[description]</td></tr></table>]]></text>
+      </BalloonStyle>
+    </Style>
+
+    <Style id="magentahighlight">
+    <!--
+      <IconStyle>
+        <Icon>
+          <href>http://home2.gvs.dev/ResourceServer/ResourceServer/KMLIcons/pal3/icon35.png</href>
+        </Icon>
+        <scale>1.0</scale>
+      </IconStyle>
+      -->
+      <LabelStyle>
+        <scale>1.0</scale>
+      </LabelStyle>
+      <LineStyle>
+        <color>ffff00ff</color>
+      </LineStyle>
+      <PolyStyle>
+        <color>99ff00ff</color>
+        <fill>1</fill>
+      </PolyStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3><b>$[name]</b></h3><table><tr><td width="400">$[description]</td></tr></table>]]></text>
+      </BalloonStyle>
+    </Style>
+
+    <Style id="orchidnormal">
+      <IconStyle>
+        <Icon>
+          <href>/icons?iconId=missile-2.png</href>
+        </Icon>
+        <scale>0.7</scale>
+      </IconStyle>
+      <LabelStyle>
+        <scale>0.0</scale>
+      </LabelStyle>
+      <LineStyle>
+        <color>ffd670da</color>
+      </LineStyle>
+      <PolyStyle>
+        <color>33d670da</color>
+        <fill>1</fill>
+      </PolyStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3><b>$[name]</b></h3><table><tr><td width="800">$[description]</td></tr></table>]]></text>
+      </BalloonStyle>
+    </Style>
+
+    <Style id="orchidhighlight">
+      <IconStyle>
+        <Icon>
+          <href>/icons?iconId=missile-2.png</href>
+        </Icon>
+        <scale>1.0</scale>
+      </IconStyle>
+      <LabelStyle>
+        <scale>1.0</scale>
+      </LabelStyle>
+      <LineStyle>
+        <color>ffd670da</color>
+      </LineStyle>
+      <PolyStyle>
+        <color>99d670da</color>
+        <fill>1</fill>
+      </PolyStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3><b>$[name]</b></h3><table><tr><td width="800">$[description]</td></tr></table>]]></text>
+      </BalloonStyle>
+    </Style>
+
+    <Style id="rednormal">
+    <!--
+      <IconStyle>
+        <Icon>
+          <href>http://home2.gvs.dev/ResourceServer/ResourceServer/KMLIcons/pal3/icon35.png</href>
+        </Icon>
+        <scale>0.7</scale>
+      </IconStyle>
+      -->
+      <LabelStyle>
+        <scale>0.0</scale>
+      </LabelStyle>
+      <LineStyle>
+        <color>ff0000ff</color>
+      </LineStyle>
+      <PolyStyle>
+        <color>330000ff</color>
+        <fill>1</fill>
+      </PolyStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3><b>$[name]</b></h3><table><tr><td width="400">$[description]</td></tr></table>]]></text>
+      </BalloonStyle>
+    </Style>
+
+    <Style id="redhighlight">
+    <!--
+      <IconStyle>
+        <Icon>
+          <href>http://home2.gvs.dev/ResourceServer/ResourceServer/KMLIcons/pal3/icon35.png</href>
+        </Icon>
+        <scale>1.0</scale>
+      </IconStyle>
+      -->
+      <LabelStyle>
+        <scale>1.0</scale>
+      </LabelStyle>
+      <LineStyle>
+        <color>ff0000ff</color>
+      </LineStyle>
+      <PolyStyle>
+        <color>990000ff</color>
+        <fill>1</fill>
+      </PolyStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3><b>$[name]</b></h3><table><tr><td width="400">$[description]</td></tr></table>]]></text>
+      </BalloonStyle>
+    </Style>
+
+    <Style id="rosybrownnormal">
+    <!--
+      <IconStyle>
+        <Icon>
+          <href>http://home2.gvs.dev/ResourceServer/ResourceServer/KMLIcons/pal3/icon35.png</href>
+        </Icon>
+        <scale>0.7</scale>
+      </IconStyle>
+      -->
+      <LabelStyle>
+        <scale>0.0</scale>
+      </LabelStyle>
+      <LineStyle>
+        <color>ff8f8fbc</color>
+      </LineStyle>
+      <PolyStyle>
+        <color>338f8fbc</color>
+        <fill>1</fill>
+      </PolyStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3><b>$[name]</b></h3><table><tr><td width="400">$[description]</td></tr></table>]]></text>
+      </BalloonStyle>
+    </Style>
+
+    <Style id="rosybrownhighlight">
+    <!--
+      <IconStyle>
+        <Icon>
+          <href>http://home2.gvs.dev/ResourceServer/ResourceServer/KMLIcons/pal3/icon35.png</href>
+        </Icon>
+        <scale>1.0</scale>
+      </IconStyle>
+      -->
+      <LabelStyle>
+        <scale>1.0</scale>
+      </LabelStyle>
+      <LineStyle>
+        <color>ff8f8fbc</color>
+      </LineStyle>
+      <PolyStyle>
+        <color>998f8fbc</color>
+        <fill>1</fill>
+      </PolyStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3><b>$[name]</b></h3><table><tr><td width="400">$[description]</td></tr></table>]]></text>
+      </BalloonStyle>
+    </Style>
+
+    <Style id="palevioletrednormal">
+    <!--
+      <IconStyle>
+        <Icon>
+          <href>http://home2.gvs.dev/ResourceServer/ResourceServer/KMLIcons/pal3/icon35.png</href>
+        </Icon>
+        <scale>0.7</scale>
+      </IconStyle>
+      -->
+      <LabelStyle>
+        <scale>0.0</scale>
+      </LabelStyle>
+      <LineStyle>
+        <color>ffd87093</color>
+      </LineStyle>
+      <PolyStyle>
+        <color>33d87093</color>
+        <fill>1</fill>
+      </PolyStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3><b>$[name]</b></h3><table><tr><td width="400">$[description]</td></tr></table>]]></text>
+      </BalloonStyle>
+    </Style>
+
+    <Style id="palevioletredhighlight">
+    <!--
+      <IconStyle>
+        <Icon>
+          <href>http://home2.gvs.dev/ResourceServer/ResourceServer/KMLIcons/pal3/icon35.png</href>
+        </Icon>
+        <scale>1.0</scale>
+      </IconStyle>
+      -->
+      <LabelStyle>
+        <scale>1.0</scale>
+      </LabelStyle>
+      <LineStyle>
+        <color>ffd87093</color>
+      </LineStyle>
+      <PolyStyle>
+        <color>99d87093</color>
+        <fill>1</fill>
+      </PolyStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3><b>$[name]</b></h3><table><tr><td width="400">$[description]</td></tr></table>]]></text>
+      </BalloonStyle>
+    </Style>
+
+    <Style id="purplenormal">
+    <!--
+      <IconStyle>
+        <Icon>
+          <href>http://home2.gvs.dev/ResourceServer/ResourceServer/KMLIcons/pal3/icon35.png</href>
+        </Icon>
+        <scale>0.7</scale>
+      </IconStyle>
+      -->
+      <LabelStyle>
+        <scale>0.0</scale>
+      </LabelStyle>
+      <LineStyle>
+        <color>ff800080</color>
+      </LineStyle>
+      <PolyStyle>
+        <color>33800080</color>
+        <fill>1</fill>
+      </PolyStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3><b>$[name]</b></h3><table><tr><td width="400">$[description]</td></tr></table>]]></text>
+      </BalloonStyle>
+    </Style>
+
+    <Style id="purplehighlight">
+    <!--
+      <IconStyle>
+        <Icon>
+          <href>http://home2.gvs.dev/ResourceServer/ResourceServer/KMLIcons/pal3/icon35.png</href>
+        </Icon>
+        <scale>1.0</scale>
+      </IconStyle>
+      -->
+      <LabelStyle>
+        <scale>1.0</scale>
+      </LabelStyle>
+      <LineStyle>
+        <color>ff800080</color>
+      </LineStyle>
+      <PolyStyle>
+        <color>99800080</color>
+        <fill>1</fill>
+      </PolyStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3><b>$[name]</b></h3><table><tr><td width="400">$[description]</td></tr></table>]]></text>
+      </BalloonStyle>
+    </Style>
+
+    <Style id="springgreennormal">
+    <!--
+      <IconStyle>
+        <Icon>
+          <href>http://home2.gvs.dev/ResourceServer/ResourceServer/KMLIcons/pal3/icon35.png</href>
+        </Icon>
+        <scale>0.7</scale>
+      </IconStyle>
+      -->
+      <LabelStyle>
+        <scale>0.0</scale>
+      </LabelStyle>
+      <LineStyle>
+        <color>ff99ff99</color>
+      </LineStyle>
+      <PolyStyle>
+        <color>3399ff99</color>
+        <fill>1</fill>
+      </PolyStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3><b>$[name]</b></h3><table><tr><td width="400">$[description]</td></tr></table>]]></text>
+      </BalloonStyle>
+    </Style>
+
+    <Style id="springgreenhighlight">
+    <!--
+      <IconStyle>
+        <Icon>
+          <href>http://home2.gvs.dev/ResourceServer/ResourceServer/KMLIcons/pal3/icon35.png</href>
+        </Icon>
+        <scale>1.0</scale>
+      </IconStyle>
+      -->
+      <LabelStyle>
+        <scale>1.0</scale>
+      </LabelStyle>
+      <LineStyle>
+        <color>ff99ff99</color>
+      </LineStyle>
+      <PolyStyle>
+        <color>9999ff99</color>
+        <fill>1</fill>
+      </PolyStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3><b>$[name]</b></h3><table><tr><td width="400">$[description]</td></tr></table>]]></text>
+      </BalloonStyle>
+    </Style>
+
+    <Style id="yellownormal">
+      <IconStyle>
+        <Icon>
+          <href>http://158.188.60.180:8181/services/catalog/kml/icons?iconId=battleship-3.png</href>
+        </Icon>
+        <scale>0.7</scale>
+      </IconStyle>
+      <LabelStyle>
+        <scale>0.0</scale>
+      </LabelStyle>
+      <LineStyle>
+        <color>ff00ffff</color>
+      </LineStyle>
+      <PolyStyle>
+        <color>3300ffff</color>
+        <fill>1</fill>
+      </PolyStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3><b>$[name]</b></h3><table><tr><td width="400">$[description]</td></tr></table>]]></text>
+      </BalloonStyle>
+    </Style>
+
+    <Style id="yellowhighlight">
+      <IconStyle>
+        <Icon>
+          <href>http://158.188.60.180:8181/services/catalog/kml/icons?iconId=battleship-3.png</href>
+        </Icon>
+        <scale>1.0</scale>
+      </IconStyle>
+      <LabelStyle>
+        <scale>1.0</scale>
+      </LabelStyle>
+      <LineStyle>
+        <color>ff00ffff</color>
+      </LineStyle>
+      <PolyStyle>
+        <color>9900ffff</color>
+        <fill>1</fill>
+      </PolyStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3><b>$[name]</b></h3><table><tr><td width="400">$[description]</td></tr></table>]]></text>
+      </BalloonStyle>
+    </Style>
+
+    <Style id="electricbluenormal">
+    <!--
+      <IconStyle>
+        <Icon>
+          <href>http://home2.gvs.dev/ResourceServer/ResourceServer/KMLIcons/pal3/icon35.png</href>
+        </Icon>
+        <scale>0.7</scale>
+      </IconStyle>
+      -->
+      <LabelStyle>
+        <scale>0.0</scale>
+      </LabelStyle>
+      <LineStyle>
+        <color>ffff0000</color>
+      </LineStyle>
+      <PolyStyle>
+        <color>33ff0000</color>
+        <fill>1</fill>
+      </PolyStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3><b>$[name]</b></h3><table><tr><td width="400">$[description]</td></tr></table>]]></text>
+      </BalloonStyle>
+    </Style>
+
+    <Style id="electricbluehighlight">
+    <!--
+      <IconStyle>
+        <Icon>
+          <href>http://home2.gvs.dev/ResourceServer/ResourceServer/KMLIcons/pal3/icon35.png</href>
+        </Icon>
+        <scale>1.0</scale>
+      </IconStyle>
+      -->
+      <LabelStyle>
+        <scale>1.0</scale>
+      </LabelStyle>
+      <LineStyle>
+        <color>ffff0000</color>
+      </LineStyle>
+      <PolyStyle>
+        <color>99ff0000</color>
+        <fill>1</fill>
+      </PolyStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3><b>$[name]</b></h3><table><tr><td width="400">$[description]</td></tr></table>]]></text>
+      </BalloonStyle>
+    </Style>
+
+    <Style id="lightaquanormal">
+    <!--
+      <IconStyle>
+        <Icon>
+          <href>http://home2.gvs.dev/ResourceServer/ResourceServer/KMLIcons/pal3/icon35.png</href>
+        </Icon>
+        <scale>0.7</scale>
+      </IconStyle>
+      -->
+      <LabelStyle>
+        <scale>0.0</scale>
+      </LabelStyle>
+      <LineStyle>
+        <color>ffffffc3</color>
+      </LineStyle>
+      <PolyStyle>
+        <color>33ffffc3</color>
+        <fill>1</fill>
+      </PolyStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3><b>$[name]</b></h3><table><tr><td width="400">$[description]</td></tr></table>]]></text>
+      </BalloonStyle>
+    </Style>
+
+    <Style id="lightaquahighlight">
+    <!--
+      <IconStyle>
+        <Icon>
+          <href>http://home2.gvs.dev/ResourceServer/ResourceServer/KMLIcons/pal3/icon35.png</href>
+        </Icon>
+        <scale>1.0</scale>
+      </IconStyle>
+      -->
+      <LabelStyle>
+        <scale>1.0</scale>
+      </LabelStyle>
+      <LineStyle>
+        <color>ffffffc3</color>
+      </LineStyle>
+      <PolyStyle>
+        <color>99ffffc3</color>
+        <fill>1</fill>
+      </PolyStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3><b>$[name]</b></h3><table><tr><td width="400">$[description]</td></tr></table>]]></text>
+      </BalloonStyle>
+    </Style>
+
+    <Style id="lightskybluenormal">
+    <!--
+      <IconStyle>
+        <Icon>
+          <href>http://home2.gvs.dev/ResourceServer/ResourceServer/KMLIcons/pal3/icon35.png</href>
+        </Icon>
+        <scale>0.7</scale>
+      </IconStyle>
+      -->
+      <LabelStyle>
+        <scale>0.0</scale>
+      </LabelStyle>
+      <LineStyle>
+        <color>ffFACE87</color>
+      </LineStyle>
+      <PolyStyle>
+        <color>33FACE87</color>
+        <fill>1</fill>
+      </PolyStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3><b>$[name]</b></h3><table><tr><td width="400">$[description]</td></tr></table>]]></text>
+      </BalloonStyle>
+    </Style>
+
+    <Style id="lightskybluehighlight">
+    <!--
+      <IconStyle>
+        <Icon>
+          <href>http://home2.gvs.dev/ResourceServer/ResourceServer/KMLIcons/pal3/icon35.png</href>
+        </Icon>
+        <scale>1.0</scale>
+      </IconStyle>
+      -->
+      <LabelStyle>
+        <scale>1.0</scale>
+      </LabelStyle>
+      <LineStyle>
+        <color>ffFACE87</color>
+      </LineStyle>
+      <PolyStyle>
+        <color>99FACE87</color>
+        <fill>1</fill>
+      </PolyStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3><b>$[name]</b></h3><table><tr><td width="400">$[description]</td></tr></table>]]></text>
+      </BalloonStyle>
+    </Style>
+
+    <Style id="nesmagentanormal">
+    <!--
+      <IconStyle>
+        <Icon>
+          <href>http://home2.gvs.dev/ResourceServer/ResourceServer/KMLIcons/pal3/icon35.png</href>
+        </Icon>
+        <scale>0.7</scale>
+      </IconStyle>
+      -->
+      <LabelStyle>
+        <scale>0.0</scale>
+      </LabelStyle>
+      <LineStyle>
+        <color>ffca00dc</color>
+      </LineStyle>
+      <PolyStyle>
+        <color>33ca00dc</color>
+        <fill>1</fill>
+      </PolyStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3><b>$[name]</b></h3><table><tr><td width="400">$[description]</td></tr></table>]]></text>
+      </BalloonStyle>
+    </Style>
+
+    <Style id="nesmagentahighlight">
+    <!--
+      <IconStyle>
+        <Icon>
+          <href>http://home2.gvs.dev/ResourceServer/ResourceServer/KMLIcons/pal3/icon35.png</href>
+        </Icon>
+        <scale>1.0</scale>
+      </IconStyle>
+      -->
+      <LabelStyle>
+        <scale>1.0</scale>
+      </LabelStyle>
+      <LineStyle>
+        <color>ffca00dc</color>
+      </LineStyle>
+      <PolyStyle>
+        <color>99ca00dc</color>
+        <fill>1</fill>
+      </PolyStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3><b>$[name]</b></h3><table><tr><td width="400">$[description]</td></tr></table>]]></text>
+      </BalloonStyle>
+    </Style>
+
+    <Style id="lightpinknormal">
+    <!--
+      <IconStyle>
+        <Icon>
+          <href>http://home2.gvs.dev/ResourceServer/ResourceServer/KMLIcons/pal3/icon35.png</href>
+        </Icon>
+        <scale>0.7</scale>
+      </IconStyle>
+      -->
+      <LabelStyle>
+        <scale>0.0</scale>
+      </LabelStyle>
+      <LineStyle>
+        <color>ff9999ff</color>
+      </LineStyle>
+      <PolyStyle>
+        <color>339999ff</color>
+        <fill>1</fill>
+      </PolyStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3><b>$[name]</b></h3><table><tr><td width="400">$[description]</td></tr></table>]]></text>
+      </BalloonStyle>
+    </Style>
+
+    <Style id="lightpinkhighlight">
+    <!--
+      <IconStyle>
+        <Icon>
+          <href>http://home2.gvs.dev/ResourceServer/ResourceServer/KMLIcons/pal3/icon35.png</href>
+        </Icon>
+        <scale>1.0</scale>
+      </IconStyle>
+      -->
+      <LabelStyle>
+        <scale>1.0</scale>
+      </LabelStyle>
+      <LineStyle>
+        <color>ff9999ff</color>
+      </LineStyle>
+      <PolyStyle>
+        <color>999999ff</color>
+        <fill>1</fill>
+      </PolyStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3><b>$[name]</b></h3><table><tr><td width="400">$[description]</td></tr></table>]]></text>
+      </BalloonStyle>
+    </Style>
+
+    <Style id="salmonnormal">
+    <!--
+      <IconStyle>
+        <Icon>
+          <href>http://home2.gvs.dev/ResourceServer/ResourceServer/KMLIcons/pal3/icon35.png</href>
+        </Icon>
+        <scale>0.7</scale>
+      </IconStyle>
+      -->
+      <LabelStyle>
+        <scale>0.0</scale>
+      </LabelStyle>
+      <LineStyle>
+        <color>ff2a21ff</color>
+      </LineStyle>
+      <PolyStyle>
+        <color>332a21ff</color>
+        <fill>1</fill>
+      </PolyStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3><b>$[name]</b></h3><table><tr><td width="400">$[description]</td></tr></table>]]></text>
+      </BalloonStyle>
+    </Style>
+
+    <Style id="salmonhighlight">
+    <!--
+      <IconStyle>
+        <Icon>
+          <href>http://home2.gvs.dev/ResourceServer/ResourceServer/KMLIcons/pal3/icon35.png</href>
+        </Icon>
+        <scale>1.0</scale>
+      </IconStyle>
+      -->
+      <LabelStyle>
+        <scale>1.0</scale>
+      </LabelStyle>
+      <LineStyle>
+        <color>ff2a21ff</color>
+      </LineStyle>
+      <PolyStyle>
+        <color>992a21ff</color>
+        <fill>1</fill>
+      </PolyStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3><b>$[name]</b></h3><table><tr><td width="400">$[description]</td></tr></table>]]></text>
+      </BalloonStyle>
+    </Style>
+
+    <Style id="lighterforestgreennormal">
+    <!--
+      <IconStyle>
+        <Icon>
+          <href>http://home2.gvs.dev/ResourceServer/ResourceServer/KMLIcons/pal3/icon35.png</href>
+        </Icon>
+        <scale>0.7</scale>
+      </IconStyle>
+      -->
+      <LabelStyle>
+        <scale>0.0</scale>
+      </LabelStyle>
+      <LineStyle>
+        <color>ff669900</color>
+      </LineStyle>
+      <PolyStyle>
+        <color>33669900</color>
+        <fill>1</fill>
+      </PolyStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3><b>$[name]</b></h3><table><tr><td width="400">$[description]</td></tr></table>]]></text>
+      </BalloonStyle>
+    </Style>
+
+    <Style id="lighterforestgreenhighlight">
+    <!--
+      <IconStyle>
+        <Icon>
+          <href>http://home2.gvs.dev/ResourceServer/ResourceServer/KMLIcons/pal3/icon35.png</href>
+        </Icon>
+        <scale>1.0</scale>
+      </IconStyle>
+      -->
+      <LabelStyle>
+        <scale>1.0</scale>
+      </LabelStyle>
+      <LineStyle>
+        <color>ff669900</color>
+      </LineStyle>
+      <PolyStyle>
+        <color>99669900</color>
+        <fill>1</fill>
+      </PolyStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3><b>$[name]</b></h3><table><tr><td width="400">$[description]</td></tr></table>]]></text>
+      </BalloonStyle>
+    </Style>
+
+    <Style id="MagnifierMarkernormal">
+    <!--
+      <IconStyle>
+        <Icon>
+          <href>http://home2.gvs.dev/ResourceServer/ResourceServer/KMLIcons/pal3/icon35.png</href>
+        </Icon>
+        <scale>1.0</scale>
+      </IconStyle>
+      -->
+      <LabelStyle>
+        <scale>0.0</scale>
+      </LabelStyle>
+      <LineStyle>
+        <color>ff0000ff</color>
+      </LineStyle>
+      <PolyStyle>
+        <color>330000ff</color>
+        <fill>1</fill>
+      </PolyStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3><b>$[name]</b></h3><table><tr><td width="400">$[description]</td></tr></table>]]></text>
+      </BalloonStyle>
+    </Style>
+
+    <Style id="MagnifierMarkerhighlight">
+    <!--
+      <IconStyle>
+        <Icon>
+          <href>http://home2.gvs.dev/ResourceServer/ResourceServer/KMLIcons/pal3/icon35.png</href>
+        </Icon>
+        <scale>1.0</scale>
+      </IconStyle>
+      -->
+      <LabelStyle>
+        <scale>1.0</scale>
+      </LabelStyle>
+      <LineStyle>
+        <color>ff0000ff</color>
+      </LineStyle>
+      <PolyStyle>
+        <color>990000ff</color>
+        <fill>1</fill>
+      </PolyStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3><b>$[name]</b></h3><table><tr><td width="400">$[description]</td></tr></table>]]></text>
+      </BalloonStyle>
+    </Style>
+
+    <Style id="MultiImageMarkernormal">
+    <!--
+      <IconStyle>
+        <Icon>
+          <href>http://home2.gvs.dev/ResourceServer/ResourceServer/KMLIcons/pal3/icon35.png</href>
+        </Icon>
+        <scale>1.0</scale>
+      </IconStyle>
+      -->
+      <LabelStyle>
+        <scale>0.0</scale>
+      </LabelStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3><b>$[name]</b></h3><table><tr><td width="200">$[description]</td></tr></table>]]></text>
+      </BalloonStyle>
+    </Style>
+    <Style id="MultiImageMarkerhighlight">
+    <!--
+      <IconStyle>
+        <Icon>
+          <href>http://home2.gvs.dev/ResourceServer/ResourceServer/KMLIcons/pal3/icon35.png</href>
+        </Icon>
+        <scale>1.0</scale>
+      </IconStyle>
+      -->
+      <LabelStyle>
+        <scale>1.0</scale>
+      </LabelStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3><b>$[name]</b></h3><table><tr><td width="200">$[description]</td></tr></table>]]></text>
+      </BalloonStyle>
+    </Style>
+
+    <StyleMap id="white">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#whitenormal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#whitehighlight</styleUrl>
+      </Pair>
+    </StyleMap>
+
+    <StyleMap id="blue">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#bluenormal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#bluehighlight</styleUrl>
+      </Pair>
+    </StyleMap>
+
+    <StyleMap id="chartreuse">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#chartreusenormal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#chartreusehighlight</styleUrl>
+      </Pair>
+    </StyleMap>
+
+    <StyleMap id="chestnutrose">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#chestnutrosenormal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#chestnutrosehighlight</styleUrl>
+      </Pair>
+    </StyleMap>
+
+    <StyleMap id="cobalt">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#cobaltnormal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#cobalthighlight</styleUrl>
+      </Pair>
+    </StyleMap>
+
+    <StyleMap id="coral">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#coralnormal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#coralhighlight</styleUrl>
+      </Pair>
+    </StyleMap>
+
+    <StyleMap id="cyan">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#cyannormal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#cyanhighlight</styleUrl>
+      </Pair>
+    </StyleMap>
+
+    <StyleMap id="gamboge">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#gambogenormal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#gambogehighlight</styleUrl>
+      </Pair>
+    </StyleMap>
+
+    <StyleMap id="green">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#greennormal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#greenhighlight</styleUrl>
+      </Pair>
+    </StyleMap>
+
+    <StyleMap id="hotpink">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#hotpinknormal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#hotpinkhighlight</styleUrl>
+      </Pair>
+    </StyleMap>
+
+    <StyleMap id="lightskyblue">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#lightskybluenormal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#lightskybluehighlight</styleUrl>
+      </Pair>
+    </StyleMap>
+
+    <StyleMap id="magenta">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#magentanormal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#magentahighlight</styleUrl>
+      </Pair>
+    </StyleMap>
+
+    <StyleMap id="orchid">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#orchidnormal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#orchidhighlight</styleUrl>
+      </Pair>
+    </StyleMap>
+
+    <StyleMap id="red">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#rednormal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#redhighlight</styleUrl>
+      </Pair>
+    </StyleMap>
+
+    <StyleMap id="rosybrown">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#rosybrownnormal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#rosybrownhighlight</styleUrl>
+      </Pair>
+    </StyleMap>
+
+    <StyleMap id="palevioletred">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#palevioletrednormal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#palevioletredhighlight</styleUrl>
+      </Pair>
+    </StyleMap>
+
+    <StyleMap id="purple">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#purplenormal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#purplehighlight</styleUrl>
+      </Pair>
+    </StyleMap>
+
+    <StyleMap id="springgreen">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#springgreennormal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#springgreenhighlight</styleUrl>
+      </Pair>
+    </StyleMap>
+
+    <StyleMap id="yellow">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#yellownormal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#yellowhighlight</styleUrl>
+      </Pair>
+    </StyleMap>
+
+    <StyleMap id="electricblue">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#electricbluenormal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#electricbluehighlight</styleUrl>
+      </Pair>
+    </StyleMap>
+
+    <StyleMap id="lightaqua">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#lightaquanormal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#lightaquahighlight</styleUrl>
+      </Pair>
+    </StyleMap>
+
+    <StyleMap id="nesmagenta">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#nesmagentanormal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#nesmagentahighlight</styleUrl>
+      </Pair>
+    </StyleMap>
+
+    <StyleMap id="lightpink">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#lightpinknormal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#lightpinkhighlight</styleUrl>
+      </Pair>
+    </StyleMap>
+
+    <StyleMap id="salmon">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#salmonnormal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#salmonhighlight</styleUrl>
+      </Pair>
+    </StyleMap>
+
+    <StyleMap id="lighterforestgreen">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#lighterforestgreennormal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#lighterforestgreenhighlight</styleUrl>
+      </Pair>
+    </StyleMap>
+
+    <StyleMap id="MagnifierMarker">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#MagnifierMarkernormal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#MagnifierMarkerhighlight</styleUrl>
+      </Pair>
+    </StyleMap>
+
+    <StyleMap id="MultiImageMarker">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#MultiImageMarkernormal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#MultiImageMarkerhighlight</styleUrl>
+      </Pair>
+    </StyleMap>
+
+  </Document>
+</kml>

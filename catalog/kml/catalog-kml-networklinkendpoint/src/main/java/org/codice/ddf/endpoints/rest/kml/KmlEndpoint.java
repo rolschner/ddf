@@ -15,6 +15,7 @@
 
 package org.codice.ddf.endpoints.rest.kml;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.io.StringWriter;
 import java.net.MalformedURLException;
@@ -23,6 +24,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,11 +47,17 @@ import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import javax.xml.bind.JAXBException;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.codice.ddf.configuration.ConfigurationManager;
+import org.codice.ddf.configuration.ConfigurationWatcher;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
+import org.osgi.service.cm.Configuration;
+import org.osgi.service.cm.ConfigurationAdmin;
 
 import ddf.catalog.Constants;
 import ddf.catalog.data.Metacard;
@@ -57,7 +65,6 @@ import ddf.catalog.event.Subscription;
 import ddf.catalog.plugin.PluginExecutionException;
 import ddf.catalog.transform.CatalogTransformerException;
 import ddf.catalog.util.DdfConfigurationManager;
-import ddf.catalog.util.DdfConfigurationWatcher;
 import ddf.service.kml.KMLTransformer;
 import ddf.service.kml.subscription.KmlSubscription;
 import ddf.service.kml.subscription.KmlUpdateDeliveryMethod;
@@ -85,7 +92,7 @@ import de.micromata.opengis.kml.v_2_2_0.ViewRefreshMode;
  * 
  */
 @Path("/")
-public class KmlEndpoint implements DdfConfigurationWatcher {
+public class KmlEndpoint implements ConfigurationWatcher {
 
     private static final String URL_KEY = "url";
 
@@ -160,9 +167,17 @@ public class KmlEndpoint implements DdfConfigurationWatcher {
     private String ddfPort;
 
     private String servicesContextRoot;
+    
+    private String stylesDoc;
+    
+    private static final String STYLE_URL = "styleUrl";
+    
+    private String styleUrl = "";
+    
+    private static final String PID = "org.codice.ddf.endpoints.rest.kml.KmlEndpoint";
 
     private static final Logger LOGGER = Logger.getLogger(KmlEndpoint.class);
-
+    
     public KmlEndpoint(BundleContext context, KMLTransformer kmlTransformer) {
         LOGGER.trace("ENTERING: KML Enpoint Constructor");
         this.context = context;
@@ -171,9 +186,56 @@ public class KmlEndpoint implements DdfConfigurationWatcher {
 
         this.hrefMap = new HashMap<String, URL>();
         this.executorService = Executors.newCachedThreadPool();
+        
+        setInitialUrlToDefaultResource();
         LOGGER.trace("EXITING: KML Enpoint Constructor");
     }
+    
+    private void setInitialUrlToDefaultResource() {
+        URL stylesUrl = context.getBundle().getResource("/GVS_Styles.kml");
+        if (stylesUrl != null) {
+            try {
+                stylesDoc = IOUtils.toString(stylesUrl.openStream());
+            } catch (IOException e) {
+                LOGGER.warn("Exception while extracting style from string", e);
+            }
+        }
+    }
 
+    public void updateStyle(Map<String, ?> props) {
+        if (props != null) {
+
+            String url = (String) props.get(STYLE_URL);
+            if (StringUtils.isNotBlank(url)) {
+                try {
+                	URL stylesUrl = new URL(url);
+                	this.styleUrl = url;
+                    stylesDoc = IOUtils.toString(stylesUrl.openStream());
+                } catch (MalformedURLException e){
+                	LOGGER.warn("Exception, string is not a valid URL", e);
+                	// Put the previous url into the config.
+                	updateConfigAdminProperties();
+                } catch (IOException e) {
+                    LOGGER.warn("Exception while extracting style from URL", e);
+                }
+            } else {
+            	// When the configuration is blank, use the initial style resource.
+            	setInitialUrlToDefaultResource();
+            }
+        }
+    }
+    
+    private void updateConfigAdminProperties() {
+        Configuration config = getManagedConfig();
+        Dictionary<String, Object> props = config.getProperties();
+        props.put(STYLE_URL, this.styleUrl);
+        try {
+            config.update(props);
+        } catch (IOException e) {
+            LOGGER.warn("Unable to revert KML Endpoint Style URL", e);
+        }
+    }
+    
     private String marshalKml(Kml kmlResult) {
         String kmlResultString = null;
 
@@ -707,6 +769,23 @@ public class KmlEndpoint implements DdfConfigurationWatcher {
         return (KmlSubscription) service;
     }
 
+    /**
+     * Kml REST Get. Returns a KML Network Link to the DDF OpenSearch Endpoint Any query parameters
+     * passed in will be used in the OpenSearch query.
+     * 
+     * @param uriInfo
+     * @return KML Network Link
+     */
+    @GET
+    @Path(FORWARD_SLASH + "styles")
+    public Response getKmlStyles(@Context
+    UriInfo uriInfo) {
+        LOGGER.debug("ENTERING: getKmlStyles");
+        LOGGER.debug("EXITING: getKmlStyles");
+        return Response.ok(stylesDoc, KML_MIME_TYPE).build();
+
+    }
+    
     // public long getTimeoutMs()
     // {
     // return timeoutMs;
@@ -782,12 +861,12 @@ public class KmlEndpoint implements DdfConfigurationWatcher {
     }
 
     @Override
-    public void ddfConfigurationUpdated(Map properties) {
+    public void configurationUpdateCallback(Map<String, String> configuration) {
         String methodName = "ddfConfigurationUpdated";
         LOGGER.debug("ENTERING: " + methodName);
 
-        if (properties != null && !properties.isEmpty()) {
-            Object value = properties.get(DdfConfigurationManager.HOST);
+        if (configuration != null && !configuration.isEmpty()) {
+            Object value = configuration.get(ConfigurationManager.HOST);
             if (value != null) {
                 this.ddfHost = value.toString();
                 LOGGER.debug("ddfHost = " + this.ddfHost);
@@ -795,7 +874,7 @@ public class KmlEndpoint implements DdfConfigurationWatcher {
                 LOGGER.debug("ddfHost = NULL");
             }
 
-            value = properties.get(DdfConfigurationManager.PORT);
+            value = configuration.get(ConfigurationManager.PORT);
             if (value != null) {
                 this.ddfPort = value.toString();
                 LOGGER.debug("ddfPort = " + this.ddfPort);
@@ -803,7 +882,7 @@ public class KmlEndpoint implements DdfConfigurationWatcher {
                 LOGGER.debug("ddfPort = NULL");
             }
 
-            value = properties.get(DdfConfigurationManager.SERVICES_CONTEXT_ROOT);
+            value = configuration.get(ConfigurationManager.SERVICES_CONTEXT_ROOT);
             if (value != null) {
                 this.servicesContextRoot = value.toString();
                 LOGGER.debug("servicesContextRoot = " + this.servicesContextRoot);
@@ -815,5 +894,22 @@ public class KmlEndpoint implements DdfConfigurationWatcher {
         }
 
         LOGGER.debug("EXITING: " + methodName);
+    }
+    
+    private Configuration getManagedConfig() {
+        Configuration managedConfig = null;
+        ServiceReference configurationAdminReference = context
+                .getServiceReference(ConfigurationAdmin.class.getName());
+        if (configurationAdminReference != null) {
+            ConfigurationAdmin confAdmin = (ConfigurationAdmin) context
+                    .getService(configurationAdminReference);
+            try {
+                managedConfig = confAdmin.getConfiguration(PID);
+            } catch (IOException e) {
+                LOGGER.warn("Failed to capture KML Stlye Mapping Config. " + PID);
+            }
+        }
+
+        return managedConfig;
     }
 }
