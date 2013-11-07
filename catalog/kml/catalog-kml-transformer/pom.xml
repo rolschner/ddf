@@ -54,6 +54,26 @@
 	   	<groupId>com.vividsolutions</groupId>
 	   	<artifactId>jts</artifactId>
 	   </dependency>
+		<dependency>
+			<groupId>com.github.jknack</groupId>
+			<artifactId>handlebars</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.antlr</groupId>
+			<artifactId>antlr4-runtime</artifactId>
+			<version>4.1</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.abego.treelayout</groupId>
+					<artifactId>org.abego.treelayout.core</artifactId>
+				</exclusion>
+			</exclusions>	
+		</dependency>		
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.0</version>
+		</dependency>		
 	</dependencies>
 
 	<build>
@@ -64,7 +84,8 @@
 				<configuration>
 					<instructions>
 						<Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-						<Embed-Dependency>JavaAPIforKml</Embed-Dependency>
+						<Embed-Dependency>JavaAPIforKml, handlebars, commons-lang3, antlr4-runtime</Embed-Dependency>
+						<Import-Package>!org.abego.treelayout.*, *</Import-Package>
 						<Export-Package>ddf.service.kml, ddf.service.kml.subscription</Export-Package>
 					</instructions>
 				</configuration>

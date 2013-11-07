@@ -46,11 +46,15 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.codice.ddf.configuration.ConfigurationWatcher;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 
+import com.github.jknack.handlebars.Handlebars;
+import com.github.jknack.handlebars.Template;
+import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
 import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
@@ -90,7 +94,7 @@ import de.micromata.opengis.kml.v_2_2_0.StyleSelector;
  * @author Ashraf Barakat, Ian Barnett, Keith C Wire
  * 
  */
-public class KMLTransformerImpl implements KMLTransformer {
+public class KMLTransformerImpl implements KMLTransformer, ConfigurationWatcher {
 
     private static final String UTF_8 = "UTF-8";
 
@@ -103,7 +107,7 @@ public class KMLTransformerImpl implements KMLTransformer {
     private static final String XSL_REST_URL_PROPERTY = "resturl";
 
     private static final String SERVICES_REST = "/services/catalog/";
-
+    
     private static final String QUALIFIER = "qualifier";
 
     private static final String AMPERSAND = "&";
@@ -123,6 +127,12 @@ public class KMLTransformerImpl implements KMLTransformer {
 
     private static final String BBOX_QUERY_PARAM_KEY = "bbox";
 
+    private static final String TEMPLATE_DIRECTORY = "/templates";
+
+    private static final String TEMPLATE_SUFFIX = ".hbt";
+
+    private static final String DESCRIPTION_TEMPLATE = "description";
+
     protected BundleContext context;
 
     private static List<StyleSelector> defaultStyle = new ArrayList<StyleSelector>();
@@ -134,10 +144,14 @@ public class KMLTransformerImpl implements KMLTransformer {
     private Marshaller marshaller;
 
     private Unmarshaller unmarshaller;
-
+            
     private static final Logger LOGGER = Logger.getLogger(KMLTransformerImpl.class);
 
     private KmlStyleMapper styleMapper;
+    
+    private ClassPathTemplateLoader templateLoader;
+    
+    private Map<String, String> platformConfiguration;
 
     public KMLTransformerImpl(BundleContext bundleContext, String defaultStylingName,
             KmlStyleMapper mapper) {
@@ -181,6 +195,10 @@ public class KMLTransformerImpl implements KMLTransformer {
         } catch (PropertyException e) {
             LOGGER.error("Unable to set properties on JAXB Marshaller: ", e);
         }
+
+        templateLoader = new ClassPathTemplateLoader();
+        templateLoader.setPrefix(TEMPLATE_DIRECTORY);
+        templateLoader.setSuffix(TEMPLATE_SUFFIX);
     }
 
     /**
@@ -262,7 +280,8 @@ public class KMLTransformerImpl implements KMLTransformer {
             LOGGER.warn("Could not transform for given content type: " + e.getMessage());
             LOGGER.info("No other transformer can properly perform the transformation, defaulting to common kml transformation.");
         }
-        return performDefaultTransformation(entry, urlToMetacard);
+
+        return performDefaultTransformation(entry, incomingRestUriAbsolutePathString);
     }
 
     protected void addNetworkLinkUpdate(Kml kmlResult, URL requestUrl, String subscriptionId,
@@ -324,7 +343,7 @@ public class KMLTransformerImpl implements KMLTransformer {
      * @return
      * @throws TransformerException
      */
-    protected Placemark performDefaultTransformation(Metacard entry, String urlToMetacard)
+    protected Placemark performDefaultTransformation(Metacard entry, String url)
         throws CatalogTransformerException {
         Placemark kmlPlacemark = KmlFactory.createPlacemark();
         kmlPlacemark.setId("Placemark-" + entry.getId());
@@ -343,8 +362,18 @@ public class KMLTransformerImpl implements KMLTransformer {
 
         kmlPlacemark.setGeometry(getKmlGeoFromWkt(entry.getLocation()));
 
-        // TODO - Description should be an HTML document.
-        kmlPlacemark.setDescription(entry.getTitle());
+        String description = entry.getTitle();
+        Handlebars handlebars = new Handlebars(templateLoader);
+        handlebars.registerHelpers(new DescriptionTemplateHelper(url, platformConfiguration));
+        try {
+            Template template = handlebars.compile(DESCRIPTION_TEMPLATE);
+            description = template.apply(entry);
+            LOGGER.debug(description);
+            
+        } catch (IOException e) {
+            LOGGER.error("Failed to apply description Template", e);
+        }
+        kmlPlacemark.setDescription(description);
 
         String styleUrl = styleMapper.getStyleForMetacard(entry);
         if (StringUtils.isNotBlank(styleUrl)) {
@@ -416,7 +445,7 @@ public class KMLTransformerImpl implements KMLTransformer {
         }
     }
 
-    private Geometry addPointToKmlGeo(Geometry kmlGeo, com.vividsolutions.jts.geom.Coordinate vertex){
+    private Geometry addPointToKmlGeo(Geometry kmlGeo, com.vividsolutions.jts.geom.Coordinate vertex) {
         de.micromata.opengis.kml.v_2_2_0.Point kmlPoint = KmlFactory.createPoint()
                 .addToCoordinates(vertex.x, vertex.y);
         return KmlFactory.createMultiGeometry().addToGeometry(kmlPoint).addToGeometry(kmlGeo);
@@ -439,6 +468,11 @@ public class KMLTransformerImpl implements KMLTransformer {
         } catch (InvalidSyntaxException e) {
             throw new IllegalArgumentException("Invalid transformer shortName");
         }
+    }
+
+    @Override
+    public void configurationUpdateCallback(Map<String, String> configuration) {
+        platformConfiguration = configuration;
     }
 
     @Override
