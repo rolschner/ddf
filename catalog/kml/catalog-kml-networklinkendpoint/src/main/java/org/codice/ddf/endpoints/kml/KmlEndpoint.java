@@ -13,7 +13,7 @@
  * 
  **/
 
-package org.codice.ddf.endpoints.rest.kml;
+package org.codice.ddf.endpoints.kml;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -24,7 +24,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -56,15 +55,12 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
-import org.osgi.service.cm.Configuration;
-import org.osgi.service.cm.ConfigurationAdmin;
 
 import ddf.catalog.Constants;
 import ddf.catalog.data.Metacard;
 import ddf.catalog.event.Subscription;
 import ddf.catalog.plugin.PluginExecutionException;
 import ddf.catalog.transform.CatalogTransformerException;
-import ddf.catalog.util.DdfConfigurationManager;
 import ddf.service.kml.KMLTransformer;
 import ddf.service.kml.subscription.KmlSubscription;
 import ddf.service.kml.subscription.KmlUpdateDeliveryMethod;
@@ -174,9 +170,27 @@ public class KmlEndpoint implements ConfigurationWatcher {
     
     private String styleUrl = "";
     
-    private static final String PID = "org.codice.ddf.endpoints.rest.kml.KmlEndpoint";
+    private static final String PID = "org.codice.ddf.endpoints.kml.KmlEndpoint";
 
     private static final Logger LOGGER = Logger.getLogger(KmlEndpoint.class);
+    
+    public void setStyleUrl(String url) {
+        if (StringUtils.isNotBlank(url)) {
+            try {
+            	URL stylesUrl = new URL(url);
+                stylesDoc = IOUtils.toString(stylesUrl.openStream());
+            	this.styleUrl = url;
+            } catch (MalformedURLException e){
+            	LOGGER.warn("Exception, string is not a valid URL", e);
+            } catch (IOException e) {
+                LOGGER.warn("Exception while extracting style from URL", e);
+            }
+        }
+    }
+    
+    public String getStyleUrl() {
+    	return styleUrl;
+    }
     
     public KmlEndpoint(BundleContext context, KMLTransformer kmlTransformer) {
         LOGGER.trace("ENTERING: KML Enpoint Constructor");
@@ -187,12 +201,11 @@ public class KmlEndpoint implements ConfigurationWatcher {
         this.hrefMap = new HashMap<String, URL>();
         this.executorService = Executors.newCachedThreadPool();
         
-        setInitialUrlToDefaultResource();
         LOGGER.trace("EXITING: KML Enpoint Constructor");
     }
     
-    private void setInitialUrlToDefaultResource() {
-        URL stylesUrl = context.getBundle().getResource("/GVS_Styles.kml");
+    public void setDefaultResource(String url) {
+        URL stylesUrl = context.getBundle().getResource(url);
         if (stylesUrl != null) {
             try {
                 stylesDoc = IOUtils.toString(stylesUrl.openStream());
@@ -202,40 +215,6 @@ public class KmlEndpoint implements ConfigurationWatcher {
         }
     }
 
-    public void updateStyle(Map<String, ?> props) {
-        if (props != null) {
-
-            String url = (String) props.get(STYLE_URL);
-            if (StringUtils.isNotBlank(url)) {
-                try {
-                	URL stylesUrl = new URL(url);
-                	this.styleUrl = url;
-                    stylesDoc = IOUtils.toString(stylesUrl.openStream());
-                } catch (MalformedURLException e){
-                	LOGGER.warn("Exception, string is not a valid URL", e);
-                	// Put the previous url into the config.
-                	updateConfigAdminProperties();
-                } catch (IOException e) {
-                    LOGGER.warn("Exception while extracting style from URL", e);
-                }
-            } else {
-            	// When the configuration is blank, use the initial style resource.
-            	setInitialUrlToDefaultResource();
-            }
-        }
-    }
-    
-    private void updateConfigAdminProperties() {
-        Configuration config = getManagedConfig();
-        Dictionary<String, Object> props = config.getProperties();
-        props.put(STYLE_URL, this.styleUrl);
-        try {
-            config.update(props);
-        } catch (IOException e) {
-            LOGGER.warn("Unable to revert KML Endpoint Style URL", e);
-        }
-    }
-    
     private String marshalKml(Kml kmlResult) {
         String kmlResultString = null;
 
@@ -780,10 +759,7 @@ public class KmlEndpoint implements ConfigurationWatcher {
     @Path(FORWARD_SLASH + "styles")
     public Response getKmlStyles(@Context
     UriInfo uriInfo) {
-        LOGGER.debug("ENTERING: getKmlStyles");
-        LOGGER.debug("EXITING: getKmlStyles");
         return Response.ok(stylesDoc, KML_MIME_TYPE).build();
-
     }
     
     // public long getTimeoutMs()
@@ -894,22 +870,5 @@ public class KmlEndpoint implements ConfigurationWatcher {
         }
 
         LOGGER.debug("EXITING: " + methodName);
-    }
-    
-    private Configuration getManagedConfig() {
-        Configuration managedConfig = null;
-        ServiceReference configurationAdminReference = context
-                .getServiceReference(ConfigurationAdmin.class.getName());
-        if (configurationAdminReference != null) {
-            ConfigurationAdmin confAdmin = (ConfigurationAdmin) context
-                    .getService(configurationAdminReference);
-            try {
-                managedConfig = confAdmin.getConfiguration(PID);
-            } catch (IOException e) {
-                LOGGER.warn("Failed to capture KML Stlye Mapping Config. " + PID);
-            }
-        }
-
-        return managedConfig;
     }
 }

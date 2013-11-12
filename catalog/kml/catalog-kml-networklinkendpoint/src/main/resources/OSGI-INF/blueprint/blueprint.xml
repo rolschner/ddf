@@ -33,11 +33,12 @@
 
 	<reference id="kmlTransformer" interface="ddf.service.kml.KMLTransformer" />
 	
-	<bean id="kmlEndpoint" class="org.codice.ddf.endpoints.rest.kml.KmlEndpoint">
+	<bean id="kmlEndpoint" class="org.codice.ddf.endpoints.kml.KmlEndpoint">
 		<argument ref="blueprintBundleContext" />
 		<argument ref="kmlTransformer" />
-		<cm:managed-properties persistent-id="org.codice.ddf.endpoints.rest.kml.KmlEndpoint"
-			update-strategy="component-managed" update-method="updateStyle" />
+		<property name="defaultResource" value="/GVS_Styles.kml" />
+		<cm:managed-properties persistent-id="org.codice.ddf.endpoints.kml.KmlEndpoint"
+			update-strategy="container-managed" />
 	</bean>
 	
 	<service id="kmlWatcher" ref="kmlEndpoint" interface="org.codice.ddf.configuration.ConfigurationWatcher"/>

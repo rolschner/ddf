@@ -12,7 +12,7 @@
  * <http://www.gnu.org/licenses/lgpl.html>.
  * 
  **/
-package org.codice.ddf.endpoints.rest.kml.test;
+package org.codice.ddf.endpoints.kml.test;
 
 import junit.framework.TestCase;
 

@@ -16,7 +16,7 @@
 <metatype:MetaData xmlns:metatype="http://www.osgi.org/xmlns/metatype/v1.0.0">
 
 	<OCD name="Catalog KML Endpoint"
-		id="org.codice.ddf.endpoints.rest.kml.KmlEndpoint">
+		id="org.codice.ddf.endpoints.kml.KmlEndpoint">
 		<AD
 			description="Style document for the KML endpoint"
 			name="Style Document" id="styleUrl" required="false" type="String"
@@ -24,9 +24,9 @@
 	</OCD>
 
 	<Designate
-		pid="org.codice.ddf.endpoints.rest.kml.KmlEndpoint">
+		pid="org.codice.ddf.endpoints.kml.KmlEndpoint">
 		<Object
-			ocdref="org.codice.ddf.endpoints.rest.kml.KmlEndpoint" />
+			ocdref="org.codice.ddf.endpoints.kml.KmlEndpoint" />
 	</Designate>
 
 </metatype:MetaData>
