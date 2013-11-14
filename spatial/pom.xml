@@ -41,6 +41,17 @@
               <artifactId>catalog-core-api</artifactId>
               <version>${ddf.platform.app.version}</version>
           </dependency>
+          <dependency>
+              <groupId>ddf.platform</groupId>
+              <artifactId>platform-configuration</artifactId>
+              <version>${ddf.platform.app.version}</version>
+          </dependency>          
+          <dependency>
+              <groupId>com.github.jknack</groupId>
+              <artifactId>handlebars</artifactId>
+              <version>${handlebars.version}</version>
+          </dependency>            
+          
      </dependencies>
   </dependencyManagement>
     

@@ -25,7 +25,6 @@
 			update-strategy="component-managed" update-method="updateMap" />
 	</bean>
 
-
 	<bean id="kmlTransformerImpl" class="ddf.service.kml.KMLTransformerImpl">
 		<argument ref="blueprintBundleContext" />
 		<argument value="kml-styling/defaultStyling.kml" />	<!-- Path for default base Styling file -->
@@ -51,5 +50,5 @@
 	</service>
 
 	<service ref="kmlTransformerImpl" interface="ddf.service.kml.KMLTransformer" />
-
+	<service ref="kmlTransformerImpl" interface="org.codice.ddf.configuration.ConfigurationWatcher" />
 </blueprint>
