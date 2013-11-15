@@ -342,14 +342,6 @@ public class KmlEndpoint implements ConfigurationWatcher {
 
         }
 
-        // TODO: Support federation because current subscription will not find
-        // out about updates from federated sites
-        // For now, set every query to local
-        // remove all current values for "src"
-        builder = builder.replaceQueryParam(SOURCES_QUERY_PARAM, new Object[0]);
-        // set src param for opensearch to "local"
-        // otherwise, OpenSearch defaults to enterprise search as true.
-        builder = builder.replaceQueryParam(SOURCES_QUERY_PARAM, "local");
         LOGGER.debug("using temporal sorting");
         builder = builder.queryParam(OPENSEARCH_SORT_KEY, OPENSEARCH_DEFAULT_SORT);
         builder = builder.queryParam(OPENSEARCH_FORMAT_KEY, KML_TRANSFORM_PARAM);
