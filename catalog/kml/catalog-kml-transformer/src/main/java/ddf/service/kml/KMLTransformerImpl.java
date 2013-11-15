@@ -45,12 +45,13 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
 import org.codice.ddf.configuration.ConfigurationWatcher;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.github.jknack.handlebars.Handlebars;
 import com.github.jknack.handlebars.Template;
@@ -89,7 +90,7 @@ import de.micromata.opengis.kml.v_2_2_0.StyleSelector;
  * The base Transformer for handling KML requests to take a {@link Metacard} or
  * {@link SourceResponse} and produce a KML representation. This service attempts to first locate a
  * {@link KMLEntryTransformer} for a given {@link Metacard} based on the metadata-content-type. If
- * no {@link KMLEntryTransformer} can be found, the default transformation is preformed.
+ * no {@link KMLEntryTransformer} can be found, the default transformation is performed.
  * 
  * @author Ashraf Barakat, Ian Barnett, Keith C Wire
  * 
@@ -145,16 +146,16 @@ public class KMLTransformerImpl implements KMLTransformer, ConfigurationWatcher 
 
     private Unmarshaller unmarshaller;
             
-    private static final Logger LOGGER = Logger.getLogger(KMLTransformerImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(KMLTransformerImpl.class);
 
-    private KmlStyleMapper styleMapper;
-    
     private ClassPathTemplateLoader templateLoader;
-    
+
     private Map<String, String> platformConfiguration;
 
+    private KmlStyleMap styleMapper;
+
     public KMLTransformerImpl(BundleContext bundleContext, String defaultStylingName,
-            KmlStyleMapper mapper) {
+            KmlStyleMap mapper) {
         this.subscriptionMap = new HashMap<String, ServiceRegistration>();
         this.context = bundleContext;
         this.styleMapper = mapper;
@@ -178,9 +179,8 @@ public class KMLTransformerImpl implements KMLTransformer, ConfigurationWatcher 
                 JAXBElement<Kml> jaxbKmlStyle = this.unmarshaller.unmarshal(new StreamSource(
                         stylingUrl.openStream()), Kml.class);
                 Kml kml = jaxbKmlStyle.getValue();
-                if (kml.getFeature() instanceof Document) {
-                    Document doc = (Document) kml.getFeature();
-                    defaultStyle = doc.getStyleSelector();
+                if (kml.getFeature() != null) {
+                    defaultStyle = kml.getFeature().getStyleSelector();
                 }
             }
         } catch (JAXBException e) {
@@ -248,10 +248,9 @@ public class KMLTransformerImpl implements KMLTransformer, ConfigurationWatcher 
         String qual = "type";
         try {
 
-            LOGGER.debug("Entry with id \""
-                    + entry.getId()
-                    + "\" has come in to be transformed, search for KMLEntryTransformers that handle the given qualified content type: "
-                    + qual + " : " + type);
+            LOGGER.debug("Entry with id  {} has come in to be transformed, search for "
+                    + "KMLEntryTransformers that handle the given qualified content type: {}:{}"
+                    , entry.getId(), qual, type);
             if (this.unmarshaller != null) {
                 KMLEntryTransformer kmlET = lookupTransformersForQualifiedContentType(qual, type);
                 if (kmlET != null) {
@@ -273,7 +272,8 @@ public class KMLTransformerImpl implements KMLTransformer, ConfigurationWatcher 
                     return placemark;
                 }
             } else {
-                LOGGER.warn("Unmarshaller is null. Cannot obtain kml content and kml style from KMLEntryTransformer. Attempting default transformation...");
+                LOGGER.warn("Unmarshaller is null. Cannot obtain kml content and kml style from "
+                        + "KMLEntryTransformer. Attempting default transformation...");
             }
 
         } catch (JAXBException e) {
@@ -330,6 +330,8 @@ public class KMLTransformerImpl implements KMLTransformer, ConfigurationWatcher 
             link.setRefreshInterval(refreshInterval);
             link.setHref(netLinkUpdateUri.toURL().toString());
             link.setViewBoundScale(1);
+        } else {
+            LOGGER.warn("Unable to add network link update becuase the KML was not a Document");
         }
     }
 

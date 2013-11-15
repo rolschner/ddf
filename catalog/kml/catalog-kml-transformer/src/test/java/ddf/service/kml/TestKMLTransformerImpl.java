@@ -31,6 +31,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.service.cm.ConfigurationAdmin;
 
 import ddf.catalog.data.BinaryContent;
 import ddf.catalog.data.Metacard;
@@ -46,6 +47,8 @@ import de.micromata.opengis.kml.v_2_2_0.TimeStamp;
 public class TestKMLTransformerImpl {
 
     private static BundleContext mockContext = mock(BundleContext.class);
+
+    private static ConfigurationAdmin mockConfigAdmin = mock(ConfigurationAdmin.class);
 
     private static Bundle mockBundle = mock(Bundle.class);
 
@@ -82,7 +85,7 @@ public class TestKMLTransformerImpl {
 
         dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
         kmlTransformer = new KMLTransformerImpl(mockContext, defaultStyleLocation,
-                new KmlStyleMapper(mockContext));
+                new KmlStyleMap());
     }
 
     @Test(expected = CatalogTransformerException.class)

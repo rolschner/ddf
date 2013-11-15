@@ -18,17 +18,17 @@
         http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0
         http://aries.apache.org/schemas/blueprint-cm/blueprint-cm-1.1.0.xsd">
 
+	<bean id="kmlStyleMap" class="ddf.service.kml.KmlStyleMap" />
 
-	<bean id="kmlStyleMapper" class="ddf.service.kml.KmlStyleMapper">
-		<argument ref="blueprintBundleContext" />
-		<cm:managed-properties persistent-id="org.codice.ddf.spatial.kml.style.properties"
-			update-strategy="component-managed" update-method="updateMap" />
-	</bean>
-
+	<reference-list id="kmlStyleMapList" interface="ddf.service.kml.KmlStyleMapEntry"
+		availability="optional" member-type="service-object">
+		<reference-listener bind-method="addMapEntry" unbind-method="removeMapEntry" ref="kmlStyleMap" />
+	</reference-list>
+	
 	<bean id="kmlTransformerImpl" class="ddf.service.kml.KMLTransformerImpl">
 		<argument ref="blueprintBundleContext" />
 		<argument value="kml-styling/defaultStyling.kml" />	<!-- Path for default base Styling file -->
-		<argument ref="kmlStyleMapper" />
+		<argument ref="kmlStyleMap" />
 	</bean>
 
 	<service ref="kmlTransformerImpl" interface="ddf.catalog.transform.MetacardTransformer">

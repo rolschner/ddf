@@ -15,7 +15,7 @@
  -->
 <metatype:MetaData xmlns:metatype="http://www.osgi.org/xmlns/metatype/v1.0.0">
 
-	<OCD description="KML Style Mappings" name="KML Style Mappings" id="org.codice.ddf.spatial.kml.style.properties">
+	<OCD description="KML Style Map Entry" name="KML Style Map Entry" id="org.codice.ddf.spatial.kml.style">
 
 		<AD name="Attribute Name" id="attributeName" required="true" type="String" 
 			description="The name of the Metacard Attribute to match against. e.g. titile, metadata-content-type, etc"/>
@@ -26,14 +26,10 @@
 		<AD name="Style URL" id="styleUrl" required="true" type="String" 
 			description="The full qualified URL to the KML Style. e.g. http://example.com/styles#myStyle"/>
 
-		<AD name="Mappings List" id="currentMappings" required="false" type="String"
-			cardinality="100"
-			description="List of the currently configured KML style Mappings. Items can be added or removed and should be in the form: <attributeName>=<attributeValue>;<styleUrl>" />
-
 	</OCD>
 
-	<Designate pid="org.codice.ddf.spatial.kml.style.properties">
-		<Object ocdref="org.codice.ddf.spatial.kml.style.properties" />
+	<Designate pid="org.codice.ddf.spatial.kml.style" factoryPid="org.codice.ddf.spatial.kml.style">
+		<Object ocdref="org.codice.ddf.spatial.kml.style" />
 	</Designate>
 
 </metatype:MetaData>

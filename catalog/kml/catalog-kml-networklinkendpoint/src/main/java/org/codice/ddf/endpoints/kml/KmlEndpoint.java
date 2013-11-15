@@ -492,7 +492,6 @@ public class KmlEndpoint implements ConfigurationWatcher {
                     }
                     arguments.put(Constants.SUBSCRIPTION_KEY, subscriptionId);
 
-                    // create "Document" and add "Placemark" to the document
                     Placemark placemark = kmlTransformer.transformEntry(null, currCreatedMetacard,
                             arguments);
                     createFolder.addToFeature(placemark);
